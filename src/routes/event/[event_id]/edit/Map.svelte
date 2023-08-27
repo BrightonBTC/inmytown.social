@@ -1,4 +1,5 @@
 <script lang="ts">
+    import "ol/ol.css";
     import Map from "ol/Map.js";
     import OSM from "ol/source/OSM.js";
     import TileLayer from "ol/layer/Tile.js";
@@ -14,7 +15,6 @@
     import Point from "ol/geom/Point";
     import VectorLayer from "ol/layer/Vector";
     import VectorSource from "ol/source/Vector";
-
 
     let map: Map;
     let point;
