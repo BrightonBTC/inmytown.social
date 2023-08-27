@@ -83,7 +83,7 @@
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 </script>
-    
+{#if $searchCity && $searchCountry}  
     <div class="row me-1">
         <div class="col-lg-3 pt-2 pb-4">
             <LocationSearch />
@@ -110,3 +110,7 @@
             {/if}
         </div>
     </div>
+{:else}
+<p>Please set a location to get started:</p>
+<LocationSearch />
+{/if}

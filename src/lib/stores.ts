@@ -1,6 +1,7 @@
 import { writable } from "@macfja/svelte-persistent-store";
 import type { NDKTag, NDKUserProfile } from "@nostr-dev-kit/ndk";
 import type { UserStatus } from "./user/user";
+import { derived } from "svelte/store";
 export let suggestedRelays: string[] = [
     "wss://eden.nostr.land",
     "wss://nostr.fmt.wiz.biz",
@@ -56,6 +57,10 @@ export let profile: NDKUserProfile | undefined;
 userProfile.subscribe((value) => {
     profile = value !== undefined ? JSON.parse(value) : undefined;
 });
+
+export const derivedProfile = derived(userProfile, (v) => {
+    return v !== undefined ? JSON.parse(v) : undefined;
+})
 
 export let follows: string[];
 userStatus.subscribe((value) => {

@@ -1,6 +1,6 @@
 <script>
 	import "bootstrap-icons/font/bootstrap-icons.css";
-	import { profile, userNpub } from "$lib/stores";
+	import { derivedProfile, userNpub } from "$lib/stores";
 	import Login from "./Login.svelte";
 	import { imgUrlOrDefault } from "./helpers";
 </script>
@@ -39,20 +39,22 @@
 			</ul>
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					{#if profile}
+					{#if $userNpub}
+						{#if $derivedProfile}
 						<a
 							class="d-flex nav-link border border-secondary rounded"
 							href="/user/{$userNpub}"
 						>
 							<img
-								src={imgUrlOrDefault(profile.image)}
+								src={imgUrlOrDefault($derivedProfile.image)}
 								class="rounded-circle nav-uim align-self-center me-2 ms-2"
-								alt="{profile.name} pfp"
+								alt="{$derivedProfile.name} pfp"
 							/>
 							<span class="align-self-center"
-								>{profile.displayName}</span
+								>{$derivedProfile.displayName}</span
 							>
 						</a>
+						{/if}
 					{:else}
 						<Login />
 					{/if}
