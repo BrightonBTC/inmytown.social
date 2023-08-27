@@ -9,9 +9,14 @@
 </div>
 
 <Footer />
-<style>
+<style lang="scss">
 .main{
     min-height: 100vh;
     padding-top:70px;
+}
+:global([data-bs-theme="dark"]) {
+    --bs-secondary-rgb: 47,54,61;
+    --bs-body-font-family: var(--bs-font-monospace);
+    --bs-tertiary-rgb: 55,53,57;
 }
 </style>
