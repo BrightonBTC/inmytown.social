@@ -42,7 +42,7 @@
 					{#if $userNpub}
 						{#if $derivedProfile}
 						<a
-							class="d-flex nav-link border border-secondary rounded"
+							class="d-flex nav-link "
 							href="/user/{$userNpub}"
 						>
 							<img
@@ -50,9 +50,6 @@
 								class="rounded-circle nav-uim align-self-center me-2 ms-2"
 								alt="{$derivedProfile.name} pfp"
 							/>
-							<span class="align-self-center"
-								>{$derivedProfile.displayName}</span
-							>
 						</a>
 						{/if}
 					{:else}
