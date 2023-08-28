@@ -13,6 +13,7 @@
     import Follows from "./Follows.svelte";
     import { currentUserFollows } from "./stores";
     import Del from "./Del.svelte";
+    import Loading from "$lib/Loading.svelte";
     export let data:User;   
     let ndk: NDK | undefined; 
     let page: string = 'status'
@@ -35,13 +36,23 @@
  
     async function getUserStatusData(){
         if (ndk) {
+            console.log('getUserStatusData')
             let user = new NDKUser({npub: npub})
             subUserStatus(ndk, user.hexpubkey(), (data) => {
+                console.log('statusData',data)
                 statusData = data
                 if(isLoggedInUser && statusData){
                     userStatus.set(JSON.stringify(statusData))
                 }
             })
+
+
+            //let user = new NDKUser({npub: npub})
+            // statusData = await fetchUserStatus(ndk, user.hexpubkey());
+            // console.log('status >>>>', statusData)
+            // if(isLoggedInUser && statusData){
+            //     userStatus.set(JSON.stringify(statusData))
+            // }
         } 
     }
 
@@ -79,4 +90,6 @@
             {/if}
         </div>
     </div>
+{:else}
+<Loading />
 {/if}

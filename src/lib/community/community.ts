@@ -46,7 +46,7 @@ export async function subCommunity(ndk: NDK, community_id: string, cb: (data: Co
                 "#e": [community_id],
             },
             {
-                closeOnEose: true,
+                closeOnEose: false,
             }
         );
         communitySub.on("event", (event: NDKEvent) =>  {

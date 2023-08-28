@@ -54,13 +54,15 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
 export async function subUserStatus(ndk: NDK, npub: string, cb: (data: UserStatus) => void) {
     let lastUpd = 0;
     try {
+        console.log('communitySub', npub)
         const communitySub = ndk.subscribe(
             { kinds: [10037], "authors": [npub] },
             {
-                closeOnEose: true,
+                closeOnEose: false,
             }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
+            console.log('e', event, event.created_at, lastUpd)
             if (event.created_at && event.created_at > lastUpd) {
                 lastUpd = event.created_at;
                 cb(parseUserStatusData(event));

@@ -46,31 +46,31 @@ export const EventMetaDefaults: Pick<EventMeta, 'uid' | 'eid' | 'title' | 'brief
     created_at: 0
 };
 
-export async function subEvent(ndk: NDK, id: string, cb: (data: EventMeta) => void) {
+// export async function subEvent(ndk: NDK, id: string, cb: (data: EventMeta) => void) {
     
-    try {
-        const communitySub = ndk.subscribe(
-            {
-                ids:[id],
-            },
-            {
-                closeOnEose: true,
-            }
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            subEventMeta(ndk, id, cb)
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to community", err);
-    } 
-}
+//     try {
+//         const communitySub = ndk.subscribe(
+//             {
+//                 ids:[id],
+//             },
+//             {
+//                 closeOnEose: false,
+//             }
+//         );
+//         communitySub.on("event", (event: NDKEvent) =>  {
+//             subEventMeta(ndk, id, cb)
+//         });
+//     } catch (err) {
+//         console.log("An ERROR occured when subscribing to community", err);
+//     } 
+// }
 export async function subEventMeta(ndk: NDK, eid: string, cb: (data: EventMeta) => void) {
     let lastUpd = 0
     try {
         const communitySub = ndk.subscribe(
             { kinds: [30073], "#e": [eid] },
             {
-                closeOnEose: true,
+                closeOnEose: false,
             }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
