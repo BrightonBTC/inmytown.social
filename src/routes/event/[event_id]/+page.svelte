@@ -179,6 +179,5 @@
     .e-im {
         object-fit: cover;
         width: 100%;
-        max-height: 300px;
     }
 </style>

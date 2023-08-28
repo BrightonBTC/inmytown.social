@@ -9,6 +9,6 @@
     id="name"
     placeholder="eg. My local meetup"
     name="name"
-    maxlength="50"
+    maxlength="100"
     bind:value={$eventMetaStore.title} 
 />
