@@ -18,7 +18,7 @@
     let ndk: NDK | undefined; 
     let page: string = 'status'
 
-    let statusData: UserStatus | undefined;
+    let statusData: UserStatus;
 
     $: npub = data.npub;
     $: isLoggedInUser = data.npub === $userNpub
@@ -35,6 +35,10 @@
     $: getUserStatusData(), setPage('status'), getLoggedInUserFollows(), npub
  
     async function getUserStatusData(){
+        statusData = {
+            communities: [],
+            interests: []
+        }
         if (ndk) {
             console.log('getUserStatusData')
             let user = new NDKUser({npub: npub})
@@ -45,14 +49,6 @@
                     userStatus.set(JSON.stringify(statusData))
                 }
             })
-
-
-            //let user = new NDKUser({npub: npub})
-            // statusData = await fetchUserStatus(ndk, user.hexpubkey());
-            // console.log('status >>>>', statusData)
-            // if(isLoggedInUser && statusData){
-            //     userStatus.set(JSON.stringify(statusData))
-            // }
         } 
     }
 
@@ -62,7 +58,7 @@
     }
 
 </script>
-{#if ndk && statusData}
+{#if ndk}
     <Header  {npub} {ndk} />
     <div class="row">
         <div class="col-lg-3">
