@@ -75,6 +75,7 @@
                 addEvent(event);
             } 
             else{
+                console.log('p', event)
                 addPerson(event)
             }
         });

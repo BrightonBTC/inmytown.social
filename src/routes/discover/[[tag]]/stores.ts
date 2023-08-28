@@ -55,7 +55,7 @@ export function addEvent(e:NDKEvent){
 export function addPerson(e:NDKEvent){
     personList.update(items => {
         items.push(e)
-        return [...new Map(items.map(v => [v.author, v])).values()]
+        return [...new Map(items.map(v => [v.pubkey, v])).values()]
     })
 }
 
