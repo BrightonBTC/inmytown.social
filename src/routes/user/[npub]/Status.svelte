@@ -21,7 +21,8 @@
             if(!showStatus){
                 statusData.city, statusData.country, statusData.locationStatus = undefined;
             }
-            await publishUserStatus(ndk, statusData);
+            let r = await publishUserStatus(ndk, statusData);
+            console.log(r)
             userStatus.set(JSON.stringify(statusData));
             edit = false
         }

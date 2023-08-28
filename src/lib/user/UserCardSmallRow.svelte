@@ -40,7 +40,7 @@
             <div class="card-body">
                 <h4 class="card-title"><UserName {user} /></h4>
                 {#if status}
-                    <p>{status.status}</p>
+                    <p><i class="bi bi-quote"></i> {status.status}</p>
                     <Location city={status.city} country={status.country} />
                     {#if status.locationStatus == 'visiting'}
                     <span class="badge bg-secondary">visiting</span>
@@ -51,3 +51,8 @@
     </div>
 </div>
 {/if}
+<style>
+    i{
+        font-size: 1rem;
+    }
+</style>

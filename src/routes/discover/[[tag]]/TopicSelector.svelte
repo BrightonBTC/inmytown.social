@@ -21,7 +21,7 @@
     const addTopics = () => {
         let ts = parsed.split(',');
         ts.forEach(function(t){
-            addTopic(t)
+            if(t.length > 0) addTopic(t)
         })
         loadNewTopicList()
     };

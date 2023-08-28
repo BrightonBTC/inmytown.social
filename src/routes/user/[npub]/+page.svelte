@@ -12,6 +12,7 @@
     import { fetchFollows, fetchUserStatus, type UserStatus } from "$lib/user/user";
     import Follows from "./Follows.svelte";
     import { currentUserFollows } from "./stores";
+    import Del from "./Del.svelte";
     export let data:User;   
     let ndk: NDK | undefined; 
     let page: string = 'status'
@@ -59,6 +60,7 @@
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('admin')}>Communities (admin)</a>
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('member')}>Communities (member)</a>
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('follows')}>Follows</a>
+                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('del')}>d</a>
                 </div>
             </div>
             
@@ -72,6 +74,8 @@
             <Status {ndk} {statusData} {isLoggedInUser} />
             {:else if page==='follows'}
             <Follows {ndk} {npub} />
+            {:else if page==='del'}
+            <Del {ndk} {npub} />
             {/if}
         </div>
     </div>

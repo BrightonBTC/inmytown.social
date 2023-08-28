@@ -9,7 +9,7 @@
     let d = parseUserStatusData(statusData)
     
 </script>
-<p>{d.status}</p>
+<p class="bg-dark rounded p-2"><i class="bi bi-quote "></i> {d.status} <i class="bi bi-quote rot180 "></i></p>
 <Location city={d.city} country={d.country} />
 {#if d.locationStatus == 'visiting'}
 <span class="badge bg-secondary">visiting</span>
@@ -17,3 +17,14 @@
 <div class="mt-3">
     <Tags tags={d.interests} linked={true} />
 </div>
+<style>
+    i{
+        font-size: .8rem;
+    }
+    i::before{
+        transform: translateY(-.3rem);
+    }
+    i.rot180::before{
+        transform: rotate(180deg) translateY(.3rem);
+    }
+</style>

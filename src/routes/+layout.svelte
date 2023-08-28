@@ -17,6 +17,6 @@
 :global([data-bs-theme="dark"]) {
     --bs-secondary-rgb: 47,54,61;
     --bs-body-font-family: var(--bs-font-monospace);
-    --bs-tertiary-rgb: 55,53,57;
+    --bs-tertiary-rgb: 58,69,75;
 }
 </style>

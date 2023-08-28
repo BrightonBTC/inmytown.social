@@ -32,7 +32,7 @@
 <p class="text-muted mt-4 mb-0 text-end pe-4" id="{comment.id}"><small>{ts}</small></p>
 <div class="container-fluid">
     <div class="d-flex align-items-center">
-        <div class="ps-4 pe-4 user-section text-center">
+        <div class="ps-2 pe-2 user-section text-center">
             <LinkedPfpIcon {ndk} npub={comment.author.npub} cls='sm' />
             <small class="mt-2 overflow-e"><UserName {user} /></small>
         </div>

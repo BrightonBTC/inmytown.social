@@ -100,7 +100,6 @@ export function parseUserStatusData(result:NDKEvent){
                 let c = t[1].trim().split(' ');
                 data.city = c[0];
                 if(c.length > 1) data.country = c[1];
-                break;
             break;
             case 't':
                 data.interests.push(t[1]);
@@ -138,10 +137,8 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();
-        response = ndkEvent
+        return ndkEvent
     }catch (err) {
-        response = "An ERROR occured publishing the community metadata:"+ err;
-    } finally {
-        return response;
-    }
+        return "An ERROR occured publishing the community metadata:"+ err;
+    } 
 }
