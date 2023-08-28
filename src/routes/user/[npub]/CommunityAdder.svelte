@@ -12,10 +12,8 @@
 
     
     async function submitCommunity() {
-        console.log(1)
         if (!ndk) return;
         if (nameLen < 3) return;
-        console.log(2)
         
         const ndkEvent = new NDKEvent(ndk);
         ndkEvent.kind = 1037;

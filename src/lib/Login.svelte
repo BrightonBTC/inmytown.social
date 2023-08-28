@@ -3,7 +3,6 @@
 
     let hasSigner: boolean = false;
     onMount(() => {
-        console.log('NOSTR', window.nostr)
         if(window.nostr){
             hasSigner = true;
         }

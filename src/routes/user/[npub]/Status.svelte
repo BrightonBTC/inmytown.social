@@ -22,7 +22,6 @@
                 statusData.city, statusData.country, statusData.locationStatus = undefined;
             }
             let r = await publishUserStatus(ndk, statusData);
-            console.log(r)
             userStatus.set(JSON.stringify(statusData));
             edit = false
         }

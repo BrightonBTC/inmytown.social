@@ -20,7 +20,7 @@
 		loadNDK
 	} from "$lib/nostr";
     import { goto } from "$app/navigation";
-    import { fetchCommunity, type CommunityMeta, publishCommunityMeta, CommunityMetaDefaults, validateCommunityMeta } from "$lib/community/community";
+    import { type CommunityMeta, publishCommunityMeta, CommunityMetaDefaults, validateCommunityMeta, subCommunity } from "$lib/community/community";
     import { login } from "$lib/user/user";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
@@ -49,22 +49,15 @@
 					isNew = true;
 				}
 				else{
-					let community = await ndk?.fetchEvent(data.community_id);
-					if (community?.author.npub === $userNpub) {
-						authorised = true;
-						if (ndk){
-							communityMeta = await fetchCommunity(
-								ndk,
-								data.community_id
-							);
-							console.log(communityMeta)
-							if(communityMeta && typeof communityMeta !== 'string')
-								communityMetaStore.set(communityMeta)
+					subCommunity(ndk, data.community_id, async (data) => {
+						if (data.author === $userNpub) {
+							authorised = true;
+							communityMetaStore.set(data)
 						}
-							
-					} else {
-						authorised = false;
-					}
+						else {
+							authorised = false;
+						}
+					});
 				}
 			}
 		}
@@ -113,20 +106,19 @@
 	}
 </script>
 
-	{#if authorised === true}
-		
-		{#if communityMeta}
+	{#if authorised === true} 
+		{#if $communityMetaStore}
 		<div class="row">
 			<div class="col-sm-4 border-end border-top bg-secondary rounded">
 				<h1>
 					{#if isNew}
 					Create community
 					{:else}
-					Edit community
+					Edit community.
 					{/if}
 				</h1>
 				{#if !isNew}
-				<CommunityCard communityDetails={communityMeta} />
+				<CommunityCard communityDetails={$communityMetaStore} />
 				{/if}
 			</div>
 
@@ -156,9 +148,9 @@
 					</div>
 
 					<LocationSelect />
-					{#if communityMeta.error}
+					{#if $communityMetaStore.error}
 					<div class="mb-3 mt-3">
-						<span class="alert alert-warning">{communityMeta.error}</span>
+						<span class="alert alert-warning">{$communityMetaStore.error}</span>
 					</div>
 					{/if}
 					<button type="submit" class="btn btn-primary">Submit</button>

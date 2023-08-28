@@ -1,33 +1,21 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import { onMount } from "svelte";
     import type NDK from "@nostr-dev-kit/ndk";
     import { getBadgeClassByStatus } from "$lib/helpers";
     import Loading from "$lib/Loading.svelte";
     import { dateStringFull } from "$lib/formatDates";
-    import { fetchEvent, type EventMeta } from "$lib/event/event";
+    import { type EventMeta, subEventMeta } from "$lib/event/event";
     export let eid: string;
     export let ndk: NDK;
-    let data: EventMeta | string | null;
-    let err: string | null;
     let event: EventMeta | null;
 
-    onMount(() => {
-        (async () => {
-            data = await fetchEvent(ndk, eid);
-            if (typeof data === "string") {
-                err = data;
-            } else if (data) {
-                event = data;
-            }
-        })();
-    });
+    subEventMeta(ndk, eid, async (data) => {
+        event = data
+    })
 </script>
 
 <tr>
-    {#if err}
-        <td colspan="4">{err}</td>
-    {:else if event}
+    {#if event}
         <td><span class="badge {getBadgeClassByStatus(event.status)}">{event.status}</span></td>
         <td
             ><small class="text-muted"

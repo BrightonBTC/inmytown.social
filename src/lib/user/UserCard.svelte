@@ -16,7 +16,6 @@
 
     async function setUser(){
         if(ndk && npub) user = await fetchUser(ndk, npub);
-        console.log(user)
     }
 </script>
 {#if user?.profile && npub}

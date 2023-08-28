@@ -30,12 +30,10 @@ $: updateStart(), starts, startH, startM
 $: updateEnd(), ends, endH, endM
 
 function updateStart(){
-    console.log('updateStart')
     $eventMetaStore.starts = (starts.getTime()/1000) + (startH * 60 *60 ) + (startM * 60 )
     $eventMetaStore = $eventMetaStore
 }
 function updateEnd(){
-    console.log('updateEnd')
     $eventMetaStore.ends = (ends.getTime()/1000) + (endH * 60 *60 ) + (endM * 60 )
     $eventMetaStore = $eventMetaStore
 }

@@ -37,21 +37,27 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     updated: 0
 };
 
-export async function fetchCommunity(ndk: NDK, community_id: string) {
-    let community: NDKEvent | null = null;
+export async function subCommunity(ndk: NDK, community_id: string, cb: (data: CommunityMeta) => void) {
+    let lastUpdCommunity = 0;
     try {
-        community = await ndk.fetchEvent(
-            { kinds: [30037], "#e": [community_id] },
-            {}
+        const communitySub = ndk.subscribe(
+            {
+                kinds: [30037],
+                "#e": [community_id],
+            },
+            {
+                closeOnEose: true,
+            }
         );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            if (event.created_at && event.created_at > lastUpdCommunity) {
+                lastUpdCommunity = event.created_at;
+                cb(parseCommunityData(event));
+            }
+        });
     } catch (err) {
-        console.log("An ERROR occured when fetching community", err);
-    } finally {
-        if(community){
-            return parseCommunityData(community)
-        }
-        else return null;
-    }
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
 }
 
 export function parseCommunityData(communityDetails: NDKEvent){
@@ -82,9 +88,6 @@ export function parseCommunityData(communityDetails: NDKEvent){
             case "t":
                 meta.tags.push(itm[1]);
                 break;
-            // case "n":
-            //     meta.country = itm[1];
-            //     break;
             case "c":
                 let c = itm[1].trim().split(' ');
                 meta.city = c[0];

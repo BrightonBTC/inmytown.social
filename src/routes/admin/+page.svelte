@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import "bootstrap-icons/font/bootstrap-icons.css";
     import type NDK from "@nostr-dev-kit/ndk";
     import { userNpub } from "$lib/stores";
     import { loadNDK } from "$lib/nostr";

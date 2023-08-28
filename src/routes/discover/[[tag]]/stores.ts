@@ -32,7 +32,6 @@ export function addCommunity(e:NDKEvent){
         let d = parseCommunityData(e)
         if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
         items.push(d)
-        console.log(e.id)
         return [...new Map(items.map(v => [v.eid, v])).values()]
     })
 }

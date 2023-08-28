@@ -6,17 +6,16 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import type NDK from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
     import type { EventMeta } from './event';
-    import { fetchCommunity, type CommunityMeta } from '$lib/community/community';
+    import { subCommunity } from '$lib/community/community';
     export let eventData: EventMeta | null;
     export let ndk: NDK ;
-    let c: CommunityMeta | string | null;
 
     onMount(async () => {
         if(!eventData) return
-        if(ndk) c = await fetchCommunity(ndk, eventData.community.eid);
-        if(c && typeof c!=='string'){
-            eventData.community = c;
-        }
+
+        subCommunity(ndk, eventData.community.eid, async (data) => {
+            if(eventData) eventData.community = data;
+        });
     })
 
 </script>

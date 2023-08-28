@@ -26,7 +26,6 @@ export async function deleteEvent(ndk: NDK, id: string){
         ["e", id]
     ];
     await ndkEvent.publish();
-    console.log(ndkEvent)
 }
 
 

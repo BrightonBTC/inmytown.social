@@ -22,16 +22,14 @@
     } from "./stores";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
-    import { fetchCommunity, type CommunityMeta } from "$lib/community/community";
-    import { fetchEvent, type EventMeta } from "$lib/event/event";
+    import { subCommunity, type CommunityMeta } from "$lib/community/community";
+    import { type EventMeta, subEventMeta } from "$lib/event/event";
 
     let ndk: NDK;
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let eventMeta: EventMeta | null | string = null;
     let hasRsvp: string;
     let event_id = data.event_id;
-
-    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
     attendeeStore.set([]);
 
@@ -42,15 +40,16 @@
     });
 
     async function fetchEventDetails() {
-        eventMeta = await fetchEvent(ndk, event_id);
-        if (eventMeta && typeof eventMeta !== "string") {
+        subEventMeta(ndk, event_id, async (data) => {
+            eventMeta = data
             fetchCommunityDetails(eventMeta.community.eid);
-        }
+        })
     }
 
     async function fetchCommunityDetails(id: string) {
-        console.log("eid", id);
-        communityDetails = await fetchCommunity(ndk, id);
+        subCommunity(ndk, id, async (data) => {
+            communityDetails = data
+        });
     }
 
     function subscribeRsvp() {

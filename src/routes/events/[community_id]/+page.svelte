@@ -12,7 +12,7 @@
     import { goto } from "$app/navigation";
     import { myEvents } from "./stores";
     import EventRow from "./EventRow.svelte";
-    import { fetchCommunity, type CommunityMeta, CommunityMetaDefaults } from "$lib/community/community";
+    import { type CommunityMeta, CommunityMetaDefaults, subCommunity } from "$lib/community/community";
     import { EventMetaDefaults, type EventMeta, publishEventMeta } from "$lib/event/event";
     import { login } from "$lib/user/user";
 
@@ -30,14 +30,16 @@
             await login(ndk);
 
             if ($userHex) {
-                communityDetails = await fetchCommunity(ndk, data.community_id);
 
-                if (communityDetails?.author === $userNpub) {
-                    authorised = true;
-                    fetchEvents($userHex);
-                } else {
-                    authorised = false;
-                }
+                subCommunity(ndk, data.community_id, async (data) => {
+                    communityDetails = data
+                    if (communityDetails?.author === $userNpub) {
+                        authorised = true;
+                        if($userHex) fetchEvents($userHex);
+                    } else {
+                        authorised = false;
+                    }
+                });
             }
         }
     });
@@ -51,7 +53,6 @@
             { closeOnEose: false }
         );
         communitiesSub.on("event", (event: NDKEvent) => {
-            console.log(event);
             if (event.created_at) {
                 $myEvents[event.created_at] = event;
                 $myEvents = $myEvents;
@@ -87,7 +88,6 @@
         }
         let response: NDKEvent | string | null;
         response = await publishEventMeta(ndk, eventMeta);
-        console.log(response);
         goto("/event/" + ndkEvent.id + "/edit");
     }
 </script>

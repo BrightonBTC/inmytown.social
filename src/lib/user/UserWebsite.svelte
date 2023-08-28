@@ -7,7 +7,6 @@
 
     if (profile) {
         w = isValidUrl(profile?.website);
-        console.log(w);
     }
 </script>
 

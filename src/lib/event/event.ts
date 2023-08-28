@@ -46,43 +46,45 @@ export const EventMetaDefaults: Pick<EventMeta, 'uid' | 'eid' | 'title' | 'brief
     created_at: 0
 };
 
-export async function fetchEvent(ndk: NDK, eid: string){
-    let response: EventMeta | string | null = null;
+export async function subEvent(ndk: NDK, id: string, cb: (data: EventMeta) => void) {
+    
     try {
-        let e = await ndk.fetchEvent(eid);
-        console.log('response', e)
-        if(e){
-            let etags = e.tags.filter((t) => t[0] === "e");
-            if(etags.length > 0 && etags[0].length > 1){
-                response = await fetchEventMeta(ndk, eid, etags[0][1]);
+        const communitySub = ndk.subscribe(
+            {
+                ids:[id],
+            },
+            {
+                closeOnEose: true,
             }
-            else{
-                response = "Missing e tag"
-            }
-        }
+        );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            subEventMeta(ndk, id, cb)
+        });
     } catch (err) {
-        response = "An ERROR occured when fetching event: "+ err;
-    } finally {
-        return response
-    }
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
+}
+export async function subEventMeta(ndk: NDK, eid: string, cb: (data: EventMeta) => void) {
+    let lastUpd = 0
+    try {
+        const communitySub = ndk.subscribe(
+            { kinds: [30073], "#e": [eid] },
+            {
+                closeOnEose: true,
+            }
+        );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            if(event.created_at && event.created_at > lastUpd){
+                lastUpd = event.created_at
+                cb(parseEventData(event))
+            }
+        });
+    } catch (err) {
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
 }
 
-export async function fetchEventMeta(ndk: NDK, eid: string, cid: string){
-    let response: EventMeta | string | null = null;
-    try {
-        let e = await ndk.fetchEvent(
-            { kinds: [30073], "#e": [eid] },
-            {}
-        );
-        if(e){
-            response = parseEventData(e);
-        }
-    } catch (err) {
-        response = "An ERROR occured when fetching event metadata: "+ err;
-    } finally {
-        return response
-    }
-}
+
 
 export function parseEventData(data: NDKEvent){
     let meta: EventMeta = {

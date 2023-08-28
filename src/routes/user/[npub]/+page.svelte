@@ -9,7 +9,7 @@
     import AdminOfList from "./AdminOfList.svelte";
     import Header from "./Header.svelte";
     import { NDKUser } from "@nostr-dev-kit/ndk";
-    import { fetchFollows, fetchUserStatus, type UserStatus } from "$lib/user/user";
+    import { fetchFollows, subUserStatus, type UserStatus } from "$lib/user/user";
     import Follows from "./Follows.svelte";
     import { currentUserFollows } from "./stores";
     import Del from "./Del.svelte";
@@ -36,17 +36,18 @@
     async function getUserStatusData(){
         if (ndk) {
             let user = new NDKUser({npub: npub})
-            statusData = await fetchUserStatus(ndk, user.hexpubkey());
-            if(isLoggedInUser && statusData){
-                userStatus.set(JSON.stringify(statusData))
-            }
+            subUserStatus(ndk, user.hexpubkey(), (data) => {
+                statusData = data
+                if(isLoggedInUser && statusData){
+                    userStatus.set(JSON.stringify(statusData))
+                }
+            })
         } 
     }
 
     async function getLoggedInUserFollows() {
         if(!ndk || !$userNpub) return;
         $currentUserFollows = await fetchFollows(ndk, $userNpub)
-        console.log($currentUserFollows)
     }
 
 </script>

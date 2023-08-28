@@ -74,7 +74,6 @@
 
     function setRespondingTo(id: string | null){
         respondingTo = id;
-        console.log(respondingTo)
     }
 </script>
 

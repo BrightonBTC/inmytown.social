@@ -17,7 +17,6 @@
         else{
             amFollowing = false;
         }
-        console.log($currentUserFollowsNpubs)
     } 
 
     async function follow(){

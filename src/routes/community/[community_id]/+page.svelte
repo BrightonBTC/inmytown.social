@@ -23,14 +23,15 @@
     import AdminPanel from "./AdminPanel.svelte";
     import { loadNDK } from "$lib/nostr";
     import Tags from "$lib/topics/Tags.svelte";
-    import { fetchCommunity, type CommunityMeta } from "$lib/community/community";
-    import { fetchEvent } from "$lib/event/event";
+    import { type CommunityMeta, subCommunity } from "$lib/community/community";
+    import { subEventMeta } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
 
     $: community_id = data.community_id;
     let ndk: NDK;
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let host: NDKUser | undefined;
+
     communityMembers.set([]);
     communityEvents.set([]);
     communityEventsUpcoming.set([]);
@@ -39,10 +40,12 @@
 
     onMount(async () => {
         ndk = await loadNDK();
-        communityDetails = await fetchCommunity(ndk, community_id);
-        if (communityDetails) {
-            host = await fetchUser(ndk, communityDetails.author);
-        }
+        
+        subCommunity(ndk, community_id, async (data) => {
+            communityDetails = data
+            if(!host) host = await fetchUser(ndk, data.author);
+            console.log('host', host)
+        });
         fetchMembers();
         fetchEvents();
     });
@@ -69,7 +72,6 @@
     }
 
     async function fetchEvents() {
-        console.log("fetchEvents", community_id);
         try {
             const eventsSub = ndk.subscribe(
                 {
@@ -81,7 +83,6 @@
                 }
             );
             eventsSub.on("event", (event: NDKEvent) => {
-                console.log("-------- EVENT");
                 if (!$communityEvents.includes(event.id)) {
                     fetchEventMeta(event.id);
                 }
@@ -93,10 +94,9 @@
     }
 
     async function fetchEventMeta(id: string) {
-        let event = await fetchEvent(ndk, id);
-        if (event && typeof event !== "string") {
-            addEventMeta(event);
-        }
+        subEventMeta(ndk, id, async (data) => {
+            addEventMeta(data);
+        });
     }
 </script>
 

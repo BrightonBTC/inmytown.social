@@ -62,7 +62,6 @@
         
         
         if($topics.length){
-            console.log($topics)
             let tf = {'#t': $topics}
             f = {...f, ...tf}
         }
@@ -71,7 +70,6 @@
             { closeOnEose: false }
         );
         communitiesSub.on("event", (event: NDKEvent) => {
-            console.log(event)
             if(event.kind === 30037) addCommunity(event);
             else if (event.kind === 30073){
                 addEvent(event);

@@ -19,17 +19,14 @@
     import Tags from "$lib/topics/Tags.svelte";
     import EventCard from "$lib/event/EventCard.svelte";
     import { goto } from "$app/navigation";
-    import { fetchEvent, type EventMeta, publishEventMeta } from "$lib/event/event";
+    import { type EventMeta, publishEventMeta, subEventMeta } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import TagSelector from "$lib/topics/TagSelector.svelte";
 
     let eid = data.event_id
     let ndk: NDK;
-    let authorised: boolean | undefined;
-    let eventMeta: EventMeta | string | null;
-    let err: string | null;
-
-    $: console.log($eventMetaStore)
+    let authorised: boolean;
+    let eventMeta: EventMeta;
     
     onMount(async () => {
 
@@ -39,11 +36,8 @@
             await login(ndk)
 
             if($userHex){
-                eventMeta = await fetchEvent(ndk, eid);
-                if(typeof(eventMeta) === 'string'){
-                    err = eventMeta;
-                }
-                else if(eventMeta){
+                subEventMeta(ndk, eid, async (data) => {
+                    eventMeta = data
                     if (eventMeta.author === $userNpub) {
                         authorised = true;
                         eventMetaStore.set(eventMeta)
@@ -51,7 +45,8 @@
                     } else {
                         authorised = false;
                     }
-                }
+                })
+
             }
         }
     });
@@ -59,7 +54,6 @@
     async function publishEvent(){
         let response: NDKEvent | string | null;
         response = await publishEventMeta(ndk, $eventMetaStore);
-        console.log(response);
         goto('/event/'+data.event_id)
     }
 

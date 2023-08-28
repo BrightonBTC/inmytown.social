@@ -1,4 +1,4 @@
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores"
+import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile } from "$lib/stores"
 import NDK, { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk"
 
 export interface UserStatus{
@@ -26,8 +26,6 @@ export async function login(ndk: NDK) {
                 let u = await ndk.getUser({npub: user?.npub})
                 await u.fetchProfile();
                 userProfile.set(JSON.stringify(u.profile));
-                let f = await fetchUserStatus(ndk, user?.npub)
-                userStatus.set(JSON.stringify(f));
                 loggedin = true
             }
         });
@@ -53,25 +51,24 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     }
 };
 
-
-export async function fetchUserStatus(ndk: NDK, npub: string) {
-    let data: UserStatus = {
-        communities: [],
-        interests: []
-    };
+export async function subUserStatus(ndk: NDK, npub: string, cb: (data: UserStatus) => void) {
+    let lastUpd = 0;
     try {
-        console.log("fetchCreated");
-        let result = await ndk?.fetchEvent(
+        const communitySub = ndk.subscribe(
             { kinds: [10037], "authors": [npub] },
-            {}
+            {
+                closeOnEose: true,
+            }
         );
-        if(result)
-            data = parseUserStatusData(result)
+        communitySub.on("event", (event: NDKEvent) =>  {
+            if (event.created_at && event.created_at > lastUpd) {
+                lastUpd = event.created_at;
+                cb(parseUserStatusData(event));
+            }
+        });
     } catch (err) {
-        console.log("An ERROR occured", err);
-    } finally {
-        return data;
-    }
+        console.log("An ERROR occured when subscribing to user status", err);
+    } 
 }
 
 export async function fetchFollows(ndk: NDK, npub: string){
