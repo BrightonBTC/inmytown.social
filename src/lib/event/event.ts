@@ -98,7 +98,9 @@ export function parseEventData(data: NDKEvent){
     meta.created_at = data.created_at || -1
     meta.author = data.author.npub
     meta.authorhex = data.author.hexpubkey()
-    let eidSet = false;
+    let etags = data.tags.filter(t => t[0] === 'e')
+    if(etags.length > 0) meta.eid = etags[0][1]
+    if(etags.length > 1) meta.community.eid = etags[1][1]
     data.tags.forEach(function (itm) {
         switch (itm[0]) {
             case "title":
@@ -118,9 +120,6 @@ export function parseEventData(data: NDKEvent){
             case "t":
                 meta.tags.push(itm[1]) ;
                 break;
-            // case "n":
-            //     meta.country = itm[1];
-            //     break;
             case "c":
                 let c = itm[1].trim().split(' ');
                 meta.city = c[0];
@@ -131,10 +130,6 @@ export function parseEventData(data: NDKEvent){
                 break;
             case "d":
                 meta.uid = itm[1];
-                break;
-            case "e":
-                if(!eidSet) meta.eid = itm[1], eidSet = true;
-                else meta.community.eid = itm[1]
                 break;
             case "starts":
                 meta.starts = parseInt(itm[1]);

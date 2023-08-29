@@ -6,8 +6,7 @@ import { derived, writable } from 'svelte/store';
 
 export const communityList = writable<Array<CommunityMeta>>([])
 export const personList = writable<Array<NDKEvent>>([])
-export const eventListUpcoming = writable<Array<EventMeta>>([])
-export const eventListPast = writable<Array<EventMeta>>([])
+export const eventList = writable<Array<EventMeta>>([])
 
 export const searchType = writable("communities")
 
@@ -36,20 +35,17 @@ export function addCommunity(e:NDKEvent){
     })
 }
 export function addEvent(e:NDKEvent){
+    //console.log('evnt', e)
     let d = parseEventData(e)
+    //console.log('-- evnt', d)
     if(d.status !=='draft'){
-        if(d.ends > (Date.now() / 1000)){
-            eventListUpcoming.update(items => {
+        eventList.update(items => {
+            let dupes = items.filter(x => x.uid === d.uid);
+            if(dupes.length === 0 || dupes[0].created_at < d.created_at){
                 items.push(d)
-                return [...new Map(items.map(v => [v.eid, v])).values()]
-            })
-        }
-        else{
-            eventListPast.update(items => {
-                items.push(d)
-                return [...new Map(items.map(v => [v.eid, v])).values()]
-            })
-        }
+            }
+            return [...new Map(items.map(v => [v.eid, v])).values()]
+        })
     }
 }
 export function addPerson(e:NDKEvent){
@@ -58,6 +54,9 @@ export function addPerson(e:NDKEvent){
         return [...new Map(items.map(v => [v.pubkey, v])).values()]
     })
 }
+
+export const eventListUpcoming = derived(eventList, (v) => v.filter(x => x.ends > (Date.now() / 1000)))
+export const eventListPast = derived(eventList, (v) => v.filter(x => x.ends <= (Date.now() / 1000)))
 
 export const sortedUpcoming = derived(eventListUpcoming, (v) => v.sort((a, b) => a.starts - b.starts))
 export const sortedPast = derived(eventListPast, (v) => v.sort((a, b) => a.ends - b.ends))

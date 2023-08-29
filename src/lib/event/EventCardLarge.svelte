@@ -7,14 +7,12 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { onMount } from 'svelte';
     import type { EventMeta } from './event';
     import { subCommunity } from '$lib/community/community';
-    export let eventData: EventMeta | null;
+    export let eventData: EventMeta;
     export let ndk: NDK ;
-
     onMount(async () => {
-        if(!eventData) return
 
         subCommunity(ndk, eventData.community.eid, async (data) => {
-            if(eventData) eventData.community = data;
+            eventData.community = data;
         });
     })
 

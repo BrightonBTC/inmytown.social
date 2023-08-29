@@ -1,7 +1,7 @@
 <script lang="ts">
     import LocationSearch from "./LocationSearch.svelte";
     import type { NDKEvent, NDKFilter } from "@nostr-dev-kit/ndk";
-    import { addCommunity, addEvent, addPerson, addTopic, communityList, eventListPast, eventListUpcoming, personList, searchType, sortedCommunities, topics } from "./stores";
+    import { addCommunity, addEvent, addPerson, addTopic, communityList, eventList, personList, searchType, sortedCommunities, topics } from "./stores";
     import { searchCity, searchCountry } from "$lib/stores";
     import { onMount } from "svelte";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
@@ -34,8 +34,7 @@
 
     async function fetchSearch() {
         communityList.set([])
-        eventListUpcoming.set([])
-        eventListPast.set([])
+        eventList.set([])
         personList.set([])
         setTopics();
         let kind:number = 30037
