@@ -3,9 +3,7 @@
     import type { MeetupEvent } from "./+page";
     export let data: MeetupEvent;
     import { onMount } from "svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import { loadNDK } from "$lib/nostr";
     import { userHex, userNpub } from "$lib/stores";
     import Loading from "$lib/Loading.svelte";
     import TitleInput from "./TitleInput.svelte";
@@ -22,32 +20,27 @@
     import { type EventMeta, publishEventMeta, subEventMeta } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import TagSelector from "$lib/topics/TagSelector.svelte";
+    import ndk from "$lib/ndk";
 
     let eid = data.event_id
-    let ndk: NDK;
     let authorised: boolean;
     let eventMeta: EventMeta;
     
     onMount(async () => {
+        await login(ndk)
 
-        ndk = await loadNDK();
+        if($userHex){
+            subEventMeta(ndk, eid, async (data) => {
+                eventMeta = data
+                if (eventMeta.author === $userNpub) {
+                    authorised = true;
+                    eventMetaStore.set(eventMeta)
+                    
+                } else {
+                    authorised = false;
+                }
+            })
 
-        if (ndk) {
-            await login(ndk)
-
-            if($userHex){
-                subEventMeta(ndk, eid, async (data) => {
-                    eventMeta = data
-                    if (eventMeta.author === $userNpub) {
-                        authorised = true;
-                        eventMetaStore.set(eventMeta)
-                        
-                    } else {
-                        authorised = false;
-                    }
-                })
-
-            }
         }
     });
 

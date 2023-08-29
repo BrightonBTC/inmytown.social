@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type NDK from "@nostr-dev-kit/ndk";
     import LocationSearch from "./LocationSearch.svelte";
     import type { NDKEvent, NDKFilter } from "@nostr-dev-kit/ndk";
     import { addCommunity, addEvent, addPerson, addTopic, communityList, eventListPast, eventListUpcoming, personList, searchType, sortedCommunities, topics } from "./stores";
@@ -7,21 +6,19 @@
     import { onMount } from "svelte";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import TypeSwitch from "./TypeSwitch.svelte";
-    import { loadNDK } from "$lib/nostr";
     import EventTabs from "./EventTabs.svelte";
     import type { Tag } from "./+page";
     import TopicSelector from "./TopicSelector.svelte";
     import ResultsInfo from "./ResultsInfo.svelte";
     import UserList from "./UserList.svelte";
-    export let data:Tag;   
-    let ndk: NDK;
+    import ndk from "$lib/ndk";
+    export let data:Tag;  
 
     $: tag = data.tag;
 
     $: fetchSearch(), $searchCountry, $searchCity, $searchType, tag
 
     onMount(async () => {
-        ndk = await loadNDK();
         fetchSearch();
     });
 
@@ -36,7 +33,6 @@
     }
 
     async function fetchSearch() {
-        if(!ndk) return;
         communityList.set([])
         eventListUpcoming.set([])
         eventListPast.set([])

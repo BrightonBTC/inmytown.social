@@ -2,10 +2,8 @@
     import type { Community } from "./+page";
     export let data: Community;
     import { onMount } from "svelte";
-    import NDK, { NDKEvent } from "@nostr-dev-kit/ndk";
-    import {
-        loadNDK
-    } from "$lib/nostr";
+    import { NDKEvent } from "@nostr-dev-kit/ndk";
+
     import { userHex, userNpub } from "$lib/stores";
     import Loading from "$lib/Loading.svelte";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
@@ -15,32 +13,28 @@
     import { type CommunityMeta, CommunityMetaDefaults, subCommunity } from "$lib/community/community";
     import { EventMetaDefaults, type EventMeta, publishEventMeta } from "$lib/event/event";
     import { login } from "$lib/user/user";
+    import ndk from "$lib/ndk";
 
     let community_id = data.community_id;
-    let ndk: NDK;
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let authorised: boolean | undefined;
 
     myEvents.set([]);
 
     onMount(async () => {
-        ndk = await loadNDK();
+        await login(ndk);
 
-        if (ndk) {
-            await login(ndk);
+        if ($userHex) {
 
-            if ($userHex) {
-
-                subCommunity(ndk, data.community_id, async (data) => {
-                    communityDetails = data
-                    if (communityDetails?.author === $userNpub) {
-                        authorised = true;
-                        if($userHex) fetchEvents($userHex);
-                    } else {
-                        authorised = false;
-                    }
-                });
-            }
+            subCommunity(ndk, data.community_id, async (data) => {
+                communityDetails = data
+                if (communityDetails?.author === $userNpub) {
+                    authorised = true;
+                    if($userHex) fetchEvents($userHex);
+                } else {
+                    authorised = false;
+                }
+            });
         }
     });
 

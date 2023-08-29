@@ -3,11 +3,7 @@
     import type { MeetupEvent } from "./+page";
     export let data: MeetupEvent;
     import { onMount } from "svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import {
-        loadNDK
-    } from "$lib/nostr";
     import { userNpub } from "$lib/stores";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { marked } from "marked";
@@ -24,8 +20,8 @@
     import { imgUrlOrDefault } from "$lib/helpers";
     import { subCommunity, type CommunityMeta } from "$lib/community/community";
     import { type EventMeta, subEventMeta } from "$lib/event/event";
+    import ndk from "$lib/ndk";
 
-    let ndk: NDK;
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let eventMeta: EventMeta | null | string = null;
     let hasRsvp: string;
@@ -34,7 +30,6 @@
     attendeeStore.set([]);
 
     onMount(async () => {
-        ndk = await loadNDK();
         fetchEventDetails();
         subscribeRsvp();
     });

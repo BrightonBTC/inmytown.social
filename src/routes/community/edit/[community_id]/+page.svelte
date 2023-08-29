@@ -2,9 +2,6 @@
 	import "bootstrap-icons/font/bootstrap-icons.css";
 	import type { Community } from "./+page";
 	export let data: Community;
-	import { json } from "@sveltejs/kit";
-
-	import type NDK from "@nostr-dev-kit/ndk";
 	import { onMount } from "svelte";
 	import {
     communityMetaStore
@@ -16,16 +13,13 @@
 	import ImageInput from "./ImageInput.svelte";
 	import { userHex, userNpub } from "$lib/stores";
 	import Loading from "$lib/Loading.svelte";
-	import {
-		loadNDK
-	} from "$lib/nostr";
     import { goto } from "$app/navigation";
     import { type CommunityMeta, publishCommunityMeta, CommunityMetaDefaults, validateCommunityMeta, subCommunity } from "$lib/community/community";
     import { login } from "$lib/user/user";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
+    import ndk from "$lib/ndk";
 
-	let ndk: NDK | undefined;
     let loggedin: boolean;
     let isNew: boolean = false;
 
@@ -33,32 +27,27 @@
 
 	let authorised: boolean | undefined;
 	onMount(async () => {
+		loggedin = await login(ndk)
 
-		ndk = await loadNDK();
-
-		if (ndk) {
-            loggedin = await login(ndk)
-
-            if(loggedin && $userHex){
-				if(data.community_id === 'new'){
-					communityMeta = {
-					...CommunityMetaDefaults
+		if(loggedin && $userHex){
+			if(data.community_id === 'new'){
+				communityMeta = {
+				...CommunityMetaDefaults
+				}
+				communityMetaStore.set(communityMeta)
+				authorised = true;
+				isNew = true;
+			}
+			else{
+				subCommunity(ndk, data.community_id, async (data) => {
+					if (data.author === $userNpub) {
+						authorised = true;
+						communityMetaStore.set(data)
 					}
-					communityMetaStore.set(communityMeta)
-					authorised = true;
-					isNew = true;
-				}
-				else{
-					subCommunity(ndk, data.community_id, async (data) => {
-						if (data.author === $userNpub) {
-							authorised = true;
-							communityMetaStore.set(data)
-						}
-						else {
-							authorised = false;
-						}
-					});
-				}
+					else {
+						authorised = false;
+					}
+				});
 			}
 		}
 	});

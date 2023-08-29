@@ -21,14 +21,13 @@
     import Tabs from "./Tabs.svelte";
     import { userNpub } from "$lib/stores";
     import AdminPanel from "./AdminPanel.svelte";
-    import { loadNDK } from "$lib/nostr";
     import Tags from "$lib/topics/Tags.svelte";
     import { type CommunityMeta, subCommunity } from "$lib/community/community";
     import { subEventMeta } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
+    import ndk from "$lib/ndk";
 
     $: community_id = data.community_id;
-    let ndk: NDK;
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let host: NDKUser | undefined;
 
@@ -39,7 +38,6 @@
     communityEventsDraft.set([]);
 
     onMount(async () => {
-        ndk = await loadNDK();
         
         subCommunity(ndk, community_id, async (data) => {
             communityDetails = data
