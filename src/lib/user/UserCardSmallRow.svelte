@@ -35,7 +35,7 @@
 
     function lazyLoad() {
         let item = document.querySelector(".user-"+npub);
-        if("IntersectionObserver" in window && item) {
+        if(typeof window !== 'undefined' && "IntersectionObserver" in window && item) {
             lazyloadIntersectionObserver(item);
         } 
     }
