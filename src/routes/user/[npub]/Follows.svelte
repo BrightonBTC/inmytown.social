@@ -4,8 +4,8 @@
     import { fetchUser } from "$lib/user/user";
     import UserCardSmallRow from "$lib/user/UserCardSmallRow.svelte";
 
-    export let ndk: NDK | undefined;
-    export let npub: string | undefined;
+    export let ndk: NDK;
+    export let npub: string;
 
     let user: NDKUser | undefined;
     let follows: Set<NDKUser> | undefined;
@@ -18,6 +18,7 @@
             follows = await user?.follows()
         } 
     }
+
 </script>
 {#if follows}
 {#each follows as f}

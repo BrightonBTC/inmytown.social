@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Loading from "$lib/Loading.svelte";
     import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import UserName from "./UserName.svelte";
@@ -6,13 +7,15 @@
     import LinkedPfpIcon from "./LinkedPFPIcon.svelte";
     import type {UserStatus} from "./user";
     import Location from "$lib/location/Location.svelte";
+    import { onMount } from "svelte";
+    import Tags from "$lib/topics/Tags.svelte";
 
     export let ndk: NDK | undefined;
     export let npub: string | undefined;
     let user: NDKUser | undefined;
     let status: UserStatus | undefined;
 
-    $: setUser(), npub
+    $: lazyLoad(), npub
 
     async function setUser(){
         if(ndk && npub){
@@ -29,30 +32,69 @@
             }
         } 
     }
+
+    function lazyLoad() {
+        let item = document.querySelector(".user-"+npub);
+        if("IntersectionObserver" in window && item) {
+            lazyloadIntersectionObserver(item);
+        } 
+    }
+    function lazyloadIntersectionObserver(item: Element) {
+        let itemObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(function(entry) {
+                if(entry.isIntersecting) {
+                    setUser()
+                    itemObserver.unobserve(entry.target);
+                }
+            });
+        });
+        itemObserver.observe(item);
+    }
+    onMount(() => {
+        lazyLoad()
+    })
 </script>
-{#if user}
-<div class="card mb-3 p-2">
+
+<div class="card mb-3 p-2 user-{npub}">
+    {#if user}
     <div class="d-flex">
         <div>
             <LinkedPfpIcon {ndk} npub={user.npub} />
         </div>
         <div>
             <div class="card-body">
-                <h4 class="card-title"><UserName {user} /></h4>
+                <h5 class="card-title"><UserName {user} /></h5>
                 {#if status}
-                    <p><i class="bi bi-quote"></i> {status.status}</p>
+                    {#if status.status && status.status.length > 0}
+                    <p><i class="bi bi-quote"></i> {status.status} <i class="bi bi-quote rot180"></i></p>
+                    {/if}
+                    {#if status.city && status.country}
                     <Location city={status.city} country={status.country} />
+                    {/if}
                     {#if status.locationStatus == 'visiting'}
                     <span class="badge bg-secondary">visiting</span>
+                    {/if}
+                    {#if status.interests && status.interests.length > 0}
+                    <div class="mt-3">
+                        <Tags tags={status.interests} linked={true} />
+                    </div>
                     {/if}
                 {/if}
             </div>
         </div>
     </div>
+    {:else}
+    <Loading />
+    {/if}
 </div>
-{/if}
 <style>
     i{
-        font-size: 1rem;
+        font-size: .8rem;
+    }
+    i::before{
+        transform: translateY(-.3rem);
+    }
+    i.rot180::before{
+        transform: rotate(180deg) translateY(.3rem);
     }
 </style>
