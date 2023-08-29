@@ -75,7 +75,7 @@
                 addPerson(event)
             }
         });
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        if(typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 </script>
 {#if $searchCity && $searchCountry}  
