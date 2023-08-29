@@ -5,12 +5,14 @@ import { hasSigner, relays } from "./stores";
 const ndk = new NDK({
     explicitRelayUrls: relays,
 });
-ndk.connect();
 
-if(typeof window !== 'undefined' && window.nostr){
-    console.log('HAS SIGNER')
-    hasSigner.set(true);
-    ndk.signer = new NDKNip07Signer();
+if(typeof window !== 'undefined'){
+    ndk.connect();
+    if(window.nostr){
+        console.log('HAS SIGNER')
+        hasSigner.set(true);
+        ndk.signer = new NDKNip07Signer();
+    }
 }
 
 export default ndk;
