@@ -15,7 +15,7 @@
     let user: NDKUser | undefined;
     let status: UserStatus | undefined;
 
-    $: lazyLoad(), npub
+    $: setUser(), npub
 
     async function setUser(){
         if(ndk && npub){
@@ -35,7 +35,7 @@
 
     function lazyLoad() {
         let item = document.querySelector(".user-"+npub);
-        if(typeof window !== 'undefined' && "IntersectionObserver" in window && item) {
+        if("IntersectionObserver" in window && item) {
             lazyloadIntersectionObserver(item);
         } 
     }
