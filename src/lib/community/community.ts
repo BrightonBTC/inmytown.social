@@ -89,9 +89,10 @@ export function parseCommunityData(communityDetails: NDKEvent){
                 meta.tags.push(itm[1]);
                 break;
             case "c":
-                let c = itm[1].trim().split(' ');
-                meta.city = c[0];
-                if(c.length > 1) meta.country = c[1];
+                let locationString = itm[1].trim();
+                let locationParts = locationString.split(' ');
+                meta.city = locationString.substring(0, locationString.length - 3);
+                if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
                 break;
             case "d":
                 meta.uid = itm[1];
