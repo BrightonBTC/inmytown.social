@@ -31,7 +31,7 @@
                 }),
             ],
             view: new View({
-                center: [$communityMetaStore.latitude, $communityMetaStore.longitude],
+                center: [$communityMetaStore.longitude, $communityMetaStore.latitude],
                 zoom: $communityMetaStore.zoom,
                 minZoom: 1,
                 maxZoom: 20
@@ -47,8 +47,10 @@
         });
         map.getView().on('change:center', (event) => {
             let c = map.getView().getCenter();
-            $communityMetaStore.longitude = (c !== undefined ? c[1] : 0); 
-            $communityMetaStore.latitude = (c !== undefined ? c[0] : 0); 
+            console.log('longitude', c !== undefined ? c[0] : 0)
+            console.log('latitude', c !== undefined ? c[1] : 0)
+            $communityMetaStore.longitude = (c !== undefined ? c[0] : 0); 
+            $communityMetaStore.latitude = (c !== undefined ? c[1] : 0); 
             $communityMetaStore = $communityMetaStore
         });
     });

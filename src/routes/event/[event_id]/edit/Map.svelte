@@ -26,7 +26,7 @@
         if (map !== undefined){
             point = new Point([$eventMetaStore.longitude, $eventMetaStore.latitude])
             iconFeature.setGeometry(point)
-            map.getView().animate({zoom: 10}, {center: [$eventMetaStore.longitude, $eventMetaStore.latitude]});
+            map.getView().animate({zoom: 14}, {center: [$eventMetaStore.longitude, $eventMetaStore.latitude]});
         }
         
     };
@@ -35,7 +35,9 @@
     function createStyle(src:string) {
         return new Style({
             image: new Icon({
-                anchor: [0, 0],
+                anchor: [15, 30],
+                anchorXUnits: 'pixels',
+                anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
                 src: src,
                 img: undefined,
@@ -64,7 +66,7 @@
             ],
             view: new View({
                 center: [$eventMetaStore.longitude, $eventMetaStore.latitude],
-                zoom: 10,
+                zoom: 14,
                 minZoom: 1,
                 maxZoom: 20
             }),

@@ -15,6 +15,7 @@
 
 
     onMount(() => {
+        console.log(communityDetails)
         if(communityDetails.latitude && communityDetails.longitude && communityDetails.zoom){
             useGeographic();
             const map = new Map({
@@ -25,7 +26,7 @@
                     }),
                 ],
                 view: new View({
-                    center: [communityDetails.latitude, communityDetails.longitude],
+                    center: [communityDetails.longitude, communityDetails.latitude],
                     zoom: communityDetails.zoom,
                 }),
                 interactions: defaults({mouseWheelZoom: false})

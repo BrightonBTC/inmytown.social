@@ -21,7 +21,9 @@
     function createStyle(src:string, lat:number, lng:number) {
         return new Style({
             image: new Icon({
-                anchor: [0, 0],
+                anchor: [15, 30],
+                anchorXUnits: 'pixels',
+                anchorYUnits: 'pixels',
                 crossOrigin: 'anonymous',
                 src: src,
                 img: undefined,
@@ -31,6 +33,7 @@
     }
 
     onMount(() => {
+        console.log(eventMeta)
         useGeographic();
         const iconFeature = new Feature(new Point([eventMeta.longitude, eventMeta.latitude]));
         iconFeature.set('style', createStyle('/img/meetupicon.png', eventMeta.latitude, eventMeta.longitude));
