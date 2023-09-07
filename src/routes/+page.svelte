@@ -46,6 +46,7 @@
             <div class="card-header"><h3>Latest communities</h3></div>
             <div class="card-body">
                 {#each Object.values($sortedCommunities) as community}
+                {community.id}
                     <CommunityListing community={community.id} />
                 {/each}
             </div>

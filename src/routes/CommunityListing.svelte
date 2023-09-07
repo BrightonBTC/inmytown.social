@@ -6,6 +6,8 @@
 
     export let community:string
 
+    console.log('community', community)
+
     let communityDetails: CommunityMeta
 
     $: loadCommunity(), community;
