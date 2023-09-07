@@ -25,7 +25,7 @@
 		<div class="collapse navbar-collapse  justify-content-between" id="navbarSupportedContent">
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<a class="nav-link" href="/"
+					<a class="nav-link" href="/discover"
 						><i class="bi bi-eye text-success"></i> Discover</a
 					>
 				</li>
