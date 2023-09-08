@@ -50,12 +50,9 @@ export async function subCommunity(ndk: NDK, community_id: string, cb: (data: Co
                 kinds: [1037],
                 "ids": [community_id],
             },
-            {
-                closeOnEose: false,
-            }
+            {closeOnEose: false, groupable: false}
         );
         communitySub.on("event", (event: NDKEvent) =>  {
-            console.log('community',event)
             community.created = event.created_at ? event.created_at : 0;
             subCommunityMeta(ndk, community, cb)
         });
@@ -73,9 +70,7 @@ export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (
                 kinds: [30037],
                 "#e": [community.eid],
             },
-            {
-                closeOnEose: false,
-            }
+            {closeOnEose: false, groupable: false}
         );
         communitySub.on("event", (event: NDKEvent) =>  {
             console.log('community meta',event)
