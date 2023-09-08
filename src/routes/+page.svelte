@@ -1,26 +1,20 @@
 <script lang="ts"> 
     import ndk from '$lib/ndk';
-    import type { NDKEvent, NDKSubscription } from '@nostr-dev-kit/ndk';
+    import type { NDKEvent } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
-    import { addCommunity, addEvent, sortedCommunities, sortedEvents, communities } from './stores';
-    import CommunityListing from './CommunityListing.svelte';
+    import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import EventListing from './EventListing.svelte';
+    import { subCommunities } from '$lib/community/community';
+    import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
 
     onMount(() => {
-        fetchLatestCommunities()
+        subCommunities(ndk, {}, {closeOnEose: false}, async (data) => {
+            addCommunity(data)
+        });
         fetchUpcomingEvents() 
     });
     
-    async function fetchLatestCommunities() {
-        
-        const communitiesSub = ndk.subscribe(
-            {kinds: [1037], limit:20},
-            { closeOnEose: false }
-        );
-        communitiesSub.on("event", (event: NDKEvent) => {
-            addCommunity(event)
-        });
-    }
+    
     async function fetchUpcomingEvents() {
         
         const eventsSub = ndk.subscribe(
@@ -46,8 +40,8 @@
         <div class="card bg-black mb-4">
             <div class="card-header"><h3>Latest communities</h3></div>
             <div class="card-body">
-                {#each Object.values($sortedCommunities) as community}
-                    <CommunityListing community={community.id} />
+                {#each Object.values($sortedCommunities) as communityDetails}
+                    <CommunityCardLarge {communityDetails} />
                 {/each}
             </div>
         </div>

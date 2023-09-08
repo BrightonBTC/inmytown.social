@@ -1,4 +1,4 @@
-import { NDKEvent } from "@nostr-dev-kit/ndk"
+import { NDKEvent, type NDKFilter, type NDKFilterOptions, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
 
@@ -50,7 +50,7 @@ export async function subCommunity(ndk: NDK, community_id: string, cb: (data: Co
                 kinds: [1037],
                 "ids": [community_id],
             },
-            {closeOnEose: false, groupable: false}
+            {closeOnEose: false}
         );
         communitySub.on("event", (event: NDKEvent) =>  {
             community.created = event.created_at ? event.created_at : 0;
@@ -60,6 +60,28 @@ export async function subCommunity(ndk: NDK, community_id: string, cb: (data: Co
         console.log("An ERROR occured when subscribing to community", err);
     } 
 }
+
+export async function subCommunities(ndk: NDK, filter: NDKFilter, opts: NDKSubscriptionOptions, cb: (data: CommunityMeta) => void) {
+    filter.kinds = [1037]
+    try {
+        const communitySub = ndk.subscribe(
+            filter,
+            opts
+        );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            let community: CommunityMeta = {
+                ...CommunityMetaDefaults,
+                eid: event.id,
+                created: event.created_at ? event.created_at : 0
+            };
+            
+            subCommunityMeta(ndk, community, cb)
+        });
+    } catch (err) {
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
+}
+
 
 export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) {
     let lastUpdCommunity = 0;
