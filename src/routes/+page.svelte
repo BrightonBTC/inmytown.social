@@ -1,6 +1,6 @@
 <script lang="ts"> 
     import ndk from '$lib/ndk';
-    import type { NDKEvent } from '@nostr-dev-kit/ndk';
+    import type { NDKEvent, NDKSubscription } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import CommunityListing from './CommunityListing.svelte';
@@ -19,6 +19,9 @@
         );
         communitiesSub.on("event", (event: NDKEvent) => {
             addCommunity(event)
+        });
+        communitiesSub.on("eose", (s: NDKSubscription) => {
+            $sortedCommunities = $sortedCommunities;
         });
     }
     async function fetchUpcomingEvents() {

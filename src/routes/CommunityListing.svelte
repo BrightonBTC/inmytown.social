@@ -10,13 +10,11 @@
 
     $: loadCommunity(), community;
 
-
-    const loadCommunity = async () => {
+    async function loadCommunity() {
         subCommunity(ndk, community, async (data) => {
             communityDetails = data;
         });
     }
-
 </script>
 <div class="mb-0 d-flex">
     {#if communityDetails}

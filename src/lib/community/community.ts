@@ -39,7 +39,7 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     created: 0
 };
 
-export const subCommunity = (ndk: NDK, community_id: string, cb: (data: CommunityMeta) => void) => {
+export async function subCommunity(ndk: NDK, community_id: string, cb: (data: CommunityMeta) => void) {
     let community: CommunityMeta = {
         ...CommunityMetaDefaults,
         eid: community_id
@@ -64,7 +64,7 @@ export const subCommunity = (ndk: NDK, community_id: string, cb: (data: Communit
     } 
 }
 
-export const subCommunityMeta = (ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) => {
+export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) {
     let lastUpdCommunity = 0;
     console.log('subCommunityMeta', community.eid)
     try {
