@@ -85,7 +85,6 @@ export async function subCommunities(ndk: NDK, filter: NDKFilter, opts: NDKSubsc
 
 export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) {
     let lastUpdCommunity = 0;
-    console.log('subCommunityMeta', community.eid)
     try {
         const communitySub = ndk.subscribe(
             {
@@ -95,7 +94,6 @@ export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (
             {closeOnEose: false, groupable: false}
         );
         communitySub.on("event", (event: NDKEvent) =>  {
-            console.log('community meta',event)
             if (event.created_at && event.created_at > lastUpdCommunity) {
                 lastUpdCommunity = event.created_at;
                 let meta = parseCommunityData(event)

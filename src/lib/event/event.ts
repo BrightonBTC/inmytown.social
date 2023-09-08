@@ -1,5 +1,5 @@
 import { CommunityMetaDefaults, type CommunityMeta } from "$lib/community/community"
-import NDK, { NDKEvent } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
 
 export interface EventMeta{
@@ -64,6 +64,23 @@ export const EventMetaDefaults: Pick<EventMeta, 'uid' | 'eid' | 'title' | 'brief
 //         console.log("An ERROR occured when subscribing to community", err);
 //     } 
 // }
+
+export async function subEvents(ndk: NDK, filter: NDKFilter, opts: NDKSubscriptionOptions, cb: (data: EventMeta) => void) {
+    filter.kinds = [30073]
+    try {
+        const communitySub = ndk.subscribe(
+            filter,
+            opts
+        );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            cb(parseEventData(event))
+        });
+    } catch (err) {
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
+}
+
+
 export async function subEventMeta(ndk: NDK, eid: string, cb: (data: EventMeta) => void) {
     let lastUpd = 0
     try {
