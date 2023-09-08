@@ -17,10 +17,11 @@ export interface CommunityMeta{
     city: string
     tags: Array<string>
     updated: number
+    created: number
     error?: string
 }
 
-export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'zoom' | 'content' | 'image' | 'country' | 'city' | 'updated'> = {
+export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'zoom' | 'content' | 'image' | 'country' | 'city' | 'updated' | 'created'> = {
     uid: "",
     eid: "",
     title: "",
@@ -34,25 +35,55 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     image: undefined,
     country: "",
     city: "",
-    updated: 0
+    updated: 0,
+    created: 0
 };
 
 export async function subCommunity(ndk: NDK, community_id: string, cb: (data: CommunityMeta) => void) {
-    let lastUpdCommunity = 0;
+    let community: CommunityMeta = {
+        ...CommunityMetaDefaults,
+        eid: community_id
+    };
     try {
         const communitySub = ndk.subscribe(
             {
-                kinds: [30037],
-                "#e": [community_id],
+                kinds: [1037],
+                "ids": [community_id],
             },
             {
                 closeOnEose: false,
             }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
+            console.log('community',event)
+            community.created = event.created_at ? event.created_at : 0;
+            subCommunityMeta(ndk, community, cb)
+        });
+    } catch (err) {
+        console.log("An ERROR occured when subscribing to community", err);
+    } 
+}
+
+export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) {
+    let lastUpdCommunity = 0;
+    console.log('subCommunityMeta', community.eid)
+    try {
+        const communitySub = ndk.subscribe(
+            {
+                kinds: [30037],
+                "#e": [community.eid],
+            },
+            {
+                closeOnEose: false,
+            }
+        );
+        communitySub.on("event", (event: NDKEvent) =>  {
+            console.log('community meta',event)
             if (event.created_at && event.created_at > lastUpdCommunity) {
                 lastUpdCommunity = event.created_at;
-                cb(parseCommunityData(event));
+                let meta = parseCommunityData(event)
+                meta.created = community.created
+                cb(meta);
             }
         });
     } catch (err) {

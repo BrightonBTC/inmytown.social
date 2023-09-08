@@ -5,6 +5,7 @@
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import CommunityListing from './CommunityListing.svelte';
     import EventListing from './EventListing.svelte';
+
     onMount(() => {
         fetchLatestCommunities()
         fetchUpcomingEvents() 
@@ -34,7 +35,7 @@
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4">
-            <div class="card-header"><h1>Welcome to InMyTown</h1></div>
+            <div class="card-header bg-dark"><h1>Welcome</h1><strong>to InMyTown.social</strong></div>
             <div class="card-body">
                 Find communities and meetup events in your local area using the <a href="https://nostr.how/en/what-is-nostr" target="_blank">NOSTR network</a>.
             </div>
@@ -46,7 +47,6 @@
             <div class="card-header"><h3>Latest communities</h3></div>
             <div class="card-body">
                 {#each Object.values($sortedCommunities) as community}
-                {community.id}
                     <CommunityListing community={community.id} />
                 {/each}
             </div>

@@ -6,17 +6,17 @@
 
     export let community:string
 
-    console.log('community', community)
-
     let communityDetails: CommunityMeta
 
     $: loadCommunity(), community;
 
-    async function loadCommunity() {
+
+    const loadCommunity = async () => {
         subCommunity(ndk, community, async (data) => {
             communityDetails = data;
         });
     }
+
 </script>
 <div class="mb-0 d-flex">
     {#if communityDetails}
