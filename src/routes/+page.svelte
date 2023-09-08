@@ -1,40 +1,26 @@
 <script lang="ts"> 
     import ndk from '$lib/ndk';
-    import type { NDKEvent } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
-    import CommunityListing from './CommunityListing.svelte';
-    import EventListing from './EventListing.svelte';
+    import { subCommunities } from '$lib/community/community';
+    import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
+    import { subEvents } from '$lib/event/event';
+    import EventCard from '$lib/event/EventCard.svelte';
+
     onMount(() => {
-        fetchLatestCommunities()
-        fetchUpcomingEvents() 
+        subCommunities(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+            addCommunity(data)
+        });
+        subEvents(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+            addEvent(data)
+        });
     });
-    
-    async function fetchLatestCommunities() {
-        
-        const communitiesSub = ndk.subscribe(
-            {kinds: [1037], limit:20},
-            { closeOnEose: false }
-        );
-        communitiesSub.on("event", (event: NDKEvent) => {
-            addCommunity(event)
-        });
-    }
-    async function fetchUpcomingEvents() {
-        
-        const eventsSub = ndk.subscribe(
-            {kinds: [1073], limit:20},
-            { closeOnEose: false }
-        );
-        eventsSub.on("event", (event: NDKEvent) => {
-            addEvent(event)
-        });
-    }
+
 </script>
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4">
-            <div class="card-header"><h1>Welcome to InMyTown</h1></div>
+            <div class="card-header bg-dark"><h1>Welcome</h1><strong>to InMyTown.social</strong></div>
             <div class="card-body">
                 Find communities and meetup events in your local area using the <a href="https://nostr.how/en/what-is-nostr" target="_blank">NOSTR network</a>.
             </div>
@@ -43,20 +29,20 @@
     </div>
     <div class="col-lg-5">
         <div class="card bg-black mb-4">
-            <div class="card-header"><h3>Latest communities</h3></div>
+            <div class="card-header"><h5>Latest communities</h5></div>
             <div class="card-body">
-                {#each Object.values($sortedCommunities) as community}
-                    <CommunityListing community={community.id} />
+                {#each Object.values($sortedCommunities) as communityDetails}
+                    <CommunityCardLarge {communityDetails} />
                 {/each}
             </div>
         </div>
     </div>
     <div class="col-lg-4">
         <div class="card bg-secondary border-0 mb-4">
-            <div class="card-header"><h3>Latest event listings</h3></div>
+            <div class="card-header"><h5>Upcoming Events (Global)</h5></div>
             <div class="card-body">
-                {#each Object.values($sortedEvents) as event}
-                    <EventListing event={event.id} />
+                {#each Object.values($sortedEvents) as eventData}
+                    <EventCard {eventData} />
                 {/each}
             </div>
         </div>
