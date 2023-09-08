@@ -11,7 +11,9 @@
     $: loadCommunity(), community;
 
     async function loadCommunity() {
+        console.log('loadCommunity', community)
         subCommunity(ndk, community, async (data) => {
+            console.log('subCommunity', community, data.eid)
             communityDetails = data;
         });
     }
