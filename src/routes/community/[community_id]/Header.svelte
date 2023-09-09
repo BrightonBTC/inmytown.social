@@ -35,7 +35,7 @@
 </script>
 
 
-<div class="card mb-3 p-1">
+<div class="card mb-3 p-1 shadow-sm">
     <div class="row g-0">
         <div class="col-lg-8">
             <img

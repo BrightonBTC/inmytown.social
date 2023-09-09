@@ -33,7 +33,6 @@
     }
 
     onMount(() => {
-        console.log(eventMeta)
         useGeographic();
         const iconFeature = new Feature(new Point([eventMeta.longitude, eventMeta.latitude]));
         iconFeature.set('style', createStyle('/img/meetupicon.png', eventMeta.latitude, eventMeta.longitude));

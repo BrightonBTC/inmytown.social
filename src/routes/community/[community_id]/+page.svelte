@@ -108,7 +108,7 @@
             <Tabs {ndk} {communityDetails} />
         </div>
 
-        <div class="col-sm-4 bg-secondary rounded">
+        <div class="col-sm-4 bg-secondary rounded shadow-sm">
             <Map {communityDetails} />
 
             <Tags tags={communityDetails.tags} linked={true} />
