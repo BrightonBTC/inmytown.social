@@ -9,7 +9,7 @@
     let d = parseUserStatusData(statusData)
     
 </script>
-<p class="bg-dark rounded p-2"><i class="bi bi-quote "></i> {d.status} <i class="bi bi-quote rot180 "></i></p>
+<p class="bg-dark rounded p-2 shadow-sm border border-secondary"><i class="bi bi-quote "></i>{d.status}<i class="bi bi-quote rot180 "></i></p>
 <Location city={d.city} country={d.country} />
 {#if d.locationStatus == 'visiting'}
 <span class="badge bg-secondary">visiting</span>

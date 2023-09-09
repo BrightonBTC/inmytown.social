@@ -14,9 +14,9 @@
         {#await fetchUser(ndk, statusData.author.npub)}
             <Loading />
         {:then user}
-        <div class="card mb-3 p-2 bg-secondary border-0">
+        <div class="card mb-3 p-2 bg-secondary border-0 shadow">
             <div class="d-flex align-items-center">
-                <div>
+                <div class="p-4">
                     <LinkedPfpIcon {ndk} npub={statusData.author.npub} cls='lg' />
                 </div>
                 <div class="flex-grow-1">

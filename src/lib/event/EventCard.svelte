@@ -9,7 +9,7 @@
     <small>{dateStringFull(eventData.starts)}</small>
 </p>
 
-<div class="card mb-3 p-2">
+<div class="card mb-3 p-2 shadow">
     <div class="row g-0">
         <div class="col-md-8">
             <div class="card-body">

@@ -19,7 +19,7 @@
     }
 </script>
 {#if user?.profile && npub}
-<div class="card">
+<div class="card shadow">
     <a href="/user/{npub}">
         <img class="card-img-top" src={imgUrlOrDefault(user.profile.image)} alt="{user.profile.name} photo" />
     </a>

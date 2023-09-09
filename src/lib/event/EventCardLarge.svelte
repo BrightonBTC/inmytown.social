@@ -58,8 +58,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
         </div>
     </div>
 
-    <div class="mt-2 bg-secondary p-2 border-top">
-        <small><Tags tags={eventData.tags} linked={true} /></small>
+    <div class="mt-2 p-2 pt-3 border-top">
+        <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
 {/if}

@@ -55,7 +55,7 @@
     })
 </script>
 
-<div class="card mb-3 p-2 user-{npub}">
+<div class="card mb-3 p-2 user-{npub} shadow">
     {#if user}
     <div class="d-flex">
         <div>

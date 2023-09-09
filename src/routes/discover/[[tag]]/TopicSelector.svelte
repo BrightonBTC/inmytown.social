@@ -33,7 +33,7 @@
     }
 </script>
 
-<div class="bg-secondary p-2 rounded border">
+<div class="bg-secondary p-2 rounded border shadow-sm">
     <h5>Topics</h5>
     <small class="text-muted"><em>* you can enter a comma seperated list of topics below:</em></small>
     <form class="d-flex align-content-center mb-4" on:submit|preventDefault={addTopics}>

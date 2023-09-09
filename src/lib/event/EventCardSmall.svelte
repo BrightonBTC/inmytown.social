@@ -1,12 +1,13 @@
 <script lang="ts">
     import { dateStringFull } from '$lib/formatDates';
+    import Tags from '$lib/topics/Tags.svelte';
     import type { EventMeta } from './event';
     export let eventData: EventMeta | null;
 </script>
 {#if eventData}
 
 
-<div class="card mb-3">
+<div class="card mb-3 shadow">
     <div class="card-header">
         <h4 class="card-title mb-1"><a href="/event/{eventData.eid}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
     </div>
@@ -34,12 +35,8 @@
             </li>
         </ul>
     </div>
+    <div class="card-footer">
+        <Tags tags={eventData.tags} linked={true} />
+    </div>
 </div>
 {/if}
-<style>
-    .cImg{
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-    }
-</style>

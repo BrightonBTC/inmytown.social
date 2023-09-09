@@ -28,9 +28,9 @@
     }
 </script>
 
-<div class="bg-dark text-light rounded p-2 mb-4">
+<div class="bg-dark text-light rounded pt-2 mb-4">
     Found <strong>{n}</strong> {resType}
-    <div class="bg-secondary p-1 mt-2 rounded">
+    <div class="bg-secondary p-1 ps-3 mt-2 rounded shadow-sm">
         <small>
             <strong>Filters:</strong>
                 {#each filterStrings as f}

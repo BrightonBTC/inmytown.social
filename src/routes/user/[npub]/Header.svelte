@@ -23,7 +23,7 @@
 
 </script>
 {#if ndk && user?.profile && npub}
-<div class="card">
+<div class="card shadow-sm">
     <UserFollowBtn {ndk} {npub} />
     <img class="card-img-top" src={imgUrlOrDefault(user.profile.banner)} alt="{user.profile.name}" />
     <div class="card-body row ms-0 me-0 bg-secondary">

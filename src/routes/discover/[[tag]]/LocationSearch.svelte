@@ -8,7 +8,7 @@
     }
 </script>
 
-<div class="bg-secondary border p-2 rounded">
+<div class="bg-secondary border p-2 rounded shadow-sm">
     <LocationSelect country={$searchCountry} city={$searchCity} callback={locChanged} />
 </div>
 

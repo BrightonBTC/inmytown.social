@@ -41,14 +41,7 @@
 {#if isLoggedInUser}
 <h3 class="mb-4">
     Communities you've created:
-    <!-- <button
-        type="button"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addCommunityModal"
-    >
-        +
-    </button> -->
+
     <a href="/community/edit/new"
         type="button"
         class="btn btn-primary"

@@ -25,8 +25,8 @@
                 
                 
             </li>
-            <li class="list-group-item overflow-em bg-secondary">
-                <small><Tags tags={communityDetails.tags} linked={true} /></small>
+            <li class="list-group-item overflow-em pt-3">
+                <Tags tags={communityDetails.tags} linked={true} />
             </li>
             
         </ul>

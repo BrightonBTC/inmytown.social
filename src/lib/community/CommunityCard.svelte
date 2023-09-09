@@ -4,7 +4,7 @@
 
     export let communityDetails: CommunityMeta;
 </script>
-<div class="card">
+<div class="card shadow">
     <img
         class="card-img-top header-image"
         src={imgUrlOrDefault(communityDetails.image)}
