@@ -5,7 +5,7 @@
     import { subCommunities } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
     import { subEvents } from '$lib/event/event';
-    import EventCard from '$lib/event/EventCard.svelte';
+    import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
     onMount(() => {
         subCommunities(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
@@ -19,7 +19,7 @@
 </script>
 <div class="row">
     <div class="col-lg-3">
-        <div class="card bg-secondary mb-4">
+        <div class="card bg-secondary mb-4 shadow-sm">
             <div class="card-header bg-dark"><h1>Welcome</h1><strong>to InMyTown.social</strong></div>
             <div class="card-body">
                 Find communities and meetup events in your local area using the <a href="https://nostr.how/en/what-is-nostr" target="_blank">NOSTR network</a>.
@@ -42,7 +42,7 @@
             <div class="card-header"><h5>Upcoming Events (Global)</h5></div>
             <div class="card-body">
                 {#each Object.values($sortedEvents) as eventData}
-                    <EventCard {eventData} />
+                    <EventCardSmall {eventData} />
                 {/each}
             </div>
         </div>
