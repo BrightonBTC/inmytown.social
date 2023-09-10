@@ -82,7 +82,7 @@
     }
 </script>
 
-{#if $community.meta}
+{#if $community.meta.eid.length > 0}
     <Header {host} />
     {#if $userNpub && host && $userNpub === host.npub}
         <AdminPanel {community_id} />

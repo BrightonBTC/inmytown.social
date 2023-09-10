@@ -36,7 +36,7 @@
             <small class="mt-2 overflow-e"><UserName {user} /></small>
         </div>
         <div class="flex-grow-1 bubble-wrap">
-            <div class="speech-bubble p-4 rounded-4 ">
+            <div class="speech-bubble p-4 rounded-4 shadow-sm">
                 {#if replyTo}
                     <Quote id={replyTo} />
                 {/if}

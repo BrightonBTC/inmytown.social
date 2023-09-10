@@ -8,33 +8,42 @@
     import {community} from "./stores";
 
     import { defaults } from "ol/interaction/defaults";
+    import { onMount } from "svelte";
 
-    $: showMap(), $community.meta
+    let map:Map;
 
-    const showMap = () => {
-        if($community.meta.latitude && $community.meta.longitude && $community.meta.zoom){
-            useGeographic();
-            const map = new Map({
-                target: "map",
-                layers: [
-                    new TileLayer({
-                        source: new OSM(),
-                    }),
-                ],
-                view: new View({
-                    center: [$community.meta.longitude, $community.meta.latitude],
-                    zoom: $community.meta.zoom,
+    $: updMap(), $community.meta
+
+    function initMap(){
+        console.log('initMap')
+        useGeographic();
+        map = new Map({
+            target: "map",
+            layers: [
+                new TileLayer({
+                    source: new OSM(),
                 }),
-                interactions: defaults({mouseWheelZoom: false})
-            });
-            
-        }
+            ],
+            view: new View({
+                center: [$community.meta.longitude, $community.meta.latitude],
+                zoom: $community.meta.zoom,
+            }),
+            interactions: defaults({mouseWheelZoom: false})
+        });
     }
-    showMap()
+    onMount(() => {
+        initMap()
+    })
+
+    function updMap(){
+        console.log('updMap')
+        if(!map) initMap()
+        map.getView().animate({zoom: $community.meta.zoom}, {center: [$community.meta.longitude, $community.meta.latitude]});
+    };
+
 </script>
-{#if $community.meta.latitude && $community.meta.longitude && $community.meta.zoom}
+
 <div id="map" class="mb-4 mt-5" />
-{/if}
 
 <style>
     #map {
