@@ -15,7 +15,6 @@
     $: updMap(), $community.meta
 
     function initMap(){
-        console.log('initMap')
         useGeographic();
         map = new Map({
             target: "map",
@@ -36,7 +35,6 @@
     })
 
     function updMap(){
-        console.log('updMap')
         if(!map) initMap()
         map.getView().animate({zoom: $community.meta.zoom}, {center: [$community.meta.longitude, $community.meta.latitude]});
     };
