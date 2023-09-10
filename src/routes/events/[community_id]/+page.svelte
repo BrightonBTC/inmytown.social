@@ -15,7 +15,7 @@
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
 
-    let communities = new CommunitySubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions(ndk)
 
     let community_id = data.community_id;
     let communityDetails: CommunityMeta | undefined | null = undefined;
@@ -28,7 +28,7 @@
 
         if ($userHex) {
 
-            communities.subscribeByID(data.community_id, async (data) => {
+            communitySubs.subscribeByID(data.community_id, async (data) => {
                 communityDetails = data
                 if (communityDetails?.author === $userNpub) {
                     authorised = true;

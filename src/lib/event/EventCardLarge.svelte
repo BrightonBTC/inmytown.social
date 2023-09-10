@@ -10,11 +10,11 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     export let eventData: EventMeta;
     export let ndk: NDK ;
 
-    let communities = new CommunitySubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions(ndk)
 
     onMount(async () => {
 
-        communities.subscribeByID(eventData.community.eid, async (data) => {
+        communitySubs.subscribeByID(eventData.community.eid, async (data) => {
             eventData.community = data;
         })
 

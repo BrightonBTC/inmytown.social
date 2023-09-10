@@ -10,8 +10,8 @@
     let communityDetails: CommunityMeta;
 
     if (ndk) {
-        let communities = new CommunitySubscriptions(ndk)
-        communities.subscribeByID(id, async (data) => {
+        let communitySubs = new CommunitySubscriptions(ndk)
+        communitySubs.subscribeByID(id, async (data) => {
             communityDetails = data;
         });
     }

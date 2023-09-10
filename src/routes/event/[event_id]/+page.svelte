@@ -22,7 +22,7 @@
     import { type EventMeta, subEventMeta } from "$lib/event/event";
     import ndk from "$lib/ndk";
 
-    let communities = new CommunitySubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions(ndk)
 
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let eventMeta: EventMeta | null | string = null;
@@ -44,7 +44,7 @@
     }
 
     async function fetchCommunityDetails(id: string) {
-        communities.subscribeByID(id, async (data) => {
+        communitySubs.subscribeByID(id, async (data) => {
             communityDetails = data
         });
     }

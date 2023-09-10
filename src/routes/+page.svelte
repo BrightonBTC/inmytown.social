@@ -7,11 +7,11 @@
     import { subEvents } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
-    let communities = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions(ndk);
 
     onMount(() => {
 
-        communities.subscribe({limit:50}, async (data) => {
+        communitySubs.subscribe({limit:50}, async (data) => {
             addCommunity(data)
         }, {closeOnEose: false})
 
@@ -21,7 +21,7 @@
     });
 
     onDestroy(() => {
-        communities.closeSubscriptions()
+        communitySubs.closeSubscriptions()
     })
 
 </script>

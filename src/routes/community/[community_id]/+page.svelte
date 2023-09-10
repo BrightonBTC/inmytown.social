@@ -31,7 +31,7 @@
 
     let host: NDKUser | undefined;
 
-    let communities = new CommunitySubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions(ndk)
 
     communityMembers.set([]);
     communityEvents.set([]);
@@ -41,7 +41,7 @@
 
     onMount(async () => {
         
-        communities.subscribeByID(community_id, async (data) => {
+        communitySubs.subscribeByID(community_id, async (data) => {
             $community.meta = data
             if(!host) host = await fetchUser(ndk, data.author);
             $community.fetchMembers((user) => {
@@ -53,7 +53,7 @@
     });
 
     onDestroy(() => {
-        communities.closeSubscriptions()
+        communitySubs.closeSubscriptions()
         $community.destroy()
     })
 

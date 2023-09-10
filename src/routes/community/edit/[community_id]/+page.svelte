@@ -14,7 +14,7 @@
 	import { login } from "$lib/user/user";
 	import ndk from "$lib/ndk";
 
-	let communities = new CommunitySubscriptions(ndk);
+	let communitySubs = new CommunitySubscriptions(ndk);
 
 	let loggedin: boolean;
 	let isNew: boolean = false;
@@ -35,7 +35,7 @@
 	});
 
 	async function fetchCommunity() {
-		communities.subscribeByID(data.community_id, async (data) => {
+		communitySubs.subscribeByID(data.community_id, async (data) => {
 			if (data.author === $userNpub) {
 				authorised = true;
 				$community.meta = data
