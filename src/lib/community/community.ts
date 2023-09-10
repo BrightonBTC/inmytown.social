@@ -42,6 +42,7 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
 export class Community {
     public ndk: NDK;
     public meta: CommunityMeta;
+    private membersSubscription?: NDKSubscription;
 
     public constructor(ndk: NDK, meta?: CommunityMeta){
         this.ndk = ndk
@@ -121,18 +122,23 @@ export class Community {
 
     public async fetchMembers(cb: (user: NDKUser) => void){
         try {
-            const membersSub = this.ndk.subscribe(
+            this.membersSubscription = this.ndk.subscribe(
                 {
                     kinds: [10037],
                     "#e": [this.meta.eid],
-                }
+                },
+                {closeOnEose: false}
             );
-            membersSub.on("event", (event: NDKEvent) => {
+            this.membersSubscription.on("event", (event: NDKEvent) => {
                 cb(event.author)
             });
         } catch (err) {
             console.log("An ERROR occured", err);
         }
+    }
+
+    public destroy(){
+        if(this.membersSubscription) this.membersSubscription.stop()
     }
 }
 

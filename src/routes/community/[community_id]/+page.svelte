@@ -54,6 +54,7 @@
 
     onDestroy(() => {
         communities.closeSubscriptions()
+        $community.destroy()
     })
 
     async function fetchEvents() {
