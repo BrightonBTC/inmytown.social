@@ -1,20 +1,28 @@
 <script lang="ts"> 
     import ndk from '$lib/ndk';
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
-    import { subCommunities } from '$lib/community/community';
+    import { Communities } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
     import { subEvents } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
+    let communities = new Communities(ndk);
+
     onMount(() => {
-        subCommunities(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+
+        communities.subscribe({limit:50}, async (data) => {
             addCommunity(data)
-        });
-        subEvents(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+        }, {closeOnEose: false})
+
+        subEvents(ndk, {limit:50}, {closeOnEose: true}, async (data) => {
             addEvent(data)
         });
     });
+
+    onDestroy(() => {
+        communities.closeSubscriptions()
+    })
 
 </script>
 <div class="row">

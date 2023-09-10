@@ -61,8 +61,7 @@
             f = {...f, ...tf}
         }
         const communitiesSub = ndk.subscribe(
-            f,
-            { closeOnEose: false }
+            f
         );
         communitiesSub.on("event", (event: NDKEvent) => {
             if(event.kind === 30037) addCommunity(event);

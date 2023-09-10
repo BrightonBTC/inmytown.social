@@ -55,10 +55,7 @@ export async function subUserStatus(ndk: NDK, npub: string, cb: (data: UserStatu
     let lastUpd = 0;
     try {
         const communitySub = ndk.subscribe(
-            { kinds: [10037], "authors": [npub] },
-            {
-                closeOnEose: false,
-            }
+            { kinds: [10037], "authors": [npub] }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
             if (event.created_at && event.created_at > lastUpd) {

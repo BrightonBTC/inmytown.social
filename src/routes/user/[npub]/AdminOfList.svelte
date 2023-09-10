@@ -6,7 +6,6 @@
     import type NDK from "@nostr-dev-kit/ndk";
     import { userHex } from "$lib/stores";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
-    import CommunityAdder from "./CommunityAdder.svelte";
 
     export let ndk: NDK | undefined;
     export let isLoggedInUser: boolean;
@@ -88,7 +87,7 @@
         {/each}
     </tbody>
 </table>
-<CommunityAdder {ndk} />
+
 {:else if $sortedCommunities.length > 0}
 <h3 class="mb-4">
     Administrator of:

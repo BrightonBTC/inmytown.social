@@ -1,4 +1,4 @@
-import { NDKEvent, type NDKFilter, type NDKFilterOptions, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
+import { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
 
@@ -39,166 +39,234 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     created: 0
 };
 
-export async function subCommunity(ndk: NDK, community_id: string, cb: (data: CommunityMeta) => void) {
-    let community: CommunityMeta = {
-        ...CommunityMetaDefaults,
-        eid: community_id
-    };
-    try {
-        const communitySub = ndk.subscribe(
-            {
-                kinds: [1037],
-                "ids": [community_id],
-            },
-            {closeOnEose: false}
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            community.created = event.created_at ? event.created_at : 0;
-            subCommunityMeta(ndk, community, cb)
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to community", err);
-    } 
-}
+export class Community {
+    public ndk: NDK;
+    public meta: CommunityMeta;
 
-export async function subCommunities(ndk: NDK, filter: NDKFilter, opts: NDKSubscriptionOptions, cb: (data: CommunityMeta) => void) {
-    filter.kinds = [1037]
-    try {
-        const communitySub = ndk.subscribe(
-            filter,
-            opts
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            let community: CommunityMeta = {
-                ...CommunityMetaDefaults,
-                eid: event.id,
-                created: event.created_at ? event.created_at : 0
-            };
-            
-            subCommunityMeta(ndk, community, cb)
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to community", err);
-    } 
-}
-
-
-export async function subCommunityMeta(ndk: NDK, community: CommunityMeta, cb: (data: CommunityMeta) => void) {
-    let lastUpdCommunity = 0;
-    try {
-        const communitySub = ndk.subscribe(
-            {
-                kinds: [30037],
-                "#e": [community.eid],
-            },
-            {closeOnEose: false, groupable: false}
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            if (event.created_at && event.created_at > lastUpdCommunity) {
-                lastUpdCommunity = event.created_at;
-                let meta = parseCommunityData(event)
-                meta.created = community.created
-                cb(meta);
-            }
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to community", err);
-    } 
-}
-
-export function parseCommunityData(communityDetails: NDKEvent){
-    let meta: CommunityMeta = {
-        ...CommunityMetaDefaults
-    };
-    meta.tags = [];
-    meta.content = communityDetails.content
-    meta.author = communityDetails.author.npub
-    meta.authorhex = communityDetails.author.hexpubkey()
-    if(communityDetails.created_at) meta.updated = communityDetails.created_at
-    communityDetails.tags.forEach(function (itm) {
-        switch (itm[0]) {
-            case "title":
-                meta.title = itm[1];
-                break;
-            case "banner":
-                if(itm[1].length >0) meta.image = itm[1];
-                break;
-            case "zoom":
-                meta.zoom = parseFloat(itm[1]);
-                break;
-            case "g":
-                const g = Geohash.decode(itm[1]);
-                meta.latitude = g.lat;
-                meta.longitude = g.lon;
-                break;
-            case "t":
-                meta.tags.push(itm[1]);
-                break;
-            case "c":
-                let locationString = itm[1].trim();
-                let locationParts = locationString.split(' ');
-                meta.city = locationString.substring(0, locationString.length - 3);
-                if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
-                break;
-            case "d":
-                meta.uid = itm[1];
-                break;
-            case "e":
-                meta.eid = itm[1];
-                break;
+    public constructor(ndk: NDK, meta?: CommunityMeta){
+        this.ndk = ndk
+        this.meta = {
+            ...CommunityMetaDefaults,
+            ...meta
         }
-    });
-    return meta;
-}
+    }
 
-export async function publishCommunityMeta(ndk: NDK, community: CommunityMeta){
-    community = validateCommunityMeta(community)
-    if(community.error) return community;
-    try{
-        const ndkEvent = new NDKEvent(ndk);
-        ndkEvent.kind = 30037;
-        ndkEvent.content = community.content;
-        ndkEvent.tags = [
-            ["title", community.title],
-            ["d", community.uid],
-            ["e", community.eid],
-        ];
-        if(community.image){
-            ndkEvent.tags.push(["banner", community.image])
-        }
-        if(community.latitude && community.longitude && community.zoom){
-            ndkEvent.tags.push(
-                ["g", Geohash.encode(community.latitude, community.longitude)],
-                ["zoom", community.zoom.toFixed(2)]
-            );
+    public async create(){
+        const ndkEvent = new NDKEvent(this.ndk);
+		ndkEvent.kind = 1037;
+		await ndkEvent.publish();
+        this.meta.eid = ndkEvent.id;
+        this.meta.uid = ndkEvent.id;
+        return ndkEvent.created_at;
+    }
 
-            if(community.country && community.country.length > 0 && community.city && community.city.length > 0){
-                ndkEvent.tags.push(["c", community.city + ' ' + community.country]);
-            }
-        }        
-        
-        if (community.tags.length > 0) {
-            community.tags.forEach(function (t) {
-                ndkEvent.tags.push(["t", t]);
-            });
-        }
+    public async createChat(){
+        const ndkEvent = new NDKEvent(this.ndk);
+        ndkEvent.kind = 40;
+        ndkEvent.tags.push(["e", this.meta.eid])
+        ndkEvent.content = JSON.stringify({
+            name: this.meta.title,
+            about: 'Public channel for meetup group: '+this.meta.title,
+            picture: this.meta.image
+        })
         await ndkEvent.publish();
-    }catch (err) {
-        community.error = "An ERROR occured publishing the community metadata:"+ err;
-    } finally {
-        return community;
+    }
+
+    public async publishMeta(){
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 30037;
+            ndkEvent.content = this.meta.content;
+            ndkEvent.tags = [
+                ["title", this.meta.title],
+                ["d", this.meta.uid],
+                ["e", this.meta.eid],
+            ];
+            if(this.meta.image){
+                ndkEvent.tags.push(["banner", this.meta.image])
+            }
+            if(this.meta.latitude && this.meta.longitude && this.meta.zoom){
+                ndkEvent.tags.push(
+                    ["g", Geohash.encode(this.meta.latitude, this.meta.longitude)],
+                    ["zoom", this.meta.zoom.toFixed(2)]
+                );
+    
+                if(this.meta.country && this.meta.country.length > 0 && this.meta.city && this.meta.city.length > 0){
+                    ndkEvent.tags.push(["c", this.meta.city + ' ' + this.meta.country]);
+                }
+            }        
+            
+            if (this.meta.tags.length > 0) {
+                this.meta.tags.forEach(function (t) {
+                    ndkEvent.tags.push(["t", t]);
+                });
+            }
+            await ndkEvent.publish();
+        } catch (err) {
+            this.meta.error = "An ERROR occured publishing the community metadata:"+ err;
+        }
+    }
+
+    public validate(){
+        if(this.meta.title.length < 1){
+            this.meta.error = 'Missing title';
+        }
+        else if(this.meta.content.length < 1){
+            this.meta.error = 'Missing description';
+        }
+        else{
+            this.meta.error = undefined;
+        }
+    }
+
+    public async fetchMembers(cb: (user: NDKUser) => void){
+        try {
+            const membersSub = this.ndk.subscribe(
+                {
+                    kinds: [10037],
+                    "#e": [this.meta.eid],
+                }
+            );
+            membersSub.on("event", (event: NDKEvent) => {
+                cb(event.author)
+            });
+        } catch (err) {
+            console.log("An ERROR occured", err);
+        }
     }
 }
 
-export function validateCommunityMeta(community: CommunityMeta){
-    if(community.title.length < 1){
-        community.error = 'Missing title';
+export class Communities {
+    public ndk: NDK;
+    private subscriptions: NDKSubscription[] = [];
+
+    public constructor(ndk: NDK){
+        this.ndk = ndk
     }
-    else if(community.content.length < 1){
-        community.error = 'Missing description';
+
+    public async subscribeByID(community_id: string, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+        let community: CommunityMeta = {
+            ...CommunityMetaDefaults,
+            eid: community_id
+        };
+        try {
+            let communitySub = this.ndk.subscribe(
+                {
+                    kinds: [1037],
+                    "ids": [community_id],
+                },
+                opts
+            );
+            if(opts && opts.closeOnEose === false){
+                this.subscriptions.push(communitySub)
+            }
+            communitySub.on("event", (event: NDKEvent) =>  {
+                community.created = event.created_at ? event.created_at : 0;
+                this.subscribeMeta(community, cb)
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to community", err);
+        } 
     }
-    else{
-        community.error = undefined;
+
+    public async subscribe(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+        filter.kinds = [1037]
+        try {
+            const communitiesSub = this.ndk.subscribe(
+                filter,
+                opts
+            );
+            if(opts && opts.closeOnEose === false){
+                this.subscriptions.push(communitiesSub)
+            }
+            communitiesSub.on("event", (event: NDKEvent) =>  {
+                let community: CommunityMeta = {
+                    ...CommunityMetaDefaults,
+                    eid: event.id,
+                    created: event.created_at ? event.created_at : 0
+                };
+                
+                this.subscribeMeta(community, cb)
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to community", err);
+        } 
     }
-    return community;
+
+    public async subscribeMeta(community: CommunityMeta, cb: (data: CommunityMeta) => void){
+        let lastUpdCommunity = 0;
+        try {
+            const communityMetaSub = this.ndk.subscribe(
+                {
+                    kinds: [30037],
+                    "#e": [community.eid],
+                }
+            );
+            this.subscriptions.push(communityMetaSub)
+            communityMetaSub.on("event", (event: NDKEvent) =>  {
+                if (event.created_at && event.created_at > lastUpdCommunity) {
+                    lastUpdCommunity = event.created_at;
+                    let meta = Communities.parseNostrEvent(event, community)
+                    cb(meta);
+                }
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to community", err);
+        } 
+    }
+
+    public static parseNostrEvent(communityDetails: NDKEvent, meta?: CommunityMeta){
+        if(!meta){
+            meta = {
+                ...CommunityMetaDefaults
+            };
+        }
+        meta.tags = [];
+        meta.content = communityDetails.content
+        meta.author = communityDetails.author.npub
+        meta.authorhex = communityDetails.author.hexpubkey()
+        if(communityDetails.created_at) meta.updated = communityDetails.created_at
+        communityDetails.tags.forEach(function (itm) {
+            if(!meta) return;
+            switch (itm[0]) {
+                case "title":
+                    meta.title = itm[1];
+                    break;
+                case "banner":
+                    if(itm[1].length >0) meta.image = itm[1];
+                    break;
+                case "zoom":
+                    meta.zoom = parseFloat(itm[1]);
+                    break;
+                case "g":
+                    const g = Geohash.decode(itm[1]);
+                    meta.latitude = g.lat;
+                    meta.longitude = g.lon;
+                    break;
+                case "t":
+                    meta.tags.push(itm[1]);
+                    break;
+                case "c":
+                    let locationString = itm[1].trim();
+                    let locationParts = locationString.split(' ');
+                    meta.city = locationString.substring(0, locationString.length - 3);
+                    if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
+                    break;
+                case "d":
+                    meta.uid = itm[1];
+                    break;
+                case "e":
+                    meta.eid = itm[1];
+                    break;
+            }
+        });
+        return meta;
+    }
+
+    public closeSubscriptions(){
+        this.subscriptions.forEach(function(sub){
+            sub.stop()
+        })
+    }
 }
+

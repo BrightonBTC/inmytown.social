@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { communityMetaStore } from "./stores";
-
-
+    import { community } from "./stores";
 </script>
 
 <label for="title" class="form-label text-muted">Community title:</label>
@@ -11,6 +9,6 @@
     id="title"
     placeholder="eg. My local meetup"
     name="title"
-    bind:value={$communityMetaStore.title}
+    bind:value={$community.meta.title}
 />
 

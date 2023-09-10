@@ -1,4 +1,4 @@
-import { parseCommunityData, type CommunityMeta } from '$lib/community/community';
+import { type CommunityMeta, Communities } from '$lib/community/community';
 import type { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
 
@@ -8,7 +8,7 @@ export const sortedCommunities = derived(communitiesStore, (v) => v.sort((a, b) 
 
 export function addCommunity(e:NDKEvent){
     communitiesStore.update(items => {
-        let d = parseCommunityData(e)
+        let d = Communities.parseNostrEvent(e)
         if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
         items.push(d)
         return [...new Map(items.map(v => [v.eid, v])).values()]

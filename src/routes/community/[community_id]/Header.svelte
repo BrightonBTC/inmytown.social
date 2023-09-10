@@ -5,28 +5,24 @@
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
     import UserName from "$lib/user/UserName.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKUser } from "@nostr-dev-kit/ndk";
-    import type { CommunityMeta } from "$lib/community/community";
     import { publishUserStatus } from "$lib/user/user";
     import Location from "$lib/location/Location.svelte";
-
-    export let ndk:NDK;
-    export let communityDetails: CommunityMeta;
-    export let community_id: string;
+    import ndk from "$lib/ndk";
+    import {community} from "./stores";
 
     export let host: NDKUser | undefined;
     let isFollower: boolean = false;
 
-    $: isFollower = (uStatus.communities?.find(el => el === community_id)) ? true: false, $communityMembers;
+    $: isFollower = (uStatus.communities?.find(el => el === $community.meta.eid)) ? true: false, $communityMembers;
 
     async function joinNow(){
-        uStatus.communities.push(community_id);
+        uStatus.communities.push($community.meta.eid);
         publishUserStatus(ndk, uStatus)
         userStatus.set(JSON.stringify(uStatus));
     }
     async function leaveNow(){
-        uStatus.communities.splice(uStatus.communities?.findIndex(e => e[1] === community_id),1);
+        uStatus.communities.splice(uStatus.communities?.findIndex(e => e[1] === $community.meta.eid),1);
         publishUserStatus(ndk, uStatus)
         userStatus.set(JSON.stringify(uStatus));
         if($userNpub) removeMember($userNpub)
@@ -39,7 +35,7 @@
     <div class="row g-0">
         <div class="col-lg-8">
             <img
-            src={imgUrlOrDefault(communityDetails.image)}
+            src={imgUrlOrDefault($community.meta.image)}
             alt="musig"
             class="img-fluid rounded header-image"
             />
@@ -47,10 +43,10 @@
         <div class="col-lg-4">
             
             <div class="card-body">
-                <h1 class="card-title"><b>{communityDetails.title}</b></h1>
+                <h1 class="card-title"><b>{$community.meta.title}</b></h1>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <Location city={communityDetails.city} country={communityDetails.country} />
+                        <Location city={$community.meta.city} country={$community.meta.country} />
                     </li>
                     <li class="list-group-item">
                         <i class="bi bi-people me-2 text-primary"></i> {$communityMembers.length} Members

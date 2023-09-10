@@ -4,9 +4,8 @@
     import Header from "./Header.svelte";
     import Map from "./Map.svelte";
     import MemberList from "./MemberList.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import {
         addEvent,
         addEventMeta,
@@ -16,20 +15,23 @@
         communityEventsPast,
         communityEventsUpcoming,
         communityMembers,
+        community
     } from "./stores";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
     import { userNpub } from "$lib/stores";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { type CommunityMeta, subCommunity } from "$lib/community/community";
+    import { Communities } from "$lib/community/community";
     import { subEventMeta } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
 
     $: community_id = data.community_id;
-    let communityDetails: CommunityMeta | undefined | null = undefined;
+
     let host: NDKUser | undefined;
+
+    let communities = new Communities(ndk)
 
     communityMembers.set([]);
     communityEvents.set([]);
@@ -39,35 +41,20 @@
 
     onMount(async () => {
         
-        subCommunity(ndk, community_id, async (data) => {
-            communityDetails = data
+        communities.subscribeByID(community_id, async (data) => {
+            $community.meta = data
             if(!host) host = await fetchUser(ndk, data.author);
-            console.log('host', host)
-        });
-        fetchMembers();
+            $community.fetchMembers((user) => {
+                addMember(user.npub)
+            })
+        }, {closeOnEose: false});
+
         fetchEvents();
     });
 
-    async function fetchMembers() {
-        try {
-            const membersSub = ndk.subscribe(
-                {
-                    kinds: [10037],
-                    "#e": [community_id],
-                },
-                {
-                    closeOnEose: false,
-                }
-            );
-            membersSub.on("event", (event: NDKEvent) => {
-                if (!$communityMembers.includes(event.author.npub)) {
-                    addMember(event.author.npub);
-                }
-            });
-        } catch (err) {
-            console.log("An ERROR occured", err);
-        }
-    }
+    onDestroy(() => {
+        communities.closeSubscriptions()
+    })
 
     async function fetchEvents() {
         try {
@@ -75,9 +62,6 @@
                 {
                     kinds: [1073],
                     "#e": [community_id],
-                },
-                {
-                    closeOnEose: false,
                 }
             );
             eventsSub.on("event", (event: NDKEvent) => {
@@ -98,22 +82,22 @@
     }
 </script>
 
-{#if communityDetails}
-    <Header {ndk} {communityDetails} {community_id} {host} />
+{#if $community.meta}
+    <Header {host} />
     {#if $userNpub && host && $userNpub === host.npub}
         <AdminPanel {community_id} />
     {/if}
     <div class="row me-1">
         <div class="col-sm-8">
-            <Tabs {ndk} {communityDetails} />
+            <Tabs />
         </div>
 
         <div class="col-sm-4 bg-secondary rounded shadow-sm">
-            <Map {communityDetails} />
+            <Map />
 
-            <Tags tags={communityDetails.tags} linked={true} />
+            <Tags tags={$community.meta.tags} linked={true} />
 
-            <MemberList {ndk} />
+            <MemberList />
         </div>
     </div>
 {:else}

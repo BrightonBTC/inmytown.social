@@ -85,10 +85,7 @@ export async function subEventMeta(ndk: NDK, eid: string, cb: (data: EventMeta) 
     let lastUpd = 0
     try {
         const communitySub = ndk.subscribe(
-            { kinds: [30073], "#e": [eid] },
-            {
-                closeOnEose: false,
-            }
+            { kinds: [30073], "#e": [eid] }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
             if(event.created_at && event.created_at > lastUpd){

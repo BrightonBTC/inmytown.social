@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { communityMetaStore } from "./stores";
+    import { community } from "./stores";
 
 </script>
 
@@ -10,5 +10,5 @@
     id="img"
     placeholder="eg. https://i.ibb.co/my-img.jpg"
     name="img"
-    bind:value={$communityMetaStore.image}
+    bind:value={$community.meta.image}
 />

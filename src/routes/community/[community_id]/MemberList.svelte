@@ -1,9 +1,7 @@
 <script lang="ts">
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
-
     import { communityMembers } from "./stores";
-    export let ndk: NDK | undefined;
+    import ndk from "$lib/ndk";
 
 </script>
 <small class="text-small"><a href="/" class="float-end pe-3">view all</a></small>

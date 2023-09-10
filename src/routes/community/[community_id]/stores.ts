@@ -1,12 +1,19 @@
 
+import { Community } from '$lib/community/community';
 import type { EventMeta } from '$lib/event/event';
+import ndk from '$lib/ndk';
 import type { NDKEvent } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
+
+export const community = writable<Community>(new Community(ndk));
 
 export const communityMembers = writable<string[]>([]);
 
 export function addMember(s: string){
-    communityMembers.update(items => [...items, s])
+    communityMembers.update(items => {
+        items.push(s)
+        return [...new Map(items.map(v => [v, v])).values()]
+    })
 };
 
 export function removeMember(s: string){

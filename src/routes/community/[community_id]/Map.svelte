@@ -5,18 +5,14 @@
     import TileLayer from "ol/layer/Tile.js";
     import View from "ol/View.js";
     import {useGeographic} from 'ol/proj.js';
-    import PointerInteraction from 'ol/interaction/Pointer.js';
+    import {community} from "./stores";
 
-    import { onMount } from "svelte";
     import { defaults } from "ol/interaction/defaults";
-    import type { CommunityMeta } from "$lib/community/community";
 
-    export let communityDetails: CommunityMeta;
+    $: showMap(), $community.meta
 
-
-    onMount(() => {
-        console.log(communityDetails)
-        if(communityDetails.latitude && communityDetails.longitude && communityDetails.zoom){
+    const showMap = () => {
+        if($community.meta.latitude && $community.meta.longitude && $community.meta.zoom){
             useGeographic();
             const map = new Map({
                 target: "map",
@@ -26,17 +22,17 @@
                     }),
                 ],
                 view: new View({
-                    center: [communityDetails.longitude, communityDetails.latitude],
-                    zoom: communityDetails.zoom,
+                    center: [$community.meta.longitude, $community.meta.latitude],
+                    zoom: $community.meta.zoom,
                 }),
                 interactions: defaults({mouseWheelZoom: false})
             });
             
         }
-        
-    });
+    }
+    showMap()
 </script>
-{#if communityDetails.latitude && communityDetails.longitude && communityDetails.zoom}
+{#if $community.meta.latitude && $community.meta.longitude && $community.meta.zoom}
 <div id="map" class="mb-4 mt-5" />
 {/if}
 
