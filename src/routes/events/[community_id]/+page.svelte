@@ -10,12 +10,12 @@
     import { goto } from "$app/navigation";
     import { myEvents } from "./stores";
     import EventRow from "./EventRow.svelte";
-    import { type CommunityMeta, CommunityMetaDefaults, Communities } from "$lib/community/community";
+    import { type CommunityMeta, CommunityMetaDefaults, CommunitySubscriptions } from "$lib/community/community";
     import { EventMetaDefaults, type EventMeta, publishEventMeta } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
 
-    let communities = new Communities(ndk)
+    let communities = new CommunitySubscriptions(ndk)
 
     let community_id = data.community_id;
     let communityDetails: CommunityMeta | undefined | null = undefined;

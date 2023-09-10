@@ -120,6 +120,55 @@ export class Community {
         }
     }
 
+
+    public static parseNostrEvent(communityDetails: NDKEvent, meta?: CommunityMeta){
+        if(!meta){
+            meta = {
+                ...CommunityMetaDefaults
+            };
+        }
+        meta.tags = [];
+        meta.content = communityDetails.content
+        meta.author = communityDetails.author.npub
+        meta.authorhex = communityDetails.author.hexpubkey()
+        if(communityDetails.created_at) meta.updated = communityDetails.created_at
+        communityDetails.tags.forEach(function (itm) {
+            if(!meta) return;
+            switch (itm[0]) {
+                case "title":
+                    meta.title = itm[1];
+                    break;
+                case "banner":
+                    if(itm[1].length >0) meta.image = itm[1];
+                    break;
+                case "zoom":
+                    meta.zoom = parseFloat(itm[1]);
+                    break;
+                case "g":
+                    const g = Geohash.decode(itm[1]);
+                    meta.latitude = g.lat;
+                    meta.longitude = g.lon;
+                    break;
+                case "t":
+                    meta.tags.push(itm[1]);
+                    break;
+                case "c":
+                    let locationString = itm[1].trim();
+                    let locationParts = locationString.split(' ');
+                    meta.city = locationString.substring(0, locationString.length - 3);
+                    if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
+                    break;
+                case "d":
+                    meta.uid = itm[1];
+                    break;
+                case "e":
+                    meta.eid = itm[1];
+                    break;
+            }
+        });
+        return meta;
+    }
+
     public async fetchMembers(cb: (user: NDKUser) => void){
         try {
             this.membersSubscription = this.ndk.subscribe(
@@ -142,7 +191,7 @@ export class Community {
     }
 }
 
-export class Communities {
+export class CommunitySubscriptions {
     public ndk: NDK;
     private subscriptions: NDKSubscription[] = [];
 
@@ -212,61 +261,13 @@ export class Communities {
             communityMetaSub.on("event", (event: NDKEvent) =>  {
                 if (event.created_at && event.created_at > lastUpdCommunity) {
                     lastUpdCommunity = event.created_at;
-                    let meta = Communities.parseNostrEvent(event, community)
+                    let meta = Community.parseNostrEvent(event, community)
                     cb(meta);
                 }
             });
         } catch (err) {
             console.log("An ERROR occured when subscribing to community", err);
         } 
-    }
-
-    public static parseNostrEvent(communityDetails: NDKEvent, meta?: CommunityMeta){
-        if(!meta){
-            meta = {
-                ...CommunityMetaDefaults
-            };
-        }
-        meta.tags = [];
-        meta.content = communityDetails.content
-        meta.author = communityDetails.author.npub
-        meta.authorhex = communityDetails.author.hexpubkey()
-        if(communityDetails.created_at) meta.updated = communityDetails.created_at
-        communityDetails.tags.forEach(function (itm) {
-            if(!meta) return;
-            switch (itm[0]) {
-                case "title":
-                    meta.title = itm[1];
-                    break;
-                case "banner":
-                    if(itm[1].length >0) meta.image = itm[1];
-                    break;
-                case "zoom":
-                    meta.zoom = parseFloat(itm[1]);
-                    break;
-                case "g":
-                    const g = Geohash.decode(itm[1]);
-                    meta.latitude = g.lat;
-                    meta.longitude = g.lon;
-                    break;
-                case "t":
-                    meta.tags.push(itm[1]);
-                    break;
-                case "c":
-                    let locationString = itm[1].trim();
-                    let locationParts = locationString.split(' ');
-                    meta.city = locationString.substring(0, locationString.length - 3);
-                    if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
-                    break;
-                case "d":
-                    meta.uid = itm[1];
-                    break;
-                case "e":
-                    meta.eid = itm[1];
-                    break;
-            }
-        });
-        return meta;
     }
 
     public closeSubscriptions(){

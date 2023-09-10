@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type CommunityMeta, Communities } from "$lib/community/community";
+    import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
     import { imgUrlOrDefault } from "$lib/helpers";
     import type NDK from "@nostr-dev-kit/ndk";
 
@@ -10,7 +10,7 @@
     let communityDetails: CommunityMeta;
 
     if (ndk) {
-        let communities = new Communities(ndk)
+        let communities = new CommunitySubscriptions(ndk)
         communities.subscribeByID(id, async (data) => {
             communityDetails = data;
         });

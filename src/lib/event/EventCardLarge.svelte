@@ -6,18 +6,18 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import type NDK from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
     import type { EventMeta } from './event';
-    import { Communities } from '$lib/community/community';
+    import { CommunitySubscriptions } from '$lib/community/community';
     export let eventData: EventMeta;
     export let ndk: NDK ;
 
-    let communities = new Communities(ndk)
+    let communities = new CommunitySubscriptions(ndk)
 
     onMount(async () => {
 
         communities.subscribeByID(eventData.community.eid, async (data) => {
             eventData.community = data;
         })
-        
+
     })
 
 </script>

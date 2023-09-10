@@ -22,7 +22,7 @@
     import { userNpub } from "$lib/stores";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { Communities } from "$lib/community/community";
+    import { CommunitySubscriptions } from "$lib/community/community";
     import { subEventMeta } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
@@ -31,7 +31,7 @@
 
     let host: NDKUser | undefined;
 
-    let communities = new Communities(ndk)
+    let communities = new CommunitySubscriptions(ndk)
 
     communityMembers.set([]);
     communityEvents.set([]);

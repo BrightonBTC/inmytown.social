@@ -18,11 +18,11 @@
     } from "./stores";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
-    import { type CommunityMeta, Communities } from "$lib/community/community";
+    import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
     import { type EventMeta, subEventMeta } from "$lib/event/event";
     import ndk from "$lib/ndk";
 
-    let communities = new Communities(ndk)
+    let communities = new CommunitySubscriptions(ndk)
 
     let communityDetails: CommunityMeta | undefined | null = undefined;
     let eventMeta: EventMeta | null | string = null;

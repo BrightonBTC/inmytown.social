@@ -2,12 +2,12 @@
     import ndk from '$lib/ndk';
     import { onDestroy, onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
-    import { Communities } from '$lib/community/community';
+    import { CommunitySubscriptions } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
     import { subEvents } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
-    let communities = new Communities(ndk);
+    let communities = new CommunitySubscriptions(ndk);
 
     onMount(() => {
 

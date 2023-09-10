@@ -9,12 +9,12 @@
 	import CommunityCard from "./CommunityCard.svelte";
     import Form from "./Form.svelte";
 	import {
-		Communities,
+		CommunitySubscriptions,
 	} from "$lib/community/community";
 	import { login } from "$lib/user/user";
 	import ndk from "$lib/ndk";
 
-	let communities = new Communities(ndk);
+	let communities = new CommunitySubscriptions(ndk);
 
 	let loggedin: boolean;
 	let isNew: boolean = false;

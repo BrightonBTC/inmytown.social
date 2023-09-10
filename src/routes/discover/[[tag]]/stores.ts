@@ -1,5 +1,5 @@
 
-import { type CommunityMeta, Communities } from '$lib/community/community';
+import { type CommunityMeta, Community } from '$lib/community/community';
 import { parseEventData, type EventMeta } from '$lib/event/event';
 import type { NDKEvent } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
@@ -28,7 +28,7 @@ export function removeTopic(tag:string){
 
 export function addCommunity(e:NDKEvent){
     communityList.update(items => {
-        let d = Communities.parseNostrEvent(e)
+        let d = Community.parseNostrEvent(e)
         if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
         items.push(d)
         return [...new Map(items.map(v => [v.eid, v])).values()]
