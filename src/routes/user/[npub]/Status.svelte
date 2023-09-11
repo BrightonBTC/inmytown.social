@@ -3,42 +3,44 @@
 
     import Location from "$lib/location/Location.svelte";
     import LocationSelect from "$lib/location/LocationSelect.svelte";
+    import ndk from "$lib/ndk";
     import { userStatus } from "$lib/stores";
     import TagSelector from "$lib/topics/TagSelector.svelte";
     import Tags from "$lib/topics/Tags.svelte";
     import { publishUserStatus, type UserStatus } from "$lib/user/user";
-    import type NDK from "@nostr-dev-kit/ndk";
+    import { meetupUser } from "./stores";
 
-    export let ndk: NDK;
-    export let statusData: UserStatus;
 
     let edit: boolean = false;
 
-    let showStatus: boolean = statusData.city && statusData.country && statusData.locationStatus ? true : false;
+    let showStatus: boolean = $meetupUser.status?.city && $meetupUser.status?.country && $meetupUser.status?.locationStatus ? true : false;
 
     async function submitStatus(){
-        if(ndk){
-            if(!showStatus){
-                statusData.city, statusData.country, statusData.locationStatus = undefined;
-            }
-            let r = await publishUserStatus(ndk, statusData);
-            userStatus.set(JSON.stringify(statusData));
-            edit = false
+        if(!$meetupUser.status) return
+        if(!showStatus){
+            $meetupUser.status.city, $meetupUser.status.country, $meetupUser.status.locationStatus = undefined;
         }
+        let r = await publishUserStatus(ndk, $meetupUser.status);
+        userStatus.set(JSON.stringify($meetupUser.status));
+        edit = false
     }
 
     function locChanged(city: City){
-        statusData.city = city.name
-        statusData.country = city.country
+        if($meetupUser.status){
+            $meetupUser.status.city = city.name
+            $meetupUser.status.country = city.country
+        }
     }
 
     function updateTags(tags: string[]){
-        statusData.interests = tags
+        if($meetupUser.status){
+            $meetupUser.status.interests = tags
+        }
     }
 </script>
 {#if isLoggedInUser && !edit}
     <button class="btn btn-success mb-5" on:click={() => {edit = true}}>Edit Status <i class="bi bi-pencil-fill"></i></button>
-{:else if isLoggedInUser}
+{:else if isLoggedInUser && $meetupUser.status}
     <form on:submit|preventDefault={submitStatus}>
         <div class="mb-3 mt-3">
             <label for="status" class="form-label">Status:</label>
@@ -48,7 +50,7 @@
                 maxlength="100"
                 placeholder="eg. visiting London"
                 name="status"
-                bind:value={statusData.status}
+                bind:value={$meetupUser.status.status}
             />
         </div>
         <div class="form-check mb-3">
@@ -65,8 +67,8 @@
         {#if showStatus}
         <div class="mb-3 d-flex">
             <label for="tags" class="form-label">Interests:</label>
-            <Tags tags={statusData.interests} linked={false} />
-            <TagSelector callback={updateTags} tags={statusData.interests} />
+            <Tags tags={$meetupUser.status.interests} linked={false} />
+            <TagSelector callback={updateTags} tags={$meetupUser.status.interests} />
         </div>
         <div class="mb-3">
             <label for="locationStatus" class="form-label">Current location:</label>
@@ -75,7 +77,7 @@
                     <select
                         class="form-select"
                         id="locationStatus"
-                        bind:value={statusData.locationStatus}
+                        bind:value={$meetupUser.status.locationStatus}
                     >
                         <option value="living">Living in</option>
                         <option value="visiting">Visiting</option>
@@ -83,7 +85,7 @@
                 </div>
                 
                 <div class="ps-2">
-                    <LocationSelect country={statusData.country} city={statusData.city} callback={locChanged} />
+                    <LocationSelect country={$meetupUser.status.country} city={$meetupUser.status.city} callback={locChanged} />
                 </div>
                 
             </div>
@@ -94,22 +96,22 @@
         <button type="submit" class="btn btn-secondary"  on:click|preventDefault={() => {edit = false}}>Cancel</button>
     </form>
 {/if}
-{#if !edit}
+{#if !edit  && $meetupUser.status}
 <div class="bg-dark text-light rounded">
     
     <p class="text-muted"><small>Current status:</small></p>
-    {#if statusData.status && statusData.status.trim().length > 0}
+    {#if $meetupUser.status.status && $meetupUser.status.status.trim().length > 0}
         <blockquote class="blockquote">
-            <p>{statusData.status}</p>
+            <p>{$meetupUser.status.status}</p>
         </blockquote>
     {:else}
         <p class="text-muted"><em><small>-- Not set --</small></em></p>
     {/if}
     <p class="text-muted"><small>Current location:</small></p>
-    {#if statusData.city && statusData.country && statusData.locationStatus}
+    {#if $meetupUser.status.city && $meetupUser.status.country && $meetupUser.status.locationStatus}
         <p>
-            <Location city={statusData.city} country={statusData.country} />
-            {#if statusData.locationStatus == 'visiting'}
+            <Location city={$meetupUser.status.city} country={$meetupUser.status.country} />
+            {#if $meetupUser.status.locationStatus == 'visiting'}
                 <span class="badge bg-secondary">visiting</span>
             {/if}
         </p>
@@ -119,7 +121,7 @@
     {/if}
     <p class="text-muted"><small>Interests:</small></p>
     <div class="mb-3">
-        <Tags tags={statusData.interests} linked={true} />
+        <Tags tags={$meetupUser.status.interests} linked={true} />
     </div>
 </div>
 {/if}

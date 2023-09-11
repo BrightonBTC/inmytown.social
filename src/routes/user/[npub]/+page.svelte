@@ -1,59 +1,38 @@
 <script lang="ts">
-    import type { User } from "./proxy+page";
-    import { onMount } from "svelte";
-    import { userNpub, userStatus } from "$lib/stores";
+    import type { UserID } from "./proxy+page";
+    import { userNpub } from "$lib/stores";
     import Status from "./Status.svelte";
     import MemberList from "./MemberList.svelte";
     import AdminOfList from "./AdminOfList.svelte";
     import Header from "./Header.svelte";
-    import { NDKUser } from "@nostr-dev-kit/ndk";
-    import { fetchFollows, subUserStatus, type UserStatus } from "$lib/user/user";
+    import { MeetupUser} from "$lib/user/user";
     import Follows from "./Follows.svelte";
-    import { currentUserFollows } from "./stores";
-    import Del from "./Del.svelte";
+    import { meetupUser } from "./stores";
     import Loading from "$lib/Loading.svelte";
-    import ndk from "$lib/ndk";
-    export let data:User;   
+    export let data:UserID;   
     let page: string = 'status'
-
-    let statusData: UserStatus;
+    let loaded:boolean
 
     $: npub = data.npub;
     $: isLoggedInUser = data.npub === $userNpub
 
-    onMount(async () => {
-        getUserStatusData()
-        getLoggedInUserFollows()
-    });
+    async function setUser(){
+        let user = new MeetupUser({npub: npub})
+        await user.fetchProfile()
+        await user.fetchStatus()
+        meetupUser.set(user)
+        loaded = true;
+    }
+
     function setPage(p:string){
         page = p
     }
 
-    $: getUserStatusData(), setPage('status'), getLoggedInUserFollows(), npub
- 
-    async function getUserStatusData(){
-        statusData = {
-            communities: [],
-            interests: []
-        }
-        let user = new NDKUser({npub: npub})
-        subUserStatus(ndk, user.hexpubkey(), (data) => {
-            console.log('statusData',data)
-            statusData = data
-            if(isLoggedInUser && statusData){
-                userStatus.set(JSON.stringify(statusData))
-            }
-        })
-    }
-
-    async function getLoggedInUserFollows() {
-        if(!ndk || !$userNpub) return;
-        $currentUserFollows = await fetchFollows(ndk, $userNpub)
-    }
+    $: loaded = false, setUser(), setPage('status'), npub
 
 </script>
-{#if ndk}
-    <Header  {npub} {ndk} />
+{#if loaded}
+    <Header />
     <div class="row">
         <div class="col-lg-3">
             <div class="mt-3 p-3 border-end">
@@ -69,18 +48,18 @@
         </div>
         <div class="col-lg-9 p-4">
             {#if page==='admin'}
-            <AdminOfList {ndk} {npub} {isLoggedInUser} />
+            <AdminOfList {isLoggedInUser} />
             {:else if page==='member'}
-            <MemberList {ndk} {statusData} />
+            <MemberList />
             {:else if page==='status'}
-            <Status {ndk} {statusData} {isLoggedInUser} />
+            <Status {isLoggedInUser} />
             {:else if page==='follows'}
-            <Follows {ndk} {npub} />
+            <Follows />
             {:else if page==='del'}
-            <Del {ndk} {npub} />
+            <!-- <Del {ndk} {npub} /> -->
             {/if}
         </div>
     </div>
 {:else}
-<Loading />
+<Loading t="Fetching User Profile..." />
 {/if}

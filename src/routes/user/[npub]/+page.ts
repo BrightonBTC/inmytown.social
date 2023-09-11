@@ -6,6 +6,6 @@ export const load: PageLoad = ({ params }) => {
     }
 }
 
-export interface User{
+export interface UserID{
     npub: string
 }

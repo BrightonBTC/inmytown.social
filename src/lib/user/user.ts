@@ -1,3 +1,4 @@
+import ndk from "$lib/ndk"
 import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile } from "$lib/stores"
 import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 
@@ -8,6 +9,26 @@ export interface UserStatus{
     locationStatus?: LocationStatus
     country?: string
     city?: string
+}
+
+export class MeetupUser extends NDKUser {
+
+    public status?: UserStatus;
+
+    public constructor(opts: {}){
+        super(opts)
+        this.ndk = ndk
+    }
+
+    public async fetchStatus(){
+        let event = await this.ndk?.fetchEvent({
+            authors: [this.hexpubkey()],
+            kinds: [10037]
+        }, {})
+        if(event){
+            this.status = parseUserStatusData(event)
+        }
+    }
 }
 
 export class UserSubscriptions {
@@ -109,11 +130,11 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     }
 };
 
-export async function subUserStatus(ndk: NDK, npub: string, cb: (data: UserStatus) => void) {
+export async function subUserStatus(ndk: NDK, hexkey: string, cb: (data: UserStatus) => void) {
     let lastUpd = 0;
     try {
         const communitySub = ndk.subscribe(
-            { kinds: [10037], "authors": [npub] }
+            { kinds: [10037], "authors": [hexkey] }
         );
         communitySub.on("event", (event: NDKEvent) =>  {
             if (event.created_at && event.created_at > lastUpd) {

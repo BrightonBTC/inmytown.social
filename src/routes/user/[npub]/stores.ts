@@ -1,16 +1,17 @@
-import { type CommunityMeta, Community } from '$lib/community/community';
-import type { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
+import type { CommunityMeta } from '$lib/community/community';
+import type { MeetupUser } from '$lib/user/user';
+import type { NDKUser } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
+
+export const meetupUser = writable<MeetupUser>()
 
 export const communitiesStore = writable<Array<CommunityMeta>>([]);
 
 export const sortedCommunities = derived(communitiesStore, (v) => v.sort((a, b) => b.updated - a.updated))
 
-export function addCommunity(e:NDKEvent){
+export function addCommunity(community:CommunityMeta){
     communitiesStore.update(items => {
-        let d = Community.parseNostrEvent(e)
-        if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
-        items.push(d)
+        items.push(community)
         return [...new Map(items.map(v => [v.eid, v])).values()]
     })
 }

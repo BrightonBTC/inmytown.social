@@ -1,17 +1,17 @@
 <script lang="ts">
     import { dateStringFull } from "$lib/formatDates";
     import { imgUrlOrDefault } from "$lib/helpers";
-    import { addCommunity, communitiesStore, sortedCommunities } from "./stores";
-    import { NDKUser, type NDKEvent, type NDKFilter } from "@nostr-dev-kit/ndk";
-    import type NDK from "@nostr-dev-kit/ndk";
+    import { addCommunity, communitiesStore, meetupUser, sortedCommunities } from "./stores";
     import { userHex } from "$lib/stores";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
+    import { CommunitySubscriptions } from "$lib/community/community";
+    import ndk from "$lib/ndk";
 
-    export let ndk: NDK | undefined;
+    let communitySubs = new CommunitySubscriptions(ndk);
+
     export let isLoggedInUser: boolean;
-    export let npub: string;
 
-    $: getList(), npub
+    $: getList(), $meetupUser
 
     async function getList(){
         communitiesStore.set([])
@@ -20,20 +20,12 @@
             hex = $userHex
         }
         else{
-            let n = new NDKUser({npub: npub})
-            hex = n.hexpubkey();
+            hex = $meetupUser.hexpubkey();
         }
-        if(ndk && hex){
-            const filter: NDKFilter = {
-                kinds: [30037],
-                authors: [hex],
-            };
-            const communitiesSub = ndk.subscribe(filter, {
-                closeOnEose: true,
-            });
-            communitiesSub.on("event", (event: NDKEvent) => {
-                addCommunity(event);
-            });
+        if(hex){
+            communitySubs.subscribe({authors: [hex]}, (data) => {
+                addCommunity(data);
+            })
         }
     }
 </script>
