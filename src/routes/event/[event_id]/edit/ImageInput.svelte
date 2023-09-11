@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { eventMetaStore } from "./stores";
+    import { meetupStore } from "./stores";
 </script>
 
 <label for="im" class="form-label text-light">Image URL:</label>
@@ -9,5 +9,5 @@
     id="im"
     placeholder="eg. http://images.com/myimage.webp"
     name="im"
-    bind:value={$eventMetaStore.image} 
+    bind:value={$meetupStore.meta.image} 
 />

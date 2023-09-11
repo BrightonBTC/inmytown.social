@@ -1,6 +1,6 @@
 
-import { type CommunityMeta, Community } from '$lib/community/community';
-import { parseEventData, type EventMeta } from '$lib/event/event';
+import type { CommunityMeta } from '$lib/community/community';
+import type { EventMeta } from '$lib/event/event';
 import type { NDKEvent } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
 
@@ -26,28 +26,46 @@ export function removeTopic(tag:string){
     })
 }
 
-export function addCommunity(e:NDKEvent){
+// export function addCommunity(e:NDKEvent){
+//     communityList.update(items => {
+//         let d = Community.parseNostrEvent(e)
+//         if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
+//         items.push(d)
+//         return [...new Map(items.map(v => [v.eid, v])).values()]
+//     })
+// }
+export function addCommunity(e:CommunityMeta){
     communityList.update(items => {
-        let d = Community.parseNostrEvent(e)
-        if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
-        items.push(d)
+        items.push(e)
         return [...new Map(items.map(v => [v.eid, v])).values()]
     })
 }
-export function addEvent(e:NDKEvent){
-    //console.log('evnt', e)
-    let d = parseEventData(e)
-    //console.log('-- evnt', d)
-    if(d.status !=='draft'){
+// export function addEvent(e:NDKEvent){
+//     //console.log('evnt', e)
+//     let d = MeetupEvent.parseNostrEvent(e)
+//     //console.log('-- evnt', d)
+//     if(d.status !=='draft'){
+//         eventList.update(items => {
+//             let dupes = items.filter(x => x.uid === d.uid);
+//             if(dupes.length === 0 || dupes[0].updated < d.updated){
+//                 items.push(d)
+//             }
+//             return [...new Map(items.map(v => [v.eid, v])).values()]
+//         })
+//     }
+// }
+export function addEvent(event:EventMeta){
+    if(event.status !=='draft'){
         eventList.update(items => {
-            let dupes = items.filter(x => x.uid === d.uid);
-            if(dupes.length === 0 || dupes[0].created_at < d.created_at){
-                items.push(d)
+            let dupes = items.filter(x => x.uid === event.uid);
+            if(dupes.length === 0 || dupes[0].updated < event.updated){
+                items.push(event)
             }
             return [...new Map(items.map(v => [v.eid, v])).values()]
         })
     }
 }
+
 export function addPerson(e:NDKEvent){
     personList.update(items => {
         items.push(e)

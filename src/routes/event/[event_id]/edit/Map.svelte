@@ -7,7 +7,7 @@
     import {useGeographic} from 'ol/proj.js';
 
     import { onMount } from "svelte";
-    import { eventMetaStore, signalUpdMap } from "./stores";
+    import { meetupStore, signalUpdMap } from "./stores";
     import { defaults } from "ol/interaction/defaults";
     import Style from "ol/style/Style";
     import Icon from "ol/style/Icon";
@@ -24,9 +24,9 @@
     export const updMap = function(){
 
         if (map !== undefined){
-            point = new Point([$eventMetaStore.longitude, $eventMetaStore.latitude])
+            point = new Point([$meetupStore.meta.longitude, $meetupStore.meta.latitude])
             iconFeature.setGeometry(point)
-            map.getView().animate({zoom: 14}, {center: [$eventMetaStore.longitude, $eventMetaStore.latitude]});
+            map.getView().animate({zoom: 14}, {center: [$meetupStore.meta.longitude, $meetupStore.meta.latitude]});
         }
         
     };
@@ -47,7 +47,7 @@
     }
 
     onMount(() => {
-        point = new Point([$eventMetaStore.longitude, $eventMetaStore.latitude])
+        point = new Point([$meetupStore.meta.longitude, $meetupStore.meta.latitude])
         
         iconFeature = new Feature(point);
         iconFeature.set('style', createStyle('/img/meetupicon.png'));
@@ -65,7 +65,7 @@
                 }),
             ],
             view: new View({
-                center: [$eventMetaStore.longitude, $eventMetaStore.latitude],
+                center: [$meetupStore.meta.longitude, $meetupStore.meta.latitude],
                 zoom: 14,
                 minZoom: 1,
                 maxZoom: 20
@@ -74,9 +74,9 @@
         });
         map.getView().on('change:center', (event) => {
             let c = map.getView().getCenter();
-            $eventMetaStore.latitude = (c !== undefined ? c[1] : 0); 
-            $eventMetaStore.longitude = (c !== undefined ? c[0] : 0); 
-            point = new Point([$eventMetaStore.longitude, $eventMetaStore.latitude])
+            $meetupStore.meta.latitude = (c !== undefined ? c[1] : 0); 
+            $meetupStore.meta.longitude = (c !== undefined ? c[0] : 0); 
+            point = new Point([$meetupStore.meta.longitude, $meetupStore.meta.latitude])
             iconFeature.setGeometry(point)
         });
     });
@@ -84,8 +84,8 @@
 
 <div id="map" class="mb-1 mt-5" />
 <small class="text-muted mb-5">
-    Lat: {$eventMetaStore.latitude} <br>
-    Lon: {$eventMetaStore.longitude}  
+    Lat: {$meetupStore.meta.latitude} <br>
+    Lon: {$meetupStore.meta.longitude}  
 </small>
 <style>
     #map {

@@ -1,17 +1,11 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type NDK from "@nostr-dev-kit/ndk";
     import { getBadgeClassByStatus } from "$lib/helpers";
     import Loading from "$lib/Loading.svelte";
     import { dateStringFull } from "$lib/formatDates";
-    import { type EventMeta, subEventMeta } from "$lib/event/event";
-    export let eid: string;
-    export let ndk: NDK;
-    let event: EventMeta | null;
+    import type { EventMeta } from "$lib/event/event";
+    export let event: EventMeta ;
 
-    subEventMeta(ndk, eid, async (data) => {
-        event = data
-    })
 </script>
 
 <tr>

@@ -6,6 +6,6 @@ export const load: PageLoad = ({ params }) => {
     }
 }
 
-export interface MeetupEvent{
+export interface MeetupEventID{
     event_id: string
 }

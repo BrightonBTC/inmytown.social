@@ -1,179 +1,82 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type { MeetupEvent } from "./+page";
-    export let data: MeetupEvent;
-    import { onMount } from "svelte";
-    import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import { userNpub } from "$lib/stores";
-    import CommunityCard from "$lib/community/CommunityCard.svelte";
-    import { marked } from "marked";
-    import { dateStringFull } from "$lib/formatDates";
-    import Map from "./Map.svelte";
-    import Rsvp from "./Rsvp.svelte";
+    import type { MeetupEventID } from "./+page";
+    export let data: MeetupEventID;
+
+    import { onDestroy, onMount } from "svelte";
+
     import {
         addAttendee,
         attendeeStore,
-        attendees,
-        interested,
+        meetupStore,
     } from "./stores";
-    import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
-    import { imgUrlOrDefault } from "$lib/helpers";
-    import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
-    import { type EventMeta, subEventMeta } from "$lib/event/event";
+    
     import ndk from "$lib/ndk";
+    import { userNpub } from "$lib/stores";
+    import Loading from "$lib/Loading.svelte";
+    import Attendees from "./Attendees.svelte";
+    import Header from "./Header.svelte";
+    import Details from "./Details.svelte";
+    import MainContent from "./MainContent.svelte";
+    import CommunityWidget from "./CommunityWidget.svelte";
+    import Rsvp from "./Rsvp.svelte";
 
-    let communitySubs = new CommunitySubscriptions(ndk)
+    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    let eventSubs = new EventSubscriptions(ndk)
 
-    let communityDetails: CommunityMeta | undefined | null = undefined;
-    let eventMeta: EventMeta | null | string = null;
     let hasRsvp: string;
     let event_id = data.event_id;
+    let loaded:boolean = false;
+
+    $: console.log('meta upd', $meetupStore.meta)
 
     attendeeStore.set([]);
+    meetupStore.set(new MeetupEvent(ndk))
 
     onMount(async () => {
-        fetchEventDetails();
-        subscribeRsvp();
+        eventSubs.subscribeByID(event_id, async (data) => {
+            $meetupStore.meta = data;
+            // await $meetupStore.fetchCommunity()
+            loaded = true;
+            subscribeRsvp();
+        })
     });
 
-    async function fetchEventDetails() {
-        subEventMeta(ndk, event_id, async (data) => {
-            eventMeta = data
-            fetchCommunityDetails(eventMeta.community.eid);
-        })
-    }
-
-    async function fetchCommunityDetails(id: string) {
-        communitySubs.subscribeByID(id, async (data) => {
-            communityDetails = data
-        });
-    }
+    onDestroy(() => {
+        $meetupStore.destroy()
+    })
 
     function subscribeRsvp() {
-        try {
-            const eventsSub = ndk.subscribe(
-                {
-                    kinds: [30038],
-                    "#d": [event_id],
-                },
-                {
-                    closeOnEose: false,
-                }
-            );
-            eventsSub.on("event", (event: NDKEvent) => {
-                let rsvp: string = event.tags
-                    .filter((x) => x[0] === "rsvp")[0][1]
-                    .toString();
-                addAttendee(event.author.npub, rsvp);
-                if (event.author.npub == $userNpub) {
-                    hasRsvp = rsvp;
-                }
-            });
-        } catch (err) {
-            console.log("An ERROR occured", err);
-        }
+        $meetupStore.fetchRSVPs(async (event) => {
+            let rsvp: string = event.tags
+                .filter((x) => x[0] === "rsvp")[0][1]
+                .toString();
+            addAttendee(event.author.npub, rsvp);
+            if (event.author.npub == $userNpub) {
+                hasRsvp = rsvp;
+            }
+        })
     }
 </script>
-
-{#if eventMeta && typeof eventMeta !== "string"}
+{#if loaded}
     <div class="row me-1">
         <div class="col-sm-4 bg-secondary rounded p-0 border">
             <h1 class="card-title text-light rounded-top mb-3 bg-secondary p-3">
-                {eventMeta.title}
+                {$meetupStore.meta.title}
             </h1>
             <div class="m-3">
-                <p class="ms-3 mb-2 text-muted">An event from:</p>
-                {#if communityDetails}
-                    <CommunityCard
-                        {communityDetails}
-                    />
-                {/if}
-                <ul class="list-group list-group-flush mt-3">
-                    <li class="list-group-item d-flex">
-                        <i class="bi bi-clock pe-2 text-primary" />
-                        <small class="ps-2 text-muted">
-                            <strong>Starts:</strong>
-                            {dateStringFull(eventMeta.starts)}<br />
-                            <strong>Ends:</strong>
-                            {dateStringFull(eventMeta.ends)}
-                        </small>
-                    </li>
-                    <li class="list-group-item d-flex">
-                        <i class="bi bi-geo-alt me-2 text-primary" />
-                        <div class="ps-2">
-                            {eventMeta.venue}<br /><small
-                                >{eventMeta.city}, {eventMeta.country}</small
-                            >
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <Map {eventMeta} />
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-tag me-2 text-primary" />
-                        {#each eventMeta.tags as t}
-                            <span class="badge rounded-pill bg-info me-1"
-                                >#{t}</span
-                            >
-                        {/each}
-                    </li>
-                </ul>
-                <ul class="list-group list-group-flush mt-3">
-                    {#if Object.values($attendees).length > 0}
-                        <li class="list-group-item">
-                            <div class="text-muted">
-                                Going ({Object.values($attendees).length})
-                            </div>
-                            {#each Object.values($attendees) as a}
-                                <div class="p-1 float-start">
-                                    <LinkedPfpIcon {ndk} npub={a[0]} />
-                                </div>
-                            {/each}
-                        </li>
-                    {/if}
-
-                    {#if Object.values($interested).length > 0}
-                        <li class="list-group-item">
-                            <div class="text-muted">
-                                Interested ({Object.values($interested).length})
-                            </div>
-                            {#each Object.values($interested) as a}
-                                <div class="p-1 float-start">
-                                    <LinkedPfpIcon {ndk} npub={a[0]} />
-                                </div>
-                            {/each}
-                        </li>
-                    {/if}
-                </ul>
+                <CommunityWidget />
+                <Details />
+                <Attendees />
             </div>
         </div>
         <div class="col-sm-8">
-            <img
-                src={imgUrlOrDefault(eventMeta.image)}
-                alt={eventMeta.title}
-                class="img-fluid rounded e-im"
-            />
-            <div class="mt-2 text-center bg-secondary rounded border p-2">
-                <Rsvp {ndk} {event_id} {hasRsvp} />
-            </div>
-
-            <p class="lead mt-2">
-                <span class="badge bg-dark mb-1 text-light border"
-                    ><i class="bi bi-clock pe-2 text-primary" />
-                    {dateStringFull(eventMeta.starts)}</span
-                >
-            </p>
-
-            <div class="p-5 border-end">
-                {@html marked(eventMeta.content)}
-            </div>
+            <Header />
+            <Rsvp {hasRsvp} />
+            <MainContent />
         </div>
     </div>
+{:else}
+    <Loading t="Fetching Event..." />
 {/if}
 
-<style>
-    .e-im {
-        object-fit: cover;
-        width: 100%;
-    }
-</style>

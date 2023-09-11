@@ -1,5 +1,5 @@
 import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile } from "$lib/stores"
-import NDK, { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 
 export interface UserStatus{
     communities: string[]
@@ -8,6 +8,64 @@ export interface UserStatus{
     locationStatus?: LocationStatus
     country?: string
     city?: string
+}
+
+export class UserSubscriptions {
+    public ndk: NDK;
+    private subscriptions: NDKSubscription[] = [];
+
+    public constructor(ndk: NDK){
+        this.ndk = ndk
+    }
+
+    public async subscribeByID(id: string, cb: (data: NDKEvent) => void, opts?: NDKSubscriptionOptions){
+        // let meta: EventMeta = {
+        //     ...EventMetaDefaults,
+        //     eid: id
+        // };
+        // try {
+        //     let communitySub = this.ndk.subscribe(
+        //         {
+        //             kinds: [1073],
+        //             "ids": [id],
+        //         },
+        //         opts
+        //     );
+        //     if(opts && opts.closeOnEose === false){
+        //         this.subscriptions.push(communitySub)
+        //     }
+        //     communitySub.on("event", (event: NDKEvent) =>  {
+        //         meta.created = event.created_at ? event.created_at : 0;
+        //         this.subscribeMeta(meta, cb)
+        //     });
+        // } catch (err) {
+        //     console.log("An ERROR occured when subscribing to event", err);
+        // } 
+    }
+
+    public async subscribe(filter: NDKFilter, cb: (data: NDKEvent) => void, opts?: NDKSubscriptionOptions){
+        filter.kinds = [10037]
+        try {
+            const sub = this.ndk.subscribe(
+                filter,
+                opts
+            );
+            if(opts && opts.closeOnEose === false){
+                this.subscriptions.push(sub)
+            }
+            sub.on("event", (event: NDKEvent) =>  {
+                cb(event)
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to events", err);
+        } 
+    }
+
+    public closeSubscriptions(){
+        this.subscriptions.forEach(function(sub){
+            sub.stop()
+        })
+    }
 }
 
 
@@ -23,7 +81,7 @@ export async function login(ndk: NDK) {
                 );
                 userNpub.set(user.npub)
                 userHex.set(user.hexpubkey())
-                let u = await ndk.getUser({npub: user?.npub})
+                let u = ndk.getUser({npub: user?.npub})
                 await u.fetchProfile();
                 userProfile.set(JSON.stringify(u.profile));
                 loggedin = true

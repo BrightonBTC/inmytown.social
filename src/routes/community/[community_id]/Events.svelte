@@ -1,6 +1,6 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import { sortedPast, sortedUpcoming } from "./stores";
+    import { sortedPast, sortedUpcoming } from "./store.events";
     import EventCard from "$lib/event/EventCard.svelte";
 </script>
 
@@ -8,7 +8,7 @@
     {#if $sortedUpcoming.length > 0}
     <h3>Upcoming events:</h3>
     {#each $sortedUpcoming as eventData}
-        <EventCard eventData = {eventData[2]} />
+        <EventCard {eventData} />
     {/each}
     {:else}
         <hr />
@@ -17,7 +17,7 @@
     {#if $sortedPast.length > 0}
     <h3>Past events:</h3>
     {#each $sortedPast as eventData}
-        <EventCard eventData = {eventData[2]} />
+        <EventCard {eventData} />
     {/each}
     {:else}
         <hr />

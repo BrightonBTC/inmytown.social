@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { eventMetaStore, signalUpdMap } from "./stores";
+    import { meetupStore, signalUpdMap } from "./stores";
     import Map from "./Map.svelte";
     import LocationSelect from "$lib/location/LocationSelect.svelte";
 
     const signal = $signalUpdMap;
 
     function locChanged(city: City){
-        $eventMetaStore.city = city.name
-        $eventMetaStore.country = city.country
-        $eventMetaStore.latitude = parseFloat(city.lat)
-        $eventMetaStore.longitude = parseFloat(city.lng)
-        $eventMetaStore = $eventMetaStore
+        $meetupStore.meta.city = city.name
+        $meetupStore.meta.country = city.country
+        $meetupStore.meta.latitude = parseFloat(city.lat)
+        $meetupStore.meta.longitude = parseFloat(city.lng)
+        //$eventMetaStore = $eventMetaStore
         signalUpdMap.update(()=> signal);
     }
 </script>
@@ -19,9 +19,9 @@
         <div class="col-sm-6 text-light">
             <h4>Where will your event be held?</h4>
 
-            <LocationSelect country={$eventMetaStore.country} city={$eventMetaStore.city} callback={locChanged} />
+            <LocationSelect country={$meetupStore.meta.country} city={$meetupStore.meta.city} callback={locChanged} />
 
-            {#if $eventMetaStore.country != ''}
+            {#if $meetupStore.meta.country != ''}
 
             <div class="mb-3 mt-2">
                 <label for="im" class="form-label text-muted">Venue:</label>
@@ -31,7 +31,7 @@
                     id="venue"
                     placeholder="Name / short address of the venue"
                     name="venue"
-                    bind:value={$eventMetaStore.venue}
+                    bind:value={$meetupStore.meta.venue}
                 />
             </div>
             {/if}

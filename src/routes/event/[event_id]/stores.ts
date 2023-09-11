@@ -1,5 +1,7 @@
+import type { MeetupEvent } from '$lib/event/event';
 import { derived, writable } from 'svelte/store';
 
+export const meetupStore = writable<MeetupEvent>();
 
 export const attendeeStore = writable<Array<[string, string]>>([]);
 

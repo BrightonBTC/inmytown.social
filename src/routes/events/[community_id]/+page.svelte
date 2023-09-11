@@ -2,89 +2,58 @@
     import type { Community } from "./+page";
     export let data: Community;
     import { onMount } from "svelte";
-    import { NDKEvent } from "@nostr-dev-kit/ndk";
 
-    import { userHex, userNpub } from "$lib/stores";
+    import { userNpub } from "$lib/stores";
     import Loading from "$lib/Loading.svelte";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { goto } from "$app/navigation";
     import { myEvents } from "./stores";
     import EventRow from "./EventRow.svelte";
-    import { type CommunityMeta, CommunityMetaDefaults, CommunitySubscriptions } from "$lib/community/community";
-    import { EventMetaDefaults, type EventMeta, publishEventMeta } from "$lib/event/event";
+    import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
+    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
+    import { addEvent } from "./stores";
 
     let communitySubs = new CommunitySubscriptions(ndk)
+    let eventSubs = new EventSubscriptions(ndk)
 
     let community_id = data.community_id;
-    let communityDetails: CommunityMeta | undefined | null = undefined;
-    let authorised: boolean | undefined;
+    let communityDetails: CommunityMeta;
+    let authorised: boolean;
 
     myEvents.set([]);
+
+    $: authorised ? fetchEvents(): void
 
     onMount(async () => {
         await login(ndk);
 
-        if ($userHex) {
-
-            communitySubs.subscribeByID(data.community_id, async (data) => {
-                communityDetails = data
-                if (communityDetails?.author === $userNpub) {
-                    authorised = true;
-                    if($userHex) fetchEvents($userHex);
-                } else {
-                    authorised = false;
-                }
-            });
+        if ($userNpub) {
+            await fetchCommunity();
+        }
+        else{
+            authorised = false;
         }
     });
 
-    async function fetchEvents(hexkey: string) {
-        const communitiesSub = ndk.subscribe(
-            {
-                kinds: [1073],
-                "#e": [community_id],
-            },
-            { closeOnEose: false }
-        );
-        communitiesSub.on("event", (event: NDKEvent) => {
-            if (event.created_at) {
-                $myEvents[event.created_at] = event;
-                $myEvents = $myEvents;
-            }
+    async function fetchCommunity() {
+        communitySubs.subscribeByID(community_id, async (data) => {
+            communityDetails = data;
+            authorised = communityDetails?.author === $userNpub;
         });
     }
 
+    async function fetchEvents() {
+        eventSubs.subscribe({"#e": [community_id]}, async (event) => {
+            addEvent(event);
+        })
+    }
+
     async function createEvent() {
-        const ndkEvent = new NDKEvent(ndk);
-        ndkEvent.kind = 1073;
-        ndkEvent.tags = [["e", community_id]];
-        await ndkEvent.publish();
-        let eventMeta: EventMeta = {
-            ...EventMetaDefaults,
-            eid: ndkEvent.id,
-            uid: Math.round(Date.now()).toString(16),
-            community: {
-                ...CommunityMetaDefaults,
-                eid: community_id,
-            },
-        };
-        if (communityDetails?.latitude) {
-            eventMeta.latitude = communityDetails?.latitude;
-        }
-        if (communityDetails?.longitude) {
-            eventMeta.longitude = communityDetails?.longitude;
-        }
-        if (communityDetails?.city) {
-            eventMeta.city = communityDetails?.city;
-        }
-        if (communityDetails?.country) {
-            eventMeta.country = communityDetails?.country;
-        }
-        let response: NDKEvent | string | null;
-        response = await publishEventMeta(ndk, eventMeta);
-        goto("/event/" + ndkEvent.id + "/edit");
+        let newMeetupEvent = await MeetupEvent.create(ndk, communityDetails);
+        await newMeetupEvent.publish();
+        goto("/event/" + newMeetupEvent.meta.eid + "/edit");
     }
 </script>
 
@@ -114,8 +83,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#each Object.values($myEvents) as ev}
-                            <EventRow {ndk} eid={ev.id} />
+                        {#each $myEvents as event}
+                            <EventRow {event} />
                         {/each}
                     </tbody>
                 </table>

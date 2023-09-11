@@ -17,7 +17,7 @@
 
         let sub = ndk.subscribe(
             {
-                kinds: [1073, 10037, 30037, 1037, 30073, 30038],
+                kinds: [1073, 10037, 30037, 1037, 30073, 30042],
                 authors: [$userHex],
             },
             { closeOnEose: false }

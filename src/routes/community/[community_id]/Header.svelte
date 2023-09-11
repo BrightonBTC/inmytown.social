@@ -1,6 +1,6 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import { communityMembers, removeMember } from "./stores";
+    import { communityMembers, removeMember } from "./store.community";
     import { uStatus, userStatus, userNpub } from "$lib/stores";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
@@ -9,7 +9,7 @@
     import { publishUserStatus } from "$lib/user/user";
     import Location from "$lib/location/Location.svelte";
     import ndk from "$lib/ndk";
-    import {community} from "./stores";
+    import {community} from "./store.community";
 
     export let host: NDKUser | undefined;
     let isFollower: boolean = false;

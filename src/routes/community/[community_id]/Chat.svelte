@@ -2,15 +2,12 @@
     import Comment from "./Comment.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
     import {
-        addComment,
-        chatCommentsStore,
-        chatStore,
-        sortedComments,
         community
-    } from "./stores";
+    } from "./store.community";
     import { relays } from "$lib/stores";
     import Quote from "./Quote.svelte";
     import ndk from "$lib/ndk";
+    import { addComment, chatCommentsStore, chatStore, sortedComments } from "./store.chat";
 
     $: getChat(), $community.meta;
     $: getComments(), $chatStore;

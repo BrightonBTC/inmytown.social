@@ -1,10 +1,6 @@
 <script lang="ts">
-    import { eventMetaStore } from "./stores";
     import "bootstrap-icons/font/bootstrap-icons.css";
-
-    let tags: string[];
-    let n: number;
-
+    import { meetupStore } from "./stores";
 
     let disabled: boolean = false;
 
@@ -14,21 +10,21 @@
 
     const addTag = () => {
         if(parsed.length > 1){
-            if(!$eventMetaStore.tags.includes(parsed)){
-                $eventMetaStore.tags = [...$eventMetaStore.tags, parsed];
+            if(!$meetupStore.meta.tags.includes(parsed)){
+                $meetupStore.meta.tags = [...$meetupStore.meta.tags, parsed];
             }
-            $eventMetaStore = $eventMetaStore
+            //$eventMetaStore = $eventMetaStore
             parsed = '';
             checkNTags();
         }
     };
     const deleteTag = (s: string) => {
-        $eventMetaStore.tags = $eventMetaStore.tags.filter((t) => t !== s)
-        $eventMetaStore = $eventMetaStore
+        $meetupStore.meta.tags = $meetupStore.meta.tags.filter((t) => t !== s)
+        //$eventMetaStore = $eventMetaStore
         checkNTags();
     };
     const checkNTags = () => {
-        disabled = $eventMetaStore.tags.length > 9;
+        disabled = $meetupStore.meta.tags.length > 9;
     }
 
     function parse(tag: string){
@@ -57,17 +53,14 @@
 
             <div class="modal-body">
                 <input id="communityTags" bind:value={parsed}  on:input={onChange} on:keyup={submitTag} disabled={disabled} />
-                <small class="text-muted">{$eventMetaStore.tags.length} of 10 tags added</small>
-                {#each $eventMetaStore.tags as t}
+                <small class="text-muted">{$meetupStore.meta.tags.length} of 10 tags added</small>
+                {#each $meetupStore.meta.tags as t}
                     <span class="badge rounded-pill bg-info m-1">#{t} <a href='#top' on:click|preventDefault={() => deleteTag(t)}><i class="bi bi-x-circle text-dark"></i></a></span>
                 {/each}
             </div>
         </div>
     </div>
 </div>
-
-
-
 <style>
     i{
         font-size:1rem;

@@ -4,24 +4,29 @@
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import { CommunitySubscriptions } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
-    import { subEvents } from '$lib/event/event';
+    import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
     let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions(ndk);
 
     onMount(() => {
 
         communitySubs.subscribe({limit:50}, async (data) => {
             addCommunity(data)
-        }, {closeOnEose: false})
+        }, {closeOnEose: false});
 
-        subEvents(ndk, {limit:50}, {closeOnEose: true}, async (data) => {
+        eventSubs.subscribe({limit:50}, async (data) => {
             addEvent(data)
-        });
+        }, {closeOnEose: false});
+
     });
 
     onDestroy(() => {
-        communitySubs.closeSubscriptions()
+
+        communitySubs.closeSubscriptions();
+        eventSubs.closeSubscriptions();
+
     })
 
 </script>

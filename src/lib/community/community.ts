@@ -240,7 +240,6 @@ export class CommunitySubscriptions {
                     eid: event.id,
                     created: event.created_at ? event.created_at : 0
                 };
-                
                 this.subscribeMeta(community, cb)
             });
         } catch (err) {
@@ -257,13 +256,31 @@ export class CommunitySubscriptions {
                     "#e": [community.eid],
                 }
             );
-            this.subscriptions.push(communityMetaSub)
             communityMetaSub.on("event", (event: NDKEvent) =>  {
                 if (event.created_at && event.created_at > lastUpdCommunity) {
                     lastUpdCommunity = event.created_at;
                     let meta = Community.parseNostrEvent(event, community)
                     cb(meta);
                 }
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to community", err);
+        } 
+    }
+
+    public async subscribeMetaMulti(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+        filter.kinds = [30037]
+        try {
+            const sub = this.ndk.subscribe(
+                filter,
+                opts
+            );
+            if(opts && opts.closeOnEose === false){
+                this.subscriptions.push(sub)
+            }
+            sub.on("event", (event: NDKEvent) =>  {
+                let meta = Community.parseNostrEvent(event)
+                cb(meta);
             });
         } catch (err) {
             console.log("An ERROR occured when subscribing to community", err);

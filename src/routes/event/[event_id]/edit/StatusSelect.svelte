@@ -1,9 +1,6 @@
 <script>
     import { getBadgeClassByStatus } from "$lib/helpers";
-
-
-    import { eventMetaStore } from "./stores";
-
+    import { meetupStore } from "./stores";
 </script>
 
 {#each ['draft', 'published', 'cancelled'] as status}
@@ -14,7 +11,7 @@
         id={status}
         name="eventStatus"
         value={status}
-        bind:group={$eventMetaStore.status}
+        bind:group={$meetupStore.meta.status}
     />
     <label class="form-check-label" for={status}>
         <span class="badge {getBadgeClassByStatus(status)}">{status}</span>

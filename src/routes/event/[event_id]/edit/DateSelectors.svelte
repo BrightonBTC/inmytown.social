@@ -1,6 +1,6 @@
 <script lang="ts">
 import { DateInput } from 'date-picker-svelte'
-import { eventMetaStore } from './stores';
+    import { meetupStore } from './stores';
 let today = new Date()
 today.setHours(0,0,0,0);
 let startH: number = 0;
@@ -9,16 +9,16 @@ let endH: number = 0;
 let endM: number = 0;
 
 let starts = new Date()
-if($eventMetaStore.starts > 0){
-    starts.setTime($eventMetaStore.starts * 1000)
+if($meetupStore.meta.starts > 0){
+    starts.setTime($meetupStore.meta.starts * 1000)
     startH = starts.getHours()
     startM = starts.getMinutes()
 }
 starts.setHours(0,0,0,0);
 
 let ends = new Date()
-if($eventMetaStore.ends > 0){
-    ends.setTime($eventMetaStore.ends * 1000)
+if($meetupStore.meta.ends > 0){
+    ends.setTime($meetupStore.meta.ends * 1000)
     endH = ends.getHours()
     endM = ends.getMinutes()
 }
@@ -30,12 +30,12 @@ $: updateStart(), starts, startH, startM
 $: updateEnd(), ends, endH, endM
 
 function updateStart(){
-    $eventMetaStore.starts = (starts.getTime()/1000) + (startH * 60 *60 ) + (startM * 60 )
-    $eventMetaStore = $eventMetaStore
+    $meetupStore.meta.starts = (starts.getTime()/1000) + (startH * 60 *60 ) + (startM * 60 )
+    //$meetupStore.meta = $meetupStore.meta
 }
 function updateEnd(){
-    $eventMetaStore.ends = (ends.getTime()/1000) + (endH * 60 *60 ) + (endM * 60 )
-    $eventMetaStore = $eventMetaStore
+    $meetupStore.meta.ends = (ends.getTime()/1000) + (endH * 60 *60 ) + (endM * 60 )
+    //$eventMetaStore = $eventMetaStore
 }
 </script>
 <div class="row">

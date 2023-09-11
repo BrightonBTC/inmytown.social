@@ -14,9 +14,8 @@
     import { Point } from "ol/geom";
     import VectorLayer from "ol/layer/Vector";
     import VectorSource from "ol/source/Vector";
-    import type { EventMeta } from "$lib/event/event";
+    import { meetupStore } from "./stores";
 
-    export let eventMeta: EventMeta;
 
     function createStyle(src:string, lat:number, lng:number) {
         return new Style({
@@ -34,8 +33,8 @@
 
     onMount(() => {
         useGeographic();
-        const iconFeature = new Feature(new Point([eventMeta.longitude, eventMeta.latitude]));
-        iconFeature.set('style', createStyle('/img/meetupicon.png', eventMeta.latitude, eventMeta.longitude));
+        const iconFeature = new Feature(new Point([$meetupStore.meta.longitude, $meetupStore.meta.latitude]));
+        iconFeature.set('style', createStyle('/img/meetupicon.png', $meetupStore.meta.latitude, $meetupStore.meta.longitude));
         const map = new Map({
             target: "map",
             layers: [
@@ -50,7 +49,7 @@
                 }),
             ],
             view: new View({
-                center: [eventMeta.longitude, eventMeta.latitude],
+                center: [$meetupStore.meta.longitude, $meetupStore.meta.latitude],
                 zoom: 14,
             }),
             interactions: defaults({mouseWheelZoom: false})

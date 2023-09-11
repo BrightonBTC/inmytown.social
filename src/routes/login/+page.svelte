@@ -1,9 +1,3 @@
-<script>
-
-    import Footer from "$lib/Footer.svelte";
-    import Menu from "$lib/Menu.svelte";
-
-</script>
 
 <p>
     Access to features such as joining or creating communities

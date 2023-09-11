@@ -1,7 +1,7 @@
 <script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
-	import type { Community } from "./+page";
-	export let data: Community;
+	import type { CommunityID } from "./+page";
+	export let data: CommunityID;
 	import { onMount } from "svelte";
 	import { community } from "./stores";
 	import { userHex, userNpub } from "$lib/stores";

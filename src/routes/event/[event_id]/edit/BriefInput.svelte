@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { eventMetaStore } from "./stores";
+    import { meetupStore } from "./stores";
 </script>
 
 <label for="brief" class="form-label text-light">Brief description</label>
@@ -10,5 +10,5 @@
     placeholder="Provide a short description"
     name="brief"
     maxlength="300"
-    bind:value={$eventMetaStore.brief}
+    bind:value={$meetupStore.meta.brief}
 />

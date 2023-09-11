@@ -1,6 +1,6 @@
 <script lang="ts">
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
-    import { communityMembers } from "./stores";
+    import { communityMembers } from "./store.community";
     import ndk from "$lib/ndk";
 
 </script>

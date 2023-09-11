@@ -1,6 +1,6 @@
 <script lang="ts">
     import { marked } from "marked";
-    import { eventMetaStore } from "./stores";
+    import { meetupStore } from "./stores";
 </script>
 
 
@@ -15,12 +15,12 @@
                 id="descript"
                 placeholder="Give some details about your event. eg. who is it for? what's the address? where can tickets be purchased?"
                 name="descript"
-                bind:value={$eventMetaStore.content}
+                bind:value={$meetupStore.meta.content}
             />
         </div>
         <div class="col-sm-6 text-light">
             <p class="text-muted">Result:</p>
-            {@html marked($eventMetaStore.content)}
+            {@html marked($meetupStore.meta.content)}
         </div>
     </div>
 </div>

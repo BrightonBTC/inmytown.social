@@ -4,7 +4,6 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import Tags from '$lib/topics/Tags.svelte';
     import Location from "$lib/location/Location.svelte";
     import type NDK from '@nostr-dev-kit/ndk';
-    import { onMount } from 'svelte';
     import type { EventMeta } from './event';
     import { CommunitySubscriptions } from '$lib/community/community';
     export let eventData: EventMeta;
@@ -12,13 +11,13 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
 
     let communitySubs = new CommunitySubscriptions(ndk)
 
-    onMount(async () => {
+    $: setData(), eventData
 
+    function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {
             eventData.community = data;
         })
-
-    })
+    }
 
 </script>
 {#if eventData}

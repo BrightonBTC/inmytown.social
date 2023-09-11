@@ -1,6 +1,6 @@
 <script lang="ts">
     import { marked } from "marked";
-    import {community} from "./stores";
+    import {community} from "./store.community";
 </script>
 
 <div class="p-4 border-start">
