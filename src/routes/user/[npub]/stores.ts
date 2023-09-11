@@ -5,6 +5,8 @@ import { derived, writable } from 'svelte/store';
 
 export const meetupUser = writable<MeetupUser>()
 
+export const editStatus = writable<Boolean>(false)
+
 export const communitiesStore = writable<Array<CommunityMeta>>([]);
 
 export const sortedCommunities = derived(communitiesStore, (v) => v.sort((a, b) => b.updated - a.updated))

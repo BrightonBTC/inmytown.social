@@ -2,7 +2,7 @@
     import Loading from "$lib/Loading.svelte";
     import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import UserName from "./UserName.svelte";
-    import { fetchUser, parseUserStatusData } from "./user";
+    import { MeetupUser, fetchUser } from "./user";
     import LinkedPfpIcon from "./LinkedPFPIcon.svelte";
     import type {UserStatus} from "./user";
     import Location from "$lib/location/Location.svelte";
@@ -14,8 +14,6 @@
     let user: NDKUser | undefined;
     let status: UserStatus | undefined;
 
-    //$: setUser(), npub
-
     async function setUser(){
         user = await fetchUser(ndk, npub);
             let hexk = user?.hexpubkey()
@@ -25,7 +23,7 @@
                     { closeOnEose: false }
                 );
                 statusSub.on("event", (event: NDKEvent) => {
-                    status = parseUserStatusData(event)
+                    status = MeetupUser.parseStatus(event)
                 });
             }
     }

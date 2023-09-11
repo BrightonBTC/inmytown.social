@@ -21,13 +21,48 @@ export class MeetupUser extends NDKUser {
     }
 
     public async fetchStatus(){
-        let event = await this.ndk?.fetchEvent({
+        let events = await this.ndk?.fetchEvents({
             authors: [this.hexpubkey()],
             kinds: [10037]
         }, {})
-        if(event){
-            this.status = parseUserStatusData(event)
+        if(events && events.size > 0){
+            this.status = MeetupUser.parseStatus([...events][0])
         }
+    }
+
+    public async submitStatus(){
+
+    }
+
+    public static parseStatus(event: NDKEvent){
+        let data: UserStatus = {
+            communities: [],
+            interests: []
+        };
+        data.communities = event.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
+        if(event && event.content.trim().length > 0){
+            data.status = event.content;
+        }
+        let tags = event.tags.filter((t) => t[0] !== 'e')
+        tags?.forEach(function(t){
+            switch(t[0]){
+                case 'c':
+                    let c = t[1].trim().split(' ');
+                    data.city = c[0];
+                    if(c.length > 1) data.country = c[1];
+                break;
+                case 't':
+                    data.interests.push(t[1]);
+                break;
+                case 'status':
+                    data.status = t[1];
+                break;
+                case 'locationStatus':
+                    data.locationStatus = t[1] as LocationStatus;
+                break;
+            }
+        })
+        return data;
     }
 }
 
@@ -130,66 +165,65 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     }
 };
 
-export async function subUserStatus(ndk: NDK, hexkey: string, cb: (data: UserStatus) => void) {
-    let lastUpd = 0;
-    try {
-        const communitySub = ndk.subscribe(
-            { kinds: [10037], "authors": [hexkey] }
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            if (event.created_at && event.created_at > lastUpd) {
-                lastUpd = event.created_at;
-                cb(parseUserStatusData(event));
-            }
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to user status", err);
-    } 
-}
+// export async function subUserStatus(ndk: NDK, hexkey: string, cb: (data: UserStatus) => void) {
+//     let lastUpd = 0;
+//     try {
+//         const communitySub = ndk.subscribe(
+//             { kinds: [10037], "authors": [hexkey] }
+//         );
+//         communitySub.on("event", (event: NDKEvent) =>  {
+//             if (event.created_at && event.created_at > lastUpd) {
+//                 lastUpd = event.created_at;
+//                 cb(parseUserStatusData(event));
+//             }
+//         });
+//     } catch (err) {
+//         console.log("An ERROR occured when subscribing to user status", err);
+//     } 
+// }
 
-export async function fetchFollows(ndk: NDK, npub: string){
-    let out: NDKUser[] = [];
-    if(ndk && npub){
-        let user = await fetchUser(ndk, npub);
-        let f = await user?.follows()
-        if(f) out = [...f]
-    } 
-    return out;
-}
+// export async function fetchFollows(ndk: NDK, npub: string){
+//     let out: NDKUser[] = [];
+//     if(ndk && npub){
+//         let user = await fetchUser(ndk, npub);
+//         let f = await user?.follows()
+//         if(f) out = [...f]
+//     } 
+//     return out;
+// }
 
-export function parseUserStatusData(result:NDKEvent){
-    let data: UserStatus = {
-        communities: [],
-        interests: []
-    };
-    data.communities = result?.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
-    if(result && result?.content.trim().length > 0){
-        data.status = result?.content;
-    }
-    let tags = result?.tags.filter((t) => t[0] !== 'e')
-    tags?.forEach(function(t){
-        switch(t[0]){
-            case 'c':
-                let c = t[1].trim().split(' ');
-                data.city = c[0];
-                if(c.length > 1) data.country = c[1];
-            break;
-            case 't':
-                data.interests.push(t[1]);
-            break;
-            case 'status':
-                data.status = t[1];
-            break;
-            case 'locationStatus':
-                data.locationStatus = t[1] as LocationStatus;
-            break;
-        }
-    })
-    return data;
-}
+// export function parseUserStatusData(result:NDKEvent){
+//     let data: UserStatus = {
+//         communities: [],
+//         interests: []
+//     };
+//     data.communities = result?.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
+//     if(result && result?.content.trim().length > 0){
+//         data.status = result?.content;
+//     }
+//     let tags = result?.tags.filter((t) => t[0] !== 'e')
+//     tags?.forEach(function(t){
+//         switch(t[0]){
+//             case 'c':
+//                 let c = t[1].trim().split(' ');
+//                 data.city = c[0];
+//                 if(c.length > 1) data.country = c[1];
+//             break;
+//             case 't':
+//                 data.interests.push(t[1]);
+//             break;
+//             case 'status':
+//                 data.status = t[1];
+//             break;
+//             case 'locationStatus':
+//                 data.locationStatus = t[1] as LocationStatus;
+//             break;
+//         }
+//     })
+//     return data;
+// }
 
 export async function publishUserStatus(ndk:NDK, data: UserStatus) {
-    let response: NDKEvent | string | null = null;
     try{
         const ndkEvent = new NDKEvent(ndk);
         ndkEvent.kind = 10037;
