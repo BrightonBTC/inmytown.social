@@ -170,13 +170,14 @@ export class Community {
     }
 
     public async fetchMembers(cb: (user: NDKUser) => void){
+        if(this.membersSubscription) return;
         try {
             this.membersSubscription = this.ndk.subscribe(
                 {
                     kinds: [10037],
                     "#e": [this.meta.eid],
                 },
-                {closeOnEose: false}
+                {closeOnEose: false, groupable: false}
             );
             this.membersSubscription.on("event", (event: NDKEvent) => {
                 cb(event.author)

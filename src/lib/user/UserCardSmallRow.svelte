@@ -19,8 +19,7 @@
             let hexk = user?.hexpubkey()
             if(hexk){
                 const statusSub = ndk.subscribe(
-                    {kinds: [10037], authors: [hexk]},
-                    { closeOnEose: false }
+                    {kinds: [10037], authors: [hexk]}
                 );
                 statusSub.on("event", (event: NDKEvent) => {
                     status = MeetupUser.parseStatus(event)

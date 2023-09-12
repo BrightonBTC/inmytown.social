@@ -41,11 +41,11 @@
             $community.fetchMembers((user) => {
                 addMember(user.npub)
             })
-        }, {closeOnEose: false});
+        });
 
         eventSubs.subscribe({"#e": [community_id]}, async (data) => {
             addEventMeta(data)
-        }, {closeOnEose: false});
+        });
 
     });
 

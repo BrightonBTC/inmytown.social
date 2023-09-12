@@ -92,6 +92,7 @@ export class MeetupEvent {
 
 
     public async fetchRSVPs(cb: (data: NDKEvent) => void){
+        if(this.rsvpSubscription) return;
         try {
             this.rsvpSubscription = this.ndk.subscribe(
                 {
@@ -100,6 +101,7 @@ export class MeetupEvent {
                 },
                 {
                     closeOnEose: false,
+                    groupable: false
                 }
             );
             this.rsvpSubscription.on("event", (event: NDKEvent) => {
@@ -112,7 +114,7 @@ export class MeetupEvent {
 
     public async rsvp(state:string){
         const ndkEvent = new NDKEvent(this.ndk);
-        ndkEvent.kind = 30038;
+        ndkEvent.kind = 30042;
         ndkEvent.tags = [
             ["rsvp", state],
             ["d", this.meta.eid]
@@ -225,7 +227,9 @@ export class MeetupEvent {
     }
 
     public destroy(){
-        if(this.rsvpSubscription) this.rsvpSubscription.stop()
+        if(this.rsvpSubscription) {
+            this.rsvpSubscription.stop()
+        }
     }
 }
 

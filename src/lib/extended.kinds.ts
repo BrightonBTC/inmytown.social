@@ -11,5 +11,5 @@ declare module 'nostr-tools/lib/event' {
     }
 }
 
-// const Kind = Kind as any;
-// Kind["MeetupCommunity"] = 1037;
+//const Kind = Kind as any;
+//Kind["MeetupCommunity"] = 1037;

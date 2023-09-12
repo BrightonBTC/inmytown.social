@@ -3,15 +3,16 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
     import Tags from '$lib/topics/Tags.svelte';
     import Location from "$lib/location/Location.svelte";
-    import type NDK from '@nostr-dev-kit/ndk';
     import type { EventMeta } from './event';
     import { CommunitySubscriptions } from '$lib/community/community';
+    import ndk from '$lib/ndk';
+
     export let eventData: EventMeta;
-    export let ndk: NDK ;
+    export let eid:string | undefined = undefined
 
-    let communitySubs = new CommunitySubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions(ndk);
 
-    $: setData(), eventData
+    $: setData(), eid
 
     function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {

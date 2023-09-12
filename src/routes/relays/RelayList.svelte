@@ -1,10 +1,9 @@
 <script lang="ts">
+    import ndk from '$lib/ndk';
     import type { NDKRelay } from '@nostr-dev-kit/ndk';
-    import type NDK from '@nostr-dev-kit/ndk';
     import { NDKRelayStatus } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
 
-    export let ndk: NDK;
 
     let relays: NDKRelay[] = [];
     let notices: Map<NDKRelay, string[]> = new Map();
@@ -68,11 +67,11 @@
                     <span class="relay-status relay-status--flapping" />
                 {/if}
                 <span class="relay-name">{relay.url}</span>
-                {#if relay.activeSubscriptions.size > 0}
+                <!-- {#if relay.activeSubscriptions.size > 0}
                     <div class="relay-subscriptions">
                         {relay.activeSubscriptions.size} subscriptions
                     </div>
-                {/if}
+                {/if} -->
             </button>
 
             <!-- {#if notices.has(relay)}
@@ -83,10 +82,10 @@
                 </ul>
             {/if} -->
 
-            {#if expandSubscriptionList[relay.url]}
+            <!-- {#if expandSubscriptionList[relay.url]}
                 <ul>
                     {#each Array.from(relay.activeSubscriptions) as subscription}
-                        <li>
+                        <li><p>{subscription.subId}</p>
                             <div class="relay-subscription-filter">
                                 {JSON.stringify(subscription.filter)}
                             </div>
@@ -100,7 +99,7 @@
                         </li>
                     {/each}
                 </ul>
-            {/if}
+            {/if} -->
         </li>
     {/each}
 </ul>

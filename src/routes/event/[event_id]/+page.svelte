@@ -28,8 +28,6 @@
     let event_id = data.event_id;
     let loaded:boolean = false;
 
-    $: console.log('meta upd', $meetupStore.meta)
-
     attendeeStore.set([]);
     meetupStore.set(new MeetupEvent(ndk))
 

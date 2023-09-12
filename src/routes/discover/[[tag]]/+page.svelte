@@ -8,6 +8,7 @@
     import TypeSwitch from "./TypeSwitch.svelte";
     import EventTabs from "./EventTabs.svelte";
     import type { Tag } from "./+page";
+    export let data:Tag;  
     import TopicSelector from "./TopicSelector.svelte";
     import ResultsInfo from "./ResultsInfo.svelte";
     import UserList from "./UserList.svelte";
@@ -15,7 +16,6 @@
     import { CommunitySubscriptions } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { UserSubscriptions } from "$lib/user/user";
-    export let data:Tag;  
 
     let communitySubs = new CommunitySubscriptions(ndk);
     let eventSubs = new EventSubscriptions(ndk);
@@ -25,10 +25,11 @@
 
     $: fetchSearch(), $searchCountry, $searchCity, $searchType, tag
 
-    onMount(async () => {
-        fetchSearch();
-    });
+    // onMount(async () => {
+    //     fetchSearch();
+    // });
     onDestroy(() => {
+        console.log('destroy')
         communitySubs.closeSubscriptions();
         eventSubs.closeSubscriptions();
         userSubs.closeSubscriptions();
@@ -45,6 +46,7 @@
     }
 
     async function fetchSearch() {
+        console.log('fetchSearch')
         communityList.set([])
         eventList.set([])
         personList.set([])
@@ -65,17 +67,17 @@
             case 'communities':
                 communitySubs.subscribeMetaMulti(f, (data) => {
                     addCommunity(data)
-                }, {closeOnEose: false})
+                }, {closeOnEose: false, groupable: false})
             break;
             case 'events':
                 eventSubs.subscribeMetaMulti(f, (data) => {
                     addEvent(data)
-                }, {closeOnEose: false})
+                }, {closeOnEose: false, groupable: false})
             break;
             case 'people':
-                userSubs.subscribe(f, (data) => {
+                userSubs.subscribeStatuses(f, (data) => {
                     addPerson(data)
-                }, {closeOnEose: false})
+                }, {closeOnEose: false, groupable: false})
             break;
         }
 
@@ -103,9 +105,9 @@
                 
             </div>
             {:else if  $searchType === 'events'}
-                <EventTabs {ndk} />
+                <EventTabs />
             {:else}
-                <UserList {ndk} />
+                <UserList />
             {/if}
         </div>
     </div>

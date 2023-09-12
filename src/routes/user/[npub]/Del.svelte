@@ -1,10 +1,9 @@
 <script lang="ts">
+    import ndk from "$lib/ndk";
     import { deleteEvent } from "$lib/nostr";
     import { userHex } from "$lib/stores";
     import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import type NDK from "@nostr-dev-kit/ndk";
 
-    export let ndk: NDK | undefined;
     export let npub: string | undefined;
 
     let mevents: NDKEvent[] = [];

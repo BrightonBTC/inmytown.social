@@ -26,34 +26,14 @@ export function removeTopic(tag:string){
     })
 }
 
-// export function addCommunity(e:NDKEvent){
-//     communityList.update(items => {
-//         let d = Community.parseNostrEvent(e)
-//         if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
-//         items.push(d)
-//         return [...new Map(items.map(v => [v.eid, v])).values()]
-//     })
-// }
+
 export function addCommunity(e:CommunityMeta){
     communityList.update(items => {
         items.push(e)
         return [...new Map(items.map(v => [v.eid, v])).values()]
     })
 }
-// export function addEvent(e:NDKEvent){
-//     //console.log('evnt', e)
-//     let d = MeetupEvent.parseNostrEvent(e)
-//     //console.log('-- evnt', d)
-//     if(d.status !=='draft'){
-//         eventList.update(items => {
-//             let dupes = items.filter(x => x.uid === d.uid);
-//             if(dupes.length === 0 || dupes[0].updated < d.updated){
-//                 items.push(d)
-//             }
-//             return [...new Map(items.map(v => [v.eid, v])).values()]
-//         })
-//     }
-// }
+
 export function addEvent(event:EventMeta){
     if(event.status !=='draft'){
         eventList.update(items => {

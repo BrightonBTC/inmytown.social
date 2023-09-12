@@ -47,8 +47,6 @@
         });
         map.getView().on('change:center', (event) => {
             let c = map.getView().getCenter();
-            console.log('longitude', c !== undefined ? c[0] : 0)
-            console.log('latitude', c !== undefined ? c[1] : 0)
             $community.meta.longitude = (c !== undefined ? c[0] : 0); 
             $community.meta.latitude = (c !== undefined ? c[1] : 0); 
         });

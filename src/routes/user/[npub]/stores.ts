@@ -32,4 +32,4 @@ export function removeFollow(npub:string){
 }
 
 export const currentUserFollowsNpubs = derived(currentUserFollows, f => f.map(u => u.npub))
-export const currentUserFollowsHexs = derived(currentUserFollows, f => f.map(u => u.hexpubkey()))
+export const currentUserFollowsHexs = derived(currentUserFollows, f => f.map(u => u))

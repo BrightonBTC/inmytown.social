@@ -7,7 +7,6 @@ export function addEventMeta(item: EventMeta){
 
     communityEvents.update(items => {
         let matches = items.filter(v => v.eid === item.eid)
-        console.log(matches)
         if(matches.length > 0){
             if(matches[0].updated < item.updated){
                 items = items.filter(v => v.eid !== item.eid)
@@ -17,7 +16,6 @@ export function addEventMeta(item: EventMeta){
         else{
             items.push(item)
         }
-        console.log(items)
         return items
     })
     

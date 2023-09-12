@@ -11,7 +11,7 @@
     let eventSubs = new EventSubscriptions(ndk);
 
     onMount(() => {
-
+        console.log('mount')
         communitySubs.subscribe({limit:50}, async (data) => {
             addCommunity(data)
         }, {closeOnEose: false});

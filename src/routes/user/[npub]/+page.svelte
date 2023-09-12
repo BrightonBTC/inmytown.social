@@ -9,6 +9,7 @@
     import Follows from "./Follows.svelte";
     import { meetupUser } from "./stores";
     import Loading from "$lib/Loading.svelte";
+    import Del from "./Del.svelte";
     export let data:UserID;   
     let page: string = 'status'
     let loaded:boolean
@@ -56,7 +57,7 @@
             {:else if page==='follows'}
             <Follows />
             {:else if page==='del'}
-            <!-- <Del {ndk} {npub} /> -->
+            <!-- <Del {npub} /> -->
             {/if}
         </div>
     </div>
