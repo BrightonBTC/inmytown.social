@@ -29,7 +29,6 @@
     //     fetchSearch();
     // });
     onDestroy(() => {
-        console.log('destroy')
         communitySubs.closeSubscriptions();
         eventSubs.closeSubscriptions();
         userSubs.closeSubscriptions();
@@ -46,7 +45,6 @@
     }
 
     async function fetchSearch() {
-        console.log('fetchSearch')
         communityList.set([])
         eventList.set([])
         personList.set([])
@@ -55,7 +53,7 @@
         
         if($searchCountry.length > 0 && $searchCity.length > 0){
             f = {
-                "#c": [$searchCity + ' ' + $searchCountry]
+                "#g": [$searchCountry + ':' + $searchCity]
             }
         }
         

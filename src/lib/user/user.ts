@@ -46,10 +46,10 @@ export class MeetupUser extends NDKUser {
         let tags = event.tags.filter((t) => t[0] !== 'e')
         tags?.forEach(function(t){
             switch(t[0]){
-                case 'c':
-                    let c = t[1].trim().split(' ');
-                    data.city = c[0];
-                    if(c.length > 1) data.country = c[1];
+                case 'g':
+                    const locationParts = t[1].split(':')
+                    data.country = locationParts[0]
+                    data.city = locationParts[1]
                 break;
                 case 't':
                     data.interests.push(t[1]);
@@ -136,7 +136,6 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     } catch (error) {
         console.log("An ERROR occured when fetching user", error);
     } finally{
-        console.log(user)
         return user;
     }
 };
@@ -157,7 +156,7 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
         }
         if(data.status) ndkEvent.content = data.status
         if(data.locationStatus && data.city && data.country){
-            ndkEvent.tags.push(["c", data.city + ' ' + data.country]);
+            ndkEvent.tags.push(["g", data.country + ':' + data.city, 'city']);
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();

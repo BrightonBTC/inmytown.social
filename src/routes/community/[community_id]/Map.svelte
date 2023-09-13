@@ -25,7 +25,7 @@
             ],
             view: new View({
                 center: [$community.meta.longitude, $community.meta.latitude],
-                zoom: $community.meta.zoom,
+                zoom: 9,
             }),
             interactions: defaults({mouseWheelZoom: false})
         });
@@ -36,7 +36,7 @@
 
     function updMap(){
         if(!map) initMap()
-        map.getView().animate({zoom: $community.meta.zoom}, {center: [$community.meta.longitude, $community.meta.latitude]});
+        map.getView().animate({zoom: 9}, {center: [$community.meta.longitude, $community.meta.latitude]});
     };
 
 </script>

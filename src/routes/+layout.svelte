@@ -8,7 +8,6 @@
 
     const interval = setInterval(() => {
         inactiveFor++;
-        console.log(inactiveFor)
     }, 60000)
 
     onMount(() => {

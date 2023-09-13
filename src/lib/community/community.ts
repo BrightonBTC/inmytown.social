@@ -12,7 +12,6 @@ export interface CommunityMeta{
     image?: string
     latitude: number
     longitude: number
-    zoom: number
     country: string
     city: string
     tags: Array<string>
@@ -21,7 +20,7 @@ export interface CommunityMeta{
     error?: string
 }
 
-export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'zoom' | 'content' | 'image' | 'country' | 'city' | 'updated' | 'created'> = {
+export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'content' | 'image' | 'country' | 'city' | 'updated' | 'created'> = {
     uid: "",
     eid: "",
     title: "",
@@ -30,7 +29,6 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     authorhex: "",
     latitude: 0,
     longitude: 0,
-    zoom: 1,
     content: "",
     image: undefined,
     country: "",
@@ -84,18 +82,16 @@ export class Community {
                 ["e", this.meta.eid],
             ];
             if(this.meta.image){
-                ndkEvent.tags.push(["banner", this.meta.image])
+                ndkEvent.tags.push(["image", this.meta.image])
             }
-            if(this.meta.latitude && this.meta.longitude && this.meta.zoom){
+            if(this.meta.latitude && this.meta.longitude){
                 ndkEvent.tags.push(
-                    ["g", Geohash.encode(this.meta.latitude, this.meta.longitude)],
-                    ["zoom", this.meta.zoom.toFixed(2)]
+                    ["g", Geohash.encode(this.meta.latitude, this.meta.longitude), 'geohash']
                 );
-    
-                if(this.meta.country && this.meta.country.length > 0 && this.meta.city && this.meta.city.length > 0){
-                    ndkEvent.tags.push(["c", this.meta.city + ' ' + this.meta.country]);
-                }
-            }        
+            }     
+            if(this.meta.country && this.meta.country.length > 0 && this.meta.city && this.meta.city.length > 0){
+                ndkEvent.tags.push(["g", this.meta.country + ':' + this.meta.city, 'city']);
+            }   
             
             if (this.meta.tags.length > 0) {
                 this.meta.tags.forEach(function (t) {
@@ -138,16 +134,20 @@ export class Community {
                 case "title":
                     meta.title = itm[1];
                     break;
-                case "banner":
+                case "image":
                     if(itm[1].length >0) meta.image = itm[1];
                     break;
-                case "zoom":
-                    meta.zoom = parseFloat(itm[1]);
-                    break;
                 case "g":
-                    const g = Geohash.decode(itm[1]);
-                    meta.latitude = g.lat;
-                    meta.longitude = g.lon;
+                    if(itm[2] === 'geohash'){
+                        const g = Geohash.decode(itm[1]);
+                        meta.latitude = g.lat;
+                        meta.longitude = g.lon;
+                    }
+                    else if(itm[2] === 'city'){
+                        const locationParts = itm[1].split(':')
+                        meta.country = locationParts[0]
+                        meta.city = locationParts[1]
+                    }
                     break;
                 case "t":
                     meta.tags.push(itm[1]);

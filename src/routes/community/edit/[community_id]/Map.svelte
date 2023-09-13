@@ -16,7 +16,7 @@
     export const updMap = function(){
 
         if (map && $community.meta.longitude && $community.meta.latitude){
-            map.getView().animate({zoom: $community.meta.zoom}, {center: [$community.meta.longitude, $community.meta.latitude]});
+            map.getView().animate({zoom: 9}, {center: [$community.meta.longitude, $community.meta.latitude]});
         }
         
     };
@@ -32,19 +32,19 @@
             ],
             view: new View({
                 center: [$community.meta.longitude, $community.meta.latitude],
-                zoom: $community.meta.zoom,
+                zoom: 9,
                 minZoom: 1,
                 maxZoom: 20
             }),
             interactions: defaults({mouseWheelZoom: false})
         });
-        map.getView().on('change:resolution', (event) => {
-            let z = map.getView().getZoom();
-            if(z){
-                $community.meta.zoom = z
-                $community.meta = $community.meta
-            }
-        });
+        // map.getView().on('change:resolution', (event) => {
+        //     let z = map.getView().getZoom();
+        //     if(z){
+        //         $community.meta.zoom = z
+        //         $community.meta = $community.meta
+        //     }
+        // });
         map.getView().on('change:center', (event) => {
             let c = map.getView().getCenter();
             $community.meta.longitude = (c !== undefined ? c[0] : 0); 
@@ -57,11 +57,11 @@
 <small class="text-muted mb-5">
     Lat: {$community.meta.latitude} <br>
     Lon: {$community.meta.longitude}  <br>
-    Zoom: {$community.meta.zoom}
+    <!-- Zoom: {$community.meta.zoom} -->
 </small>
 <style>
     #map {
-        height: 500px;
+        height: 300px;
         width: 100%;
     }
 </style>

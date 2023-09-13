@@ -11,7 +11,6 @@
         $community.meta.country = city.country
         $community.meta.latitude = parseFloat(city.lat)
         $community.meta.longitude = parseFloat(city.lng)
-        $community.meta.zoom = 9
         signalUpdMap.update(()=> signal);
     }
 </script>

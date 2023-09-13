@@ -126,16 +126,16 @@ export class MeetupEvent {
         this.error = undefined;
         try {
             const ndkEvent = new NDKEvent(this.ndk);
-            ndkEvent.kind = 30073;
+            ndkEvent.kind = 31923;
             ndkEvent.content = this.meta.content;
             ndkEvent.tags = [
-                ["title", this.meta.title],
+                ["name", this.meta.title],
                 ["brief", this.meta.brief],
                 ["d", this.meta.uid],
                 ["e", this.meta.eid],
                 ["e", this.meta.community.eid],
-                ["starts", this.meta.starts.toString()],
-                ["ends", this.meta.ends.toString()],
+                ["start", this.meta.starts.toString()],
+                ["end", this.meta.ends.toString()],
                 ["status", this.meta.status]
             ];
             if(this.meta.image){
@@ -143,14 +143,14 @@ export class MeetupEvent {
             }
             if(this.meta.latitude && this.meta.longitude){
                 ndkEvent.tags.push(
-                    ["g", Geohash.encode(this.meta.latitude, this.meta.longitude)],
+                    ["g", Geohash.encode(this.meta.latitude, this.meta.longitude), 'geohash'],
                 );
             }
             if(this.meta.city && this.meta.city.length > 0 && this.meta.country && this.meta.country.length > 0){
-                ndkEvent.tags.push(["c", this.meta.city + ' ' + this.meta.country]);
+                ndkEvent.tags.push(["g", this.meta.country + ':' + this.meta.city, 'city']);
             }
             if(this.meta.venue && this.meta.venue.length > 0){
-                ndkEvent.tags.push(["venue", this.meta.venue]);
+                ndkEvent.tags.push(["location", this.meta.venue]);
             }
             if (this.meta.tags.length > 0) {
                 this.meta.tags.forEach(function (t) {
@@ -172,18 +172,41 @@ export class MeetupEvent {
                 }
             };
         }
-        meta.tags = [];
+        
         meta.content = data.content
-        meta.updated = data.created_at || -1
+        meta.updated = data.created_at || 0
         meta.author = data.author.npub
         meta.authorhex = data.author.hexpubkey()
+        
         let etags = data.tags.filter(t => t[0] === 'e')
         if(etags.length > 0) meta.eid = etags[0][1]
         if(etags.length > 1) meta.community.eid = etags[1][1]
+
+        meta.tags = [];
+        let ttags = data.tags.filter(t => t[0] === 't')
+        ttags.forEach(function(tag){
+            meta?.tags.push(tag[1]);
+        })
+
+        let gtags = data.tags.filter(t => t[0] === 'g')
+        gtags.forEach(function(tag){
+            if(!meta || tag.length < 3) return;
+            if(tag[2]==='geohash'){
+                const g = Geohash.decode(tag[1]);
+                meta.latitude = g.lat;
+                meta.longitude = g.lon;
+            }
+            else if(tag[2]==='city'){
+                const locationParts = tag[1].split(':')
+                meta.country = locationParts[0]
+                meta.city = locationParts[1]
+            }
+        })
+
         data.tags.forEach(function (itm) {
             if(!meta) return;
             switch (itm[0]) {
-                case "title":
+                case "name":
                     meta.title = itm[1];
                     break;
                 case "brief":
@@ -192,30 +215,16 @@ export class MeetupEvent {
                 case "image":
                     meta.image = itm[1];
                     break;
-                case "g":
-                    const g = Geohash.decode(itm[1]);
-                    meta.latitude = g.lat;
-                    meta.longitude = g.lon;
-                    break;
-                case "t":
-                    meta.tags.push(itm[1]) ;
-                    break;
-                case "c":
-                    let locationString = itm[1].trim();
-                    let locationParts = locationString.split(' ');
-                    meta.city = locationString.substring(0, locationString.length - 3);
-                    if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
-                    break;
-                case "venue":
+                case "location":
                     meta.venue = itm[1];
                     break;
                 case "d":
                     meta.uid = itm[1];
                     break;
-                case "starts":
+                case "start":
                     meta.starts = parseInt(itm[1]);
                 break;
-                case "ends":
+                case "end":
                     meta.ends = parseInt(itm[1]);
                 break;
                 case "status":
@@ -294,7 +303,7 @@ export class EventSubscriptions {
         let lastUpd = 0
         try {
             const communitySub = this.ndk.subscribe(
-                { kinds: [30073], "#e": [meta.eid] }
+                { kinds: [31923], "#e": [meta.eid] }
             );
             communitySub.on("event", (event: NDKEvent) =>  {
                 if(event.created_at && event.created_at > lastUpd){
@@ -308,7 +317,7 @@ export class EventSubscriptions {
     }
 
     public async subscribeMetaMulti(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
-        filter.kinds = [30073]
+        filter.kinds = [31923]
         try {
             const sub = this.ndk.subscribe(
                 filter,
@@ -332,127 +341,3 @@ export class EventSubscriptions {
     }
 }
 
-
-
-// export async function subEventMeta(ndk: NDK, eid: string, cb: (data: EventMeta) => void) {
-//     let lastUpd = 0
-//     try {
-//         const communitySub = ndk.subscribe(
-//             { kinds: [30073], "#e": [eid] }
-//         );
-//         communitySub.on("event", (event: NDKEvent) =>  {
-//             if(event.created_at && event.created_at > lastUpd){
-//                 lastUpd = event.created_at
-//                 cb(parseEventData(event))
-//             }
-//         });
-//     } catch (err) {
-//         console.log("An ERROR occured when subscribing to community", err);
-//     } 
-// }
-
-
-
-// export function parseEventData(data: NDKEvent){
-//     let meta: EventMeta = {
-//         ...EventMetaDefaults,
-//         community: {
-//             ...CommunityMetaDefaults
-//         }
-//     };
-//     meta.tags = [];
-//     meta.content = data.content
-//     meta.updated = data.created_at || -1
-//     meta.author = data.author.npub
-//     meta.authorhex = data.author.hexpubkey()
-//     let etags = data.tags.filter(t => t[0] === 'e')
-//     if(etags.length > 0) meta.eid = etags[0][1]
-//     if(etags.length > 1) meta.community.eid = etags[1][1]
-//     data.tags.forEach(function (itm) {
-//         switch (itm[0]) {
-//             case "title":
-//                 meta.title = itm[1];
-//                 break;
-//             case "brief":
-//                 meta.brief = itm[1];
-//                 break;
-//             case "image":
-//                 meta.image = itm[1];
-//                 break;
-//             case "g":
-//                 const g = Geohash.decode(itm[1]);
-//                 meta.latitude = g.lat;
-//                 meta.longitude = g.lon;
-//                 break;
-//             case "t":
-//                 meta.tags.push(itm[1]) ;
-//                 break;
-//             case "c":
-//                 let locationString = itm[1].trim();
-//                 let locationParts = locationString.split(' ');
-//                 meta.city = locationString.substring(0, locationString.length - 3);
-//                 if(locationParts.length > 1) meta.country = locationParts[locationParts.length - 1];
-//                 break;
-//             case "venue":
-//                 meta.venue = itm[1];
-//                 break;
-//             case "d":
-//                 meta.uid = itm[1];
-//                 break;
-//             case "starts":
-//                 meta.starts = parseInt(itm[1]);
-//             break;
-//             case "ends":
-//                 meta.ends = parseInt(itm[1]);
-//             break;
-//             case "status":
-//                 meta.status = itm[1];
-//             break;
-//         }
-//     });
-//     return meta;
-// }
-
-export async function publishEventMeta(ndk: NDK, data: EventMeta){
-    let response: NDKEvent | string | null = null;
-    try {
-        const ndkEvent = new NDKEvent(ndk);
-        ndkEvent.kind = 30073;
-        ndkEvent.content = data.content;
-        ndkEvent.tags = [
-			["title", data.title],
-			["brief", data.brief],
-			["d", data.uid],
-			["e", data.eid],
-			["e", data.community.eid],
-			["starts", data.starts.toString()],
-			["ends", data.ends.toString()],
-			["status", data.status]
-		];
-        if(data.image){
-            ndkEvent.tags.push(["image", data.image])
-        }
-        if(data.latitude && data.longitude){
-            ndkEvent.tags.push(
-                ["g", Geohash.encode(data.latitude, data.longitude)],
-            );
-        }
-        if(data.city && data.city.length > 0 && data.country && data.country.length > 0){
-            ndkEvent.tags.push(["c", data.city + ' ' + data.country]);
-        }
-        if(data.venue && data.venue.length > 0){
-            ndkEvent.tags.push(["venue", data.venue]);
-        }
-        if (data.tags.length > 0) {
-			data.tags.forEach(function (t) {
-				ndkEvent.tags.push(["t", t]);
-			});
-		}
-        await ndkEvent.publish();
-        response = ndkEvent;
-    } catch (err) {
-        response = "An ERROR occured publishing the event metadata:"+ err;
-    } finally {
-        return response;
-    }
-}

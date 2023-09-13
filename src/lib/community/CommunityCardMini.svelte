@@ -22,6 +22,5 @@
     .header-image {
         object-fit: cover;
         width: 100%;
-        height: 130px;
     }
 </style>
