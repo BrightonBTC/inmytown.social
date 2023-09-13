@@ -25,15 +25,15 @@
 
     function setUI(){
         switch(hasRsvp){
-            case 'going':
+            case 'accepted':
                 rclass = 'bg-success';
                 s = "You're going to this event!"
             break;
-            case 'interested':
+            case 'tentative':
                 rclass = 'bg-primary';
                 s = "You're interested in this event!"
             break;
-            case 'not':
+            case 'declined':
                 rclass = 'bg-info';
                 s = "You're not going to this event."
             break;
@@ -46,15 +46,15 @@
 </script>
 <div class="mt-2 text-center bg-secondary rounded border p-2">
     {#if !hasRsvp || overide}
-        <button type="button" class="btn btn-success" on:click={() => rsvp("going")}
+        <button type="button" class="btn btn-success" on:click={() => rsvp("accepted")}
             >I'm going!</button
         >
         <button
             type="button"
             class="btn btn-primary"
-            on:click={() => rsvp("interested")}>I'm interested!</button
+            on:click={() => rsvp("tentative")}>I'm interested!</button
         >
-        <button type="button" class="btn btn-info" on:click={() => rsvp("not")}
+        <button type="button" class="btn btn-info" on:click={() => rsvp("declined")}
             >I can't make it.</button
         >
     {:else}

@@ -96,7 +96,7 @@ export class MeetupEvent {
         try {
             this.rsvpSubscription = this.ndk.subscribe(
                 {
-                    kinds: [30042],
+                    kinds: [31925],
                     "#d": [this.meta.eid],
                 },
                 {
@@ -114,10 +114,12 @@ export class MeetupEvent {
 
     public async rsvp(state:string){
         const ndkEvent = new NDKEvent(this.ndk);
-        ndkEvent.kind = 30042;
+        ndkEvent.kind = 31925;
         ndkEvent.tags = [
-            ["rsvp", state],
-            ["d", this.meta.eid]
+            ["a", this.meta.eid+':'+this.meta.authorhex+':'+this.meta.uid],
+            ["d", this.meta.eid],
+            ['L', 'status'],
+            ['l', state, 'status']
         ];
         await ndkEvent.publish();
     }

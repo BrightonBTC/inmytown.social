@@ -47,7 +47,7 @@
     function subscribeRsvp() {
         $meetupStore.fetchRSVPs(async (event) => {
             let rsvp: string = event.tags
-                .filter((x) => x[0] === "rsvp")[0][1]
+                .filter((x) => x[0] === "l" && x[2] === 'status')[0][1]
                 .toString();
             addAttendee(event.author.npub, rsvp);
             if (event.author.npub == $userNpub) {

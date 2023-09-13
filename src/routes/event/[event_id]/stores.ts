@@ -12,6 +12,6 @@ export function addAttendee(npub: string, rsvp: string){
     })
 }
 
-export const attendees = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'going'))
-export const notgoing = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'not'))
-export const interested = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'interested'))
+export const attendees = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'accepted'))
+export const notgoing = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'declined'))
+export const interested = derived(attendeeStore, (v) => v.filter((a) => a[1] === 'tentative'))
