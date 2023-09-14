@@ -9,7 +9,7 @@
 
 <div class="card mb-3 shadow">
     <div class="card-header">
-        <h4 class="card-title mb-1"><a href="/event/{eventData.eid}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
+        <h4 class="card-title mb-1"><a href="/event/{eventData.community.eid}/{eventData.uid}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
     </div>
     <div class="card-body">
         <p class="card-text">

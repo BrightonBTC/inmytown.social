@@ -1,36 +1,49 @@
 <script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
-    import type { MeetupEvent } from "./+page";
-    export let data: MeetupEvent;
+    import type { URLVars } from "./+page";
+    export let data: URLVars;
     import { onMount } from "svelte";
     import { userHex, userNpub } from "$lib/stores";
     import Loading from "$lib/Loading.svelte";
-    import { meetupStore } from "./stores";
+    import { community, meetupStore } from "./stores";
     import EventCard from "$lib/event/EventCard.svelte";
     import { type EventMeta, EventSubscriptions } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
     import Form from "./Form.svelte";
+    import { Community, CommunitySubscriptions } from "$lib/community/community";
 
     let eid = data.event_id
     let authorised: boolean;
     let eventMeta: EventMeta;
 
-    let eventSubs = new EventSubscriptions(ndk)
+    let loadingMessage:string = 'Fetching community...';
+
+    let eventSubs = new EventSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions(ndk);
+    community.set(new Community(ndk))
     
     onMount(async () => {
         await login(ndk)
         
         if($userHex){
-            fetchMeetup()
+            fetchCommunity()
         }
         else{
             authorised = false;
         }
     });
 
+    async function fetchCommunity(){
+        communitySubs.subscribeByID(data.community_id, async (data) => {
+            $community.meta = data;
+            fetchMeetup();
+        });
+    }
+
     async function fetchMeetup() {
-        eventSubs.subscribeByID(eid, async (data) => {
+        loadingMessage = 'Fetching event...'
+        eventSubs.subscribeOne($community.meta, eid, async (data) => {
             eventMeta = data
             if (eventMeta.author === $userNpub) {
                 authorised = true;
@@ -60,6 +73,6 @@
         <strong>Warning!</strong> You are not authorised to modify this event!
     </div>
 {:else}
-    <Loading t="Fetching Event..." />
+    <Loading t={loadingMessage} />
 {/if}
     

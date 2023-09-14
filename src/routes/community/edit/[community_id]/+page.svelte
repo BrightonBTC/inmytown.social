@@ -27,6 +27,7 @@
 			if (data.community_id === "new") {
 				authorised = true;
 				isNew = true;
+				$community.newUID($userHex)
 			} 
 			else {
 				fetchCommunity()

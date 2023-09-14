@@ -68,7 +68,7 @@
                 }, {closeOnEose: false, groupable: false})
             break;
             case 'events':
-                eventSubs.subscribeMetaMulti(f, (data) => {
+                eventSubs.subscribe(f, (data) => {
                     addEvent(data)
                 }, {closeOnEose: false, groupable: false})
             break;

@@ -35,7 +35,7 @@
     <div class="row g-0">
         <div class="col-lg-8">
             <img
-            src={imgUrlOrDefault($community.meta.image)}
+            src={imgUrlOrDefault($community.meta.image, 'community')}
             alt="musig"
             class="img-fluid rounded header-image"
             />

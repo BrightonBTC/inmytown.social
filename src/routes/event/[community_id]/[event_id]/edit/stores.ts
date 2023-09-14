@@ -1,7 +1,10 @@
 
+import type { Community } from '$lib/community/community';
 import { MeetupEvent } from '$lib/event/event';
 import ndk from '$lib/ndk';
 import { writable } from 'svelte/store';
+
+export const community = writable<Community>();
 
 export const signalUpdMap = writable({});
 //export const eventMetaStore = writable<EventMeta>({...EventMetaDefaults});

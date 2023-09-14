@@ -33,7 +33,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 <div class="d-flex align-items-center">
                     <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
                     <div class="ps-2">
-                        <h4 class="card-title mb-1"><a href="/event/{eventData.eid}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
+                        <h4 class="card-title mb-1"><a href="/event/{eventData.community.eid}/{eventData.uid}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
                         <small>An event by <a href="/community/{eventData.community.eid}">{eventData.community.title}</a></small>
                     </div>
                 </div>
@@ -45,7 +45,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                     {eventData.brief}
                 </p>
                 <p class="card-text">
-                    <a href="/event/{eventData.eid}" class="btn btn-primary float-end"
+                    <a href="/event/{eventData.community.eid}/{eventData.uid}" class="btn btn-primary float-end"
                         >View event page</a
                     >
                 </p>

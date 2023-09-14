@@ -52,6 +52,7 @@
 
     async function createEvent() {
         let newMeetupEvent = await MeetupEvent.create(ndk, communityDetails);
+        console.log('newMeetupEvent', newMeetupEvent)
         await newMeetupEvent.publish();
         goto("/event/" + newMeetupEvent.meta.eid + "/edit");
     }
@@ -84,7 +85,7 @@
                     </thead>
                     <tbody>
                         {#each $myEvents as event}
-                            <EventRow {event} />
+                            <EventRow {community_id} {event} />
                         {/each}
                     </tbody>
                 </table>

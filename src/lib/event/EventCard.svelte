@@ -21,7 +21,7 @@
                     {eventData.brief}
                 </p>
                 <p class="card-text">
-                    <a href="/event/{eventData.eid}" class="btn btn-primary"
+                    <a href="/event/{eventData.community.eid}/{eventData.uid}" class="btn btn-primary"
                         >View event page</a
                     >
                 </p>

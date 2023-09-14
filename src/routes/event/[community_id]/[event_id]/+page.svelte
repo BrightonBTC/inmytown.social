@@ -1,13 +1,14 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type { MeetupEventID } from "./+page";
-    export let data: MeetupEventID;
+    import type { URLVars } from "./+page";
+    export let data: URLVars;
 
     import { onDestroy, onMount } from "svelte";
 
     import {
         addAttendee,
         attendeeStore,
+        community,
         meetupStore,
     } from "./stores";
     
@@ -23,27 +24,40 @@
 
     import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
-    let eventSubs = new EventSubscriptions(ndk)
+    import { Community, CommunitySubscriptions } from "$lib/community/community";
+    let eventSubs = new EventSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions(ndk);
 
     let hasRsvp: string;
     let event_id = data.event_id;
     let loaded:boolean = false;
 
+    let loadingMessage:string = 'Fetching community...';
+
     attendeeStore.set([]);
+    community.set(new Community(ndk))
     meetupStore.set(new MeetupEvent(ndk))
 
     onMount(async () => {
-        eventSubs.subscribeByID(event_id, async (data) => {
-            $meetupStore.meta = data;
-            // await $meetupStore.fetchCommunity()
-            loaded = true;
-            subscribeRsvp();
-        })
+        communitySubs.subscribeByID(data.community_id, async (data) => {
+            $community.meta = data;
+            fetchEvent();
+        });
     });
 
     onDestroy(() => {
         $meetupStore.destroy()
     })
+
+    async function fetchEvent(){
+        loadingMessage = 'Fetching event...'
+        eventSubs.subscribeOne($community.meta, event_id, async (data) => {
+            $meetupStore.meta = data;
+            // await $meetupStore.fetchCommunity()
+            loaded = true;
+            subscribeRsvp();
+        })
+    }
 
     function subscribeRsvp() {
         $meetupStore.fetchRSVPs(async (event) => {
@@ -71,7 +85,7 @@
         </div>
         <div class="col-sm-8">
             {#if $userNpub && $userNpub === $meetupStore.meta.author}
-                <AdminPanel {event_id} />
+                <AdminPanel {data} />
             {/if}
             <Header />
             <Rsvp {hasRsvp} />
@@ -79,6 +93,6 @@
         </div>
     </div>
 {:else}
-    <Loading t="Fetching Event..." />
+    <Loading t={loadingMessage} />
 {/if}
 

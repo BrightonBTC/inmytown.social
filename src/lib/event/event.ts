@@ -76,6 +76,7 @@ export class MeetupEvent {
         const event = new NDKEvent(ndk);
         event.kind = 1073;
         event.tags = [["e", community.eid]];
+        event.content = ""
         await event.publish();
         let meta = {
             ...EventMetaDefaults,
@@ -138,7 +139,9 @@ export class MeetupEvent {
                 ["e", this.meta.community.eid],
                 ["start", this.meta.starts.toString()],
                 ["end", this.meta.ends.toString()],
-                ["status", this.meta.status]
+                ["status", this.meta.status],
+                ['L', 'kind'],
+                ['l', 'meetup', 'kind']
             ];
             if(this.meta.image){
                 ndkEvent.tags.push(["image", this.meta.image])
@@ -277,29 +280,29 @@ export class EventSubscriptions {
         } 
     }
 
-    public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
-        filter.kinds = [1073]
-        try {
-            const sub = this.ndk.subscribe(
-                filter,
-                opts
-            );
-            if(opts && opts.closeOnEose === false){
-                this.subscriptions.push(sub)
-            }
-            sub.on("event", (event: NDKEvent) =>  {
-                let meta: EventMeta = {
-                    ...EventMetaDefaults,
-                    eid: event.id,
-                    created: event.created_at ? event.created_at : 0
-                };
+    // public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
+    //     filter.kinds = [1073]
+    //     try {
+    //         const sub = this.ndk.subscribe(
+    //             filter,
+    //             opts
+    //         );
+    //         if(opts && opts.closeOnEose === false){
+    //             this.subscriptions.push(sub)
+    //         }
+    //         sub.on("event", (event: NDKEvent) =>  {
+    //             let meta: EventMeta = {
+    //                 ...EventMetaDefaults,
+    //                 eid: event.id,
+    //                 created: event.created_at ? event.created_at : 0
+    //             };
                 
-                this.subscribeMeta(meta, cb)
-            });
-        } catch (err) {
-            console.log("An ERROR occured when subscribing to events", err);
-        } 
-    }
+    //             this.subscribeMeta(meta, cb)
+    //         });
+    //     } catch (err) {
+    //         console.log("An ERROR occured when subscribing to events", err);
+    //     } 
+    // }
 
     public async subscribeMeta(meta: EventMeta, cb: (data: EventMeta) => void) {
         let lastUpd = 0
@@ -318,8 +321,32 @@ export class EventSubscriptions {
         } 
     }
 
-    public async subscribeMetaMulti(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
+    public async subscribeOne(community:CommunityMeta, id: string, cb: (data: EventMeta) => void) {
+        let lastUpd = 0
+        try {
+            const communitySub = this.ndk.subscribe(
+                { 
+                    kinds: [31923], 
+                    "#d": [id],
+                    "#e": [community.eid],
+                    "authors": [community.authorhex],
+                    "#l": ["meetup"]
+                }
+            );
+            communitySub.on("event", (event: NDKEvent) =>  {
+                if(event.created_at && event.created_at > lastUpd){
+                    lastUpd = event.created_at
+                    cb(MeetupEvent.parseNostrEvent(event))
+                }
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to community", err);
+        } 
+    }
+
+    public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
         filter.kinds = [31923]
+        filter["#l"] = ["meetup"]
         try {
             const sub = this.ndk.subscribe(
                 filter,
