@@ -22,6 +22,7 @@
     import Rsvp from "./Rsvp.svelte";
 
     import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    import AdminPanel from "./AdminPanel.svelte";
     let eventSubs = new EventSubscriptions(ndk)
 
     let hasRsvp: string;
@@ -69,6 +70,9 @@
             </div>
         </div>
         <div class="col-sm-8">
+            {#if $userNpub && $userNpub === $meetupStore.meta.author}
+                <AdminPanel {event_id} />
+            {/if}
             <Header />
             <Rsvp {hasRsvp} />
             <MainContent />
