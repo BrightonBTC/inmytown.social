@@ -15,7 +15,9 @@
 
     async function publishEvent(){
         await $meetupStore.publish();
-        if(!$meetupStore.error) goto('/event/'+eid)
+        console.log($meetupStore.error)
+        //if(!$meetupStore.error) 
+        goto('/event/'+eid)
     }
 
     function updateTags(tags: string[]){

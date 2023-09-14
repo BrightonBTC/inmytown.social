@@ -12,6 +12,6 @@
     >
 </p>
 
-<div class="p-5 border-end">
+<div class="px-5 py-2 border-end">
     {@html marked($meetupStore.meta.content)}
 </div>

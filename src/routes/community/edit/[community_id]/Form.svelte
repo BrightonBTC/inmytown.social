@@ -19,7 +19,8 @@
 			if(created) await $community.createChat();
 		}
 		await $community.publishMeta();
-		if (!$community.meta.error) goto("/community/" + $community.meta.eid);
+		//if (!$community.meta.error) 
+        goto("/community/" + $community.meta.eid);
 	}
 
 </script>

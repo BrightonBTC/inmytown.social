@@ -161,7 +161,7 @@ export class MeetupEvent {
             }
             await ndkEvent.publish();
         } catch (err) {
-            this.error = "An ERROR occured publishing the event metadata:"+ err;
+            this.error = "An ERROR occured publishing the event metadata: "+ err;
         }
     }
 
