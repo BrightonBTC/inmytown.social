@@ -7,7 +7,7 @@
 <div class="card shadow">
     <img
         class="card-img-top header-image"
-        src={imgUrlOrDefault(communityDetails.image)}
+        src={imgUrlOrDefault(communityDetails.image, 'community')}
         alt={communityDetails.title}
     />
     <div class="card-body">

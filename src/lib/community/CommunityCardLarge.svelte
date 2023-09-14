@@ -11,7 +11,7 @@
     <a href="/community/{communityDetails.eid}">
         <img
             class="card-img-top header-image"
-            src={imgUrlOrDefault(communityDetails.image)}
+            src={imgUrlOrDefault(communityDetails.image, 'community')}
             alt={communityDetails.title}
         />
     </a>
