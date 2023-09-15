@@ -1,6 +1,5 @@
 import { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
-import { sha256 } from "js-sha256"
 import Geohash from "latlon-geohash"
 
 export interface CommunityMeta{
@@ -58,11 +57,6 @@ export class Community {
         this.meta.eid = ndkEvent.id;
         this.meta.uid = ndkEvent.id;
         return ndkEvent.created_at;
-    }
-
-    public newUID(userhex: string){
-        this.meta.uid = sha256(userhex+Date.now());
-        console.log(this.meta.uid)
     }
 
     public async createChat(){
@@ -173,6 +167,10 @@ export class Community {
             }
         });
         return meta;
+    }
+
+    public static url(community: CommunityMeta){
+        return '/community/'+community.eid
     }
 
     public async fetchMembers(cb: (user: NDKUser) => void){

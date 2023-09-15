@@ -8,6 +8,7 @@
     import FormLocation from "./FormLocation.svelte";
     import Tags from "./Tags.svelte";
     import FormError from "./FormError.svelte";
+    import { Community } from "$lib/community/community";
 
     export let isNew:boolean;
 
@@ -20,7 +21,7 @@
 		}
 		await $community.publishMeta();
 		//if (!$community.meta.error) 
-        goto("/community/" + $community.meta.eid);
+        goto(Community.url($community.meta));
 	}
 
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
+    import { type CommunityMeta, CommunitySubscriptions, Community } from "$lib/community/community";
     import { imgUrlOrDefault } from "$lib/helpers";
     import ndk from "$lib/ndk";
 
@@ -22,7 +22,7 @@
             alt={communityDetails.title}
             class="mini-banner rounded-circle me-3"
         />
-        <a href="/community/{id}">{communityDetails.title}</a>
+        <a href="{Community.url(communityDetails)}">{communityDetails.title}</a>
     </li>
 {:else}
     <li class="list-group-item list-group-item-warning d-flex">

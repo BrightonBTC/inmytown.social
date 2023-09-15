@@ -3,8 +3,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
     import Tags from '$lib/topics/Tags.svelte';
     import Location from "$lib/location/Location.svelte";
-    import type { EventMeta } from './event';
-    import { CommunitySubscriptions } from '$lib/community/community';
+    import { MeetupEvent, type EventMeta } from './event';
+    import { Community, CommunitySubscriptions } from '$lib/community/community';
     import ndk from '$lib/ndk';
 
     export let eventData: EventMeta;
@@ -33,8 +33,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 <div class="d-flex align-items-center">
                     <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
                     <div class="ps-2">
-                        <h4 class="card-title mb-1"><a href="/event/{eventData.community.eid}/{eventData.uid}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
-                        <small>An event by <a href="/community/{eventData.community.eid}">{eventData.community.title}</a></small>
+                        <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
+                        <small>An event by <a href="{Community.url(eventData.community)}">{eventData.community.title}</a></small>
                     </div>
                 </div>
                 <hr />
@@ -45,14 +45,14 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                     {eventData.brief}
                 </p>
                 <p class="card-text">
-                    <a href="/event/{eventData.community.eid}/{eventData.uid}" class="btn btn-primary float-end"
+                    <a href="{MeetupEvent.url(eventData)}" class="btn btn-primary float-end"
                         >View event page</a
                     >
                 </p>
             </div>
         </div>
         <div class="col-md-4 bg-secondary border rounded d-flex">
-            <a href="/event/{eventData.eid}" class="d-flex ">
+            <a href="{MeetupEvent.url(eventData)}" class="d-flex ">
                 <img
                     src={imgUrlOrDefault(eventData.image)}
                     alt="musig"

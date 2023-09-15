@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dateStringFull } from '$lib/formatDates';
     import Tags from '$lib/topics/Tags.svelte';
-    import type { EventMeta } from './event';
+    import { MeetupEvent, type EventMeta } from './event';
     export let eventData: EventMeta | null;
 </script>
 {#if eventData}
@@ -9,7 +9,7 @@
 
 <div class="card mb-3 shadow">
     <div class="card-header">
-        <h4 class="card-title mb-1"><a href="/event/{eventData.community.eid}/{eventData.uid}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
+        <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
     </div>
     <div class="card-body">
         <p class="card-text">

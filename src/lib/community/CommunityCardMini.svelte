@@ -1,6 +1,6 @@
 <script lang="ts">
     import { imgUrlOrDefault } from "$lib/helpers";
-    import type { CommunityMeta } from "./community";
+    import { Community, type CommunityMeta } from "./community";
 
     export let communityDetails: CommunityMeta;
 </script>
@@ -13,7 +13,7 @@
     <div class="card-body">
         <h4 class="card-title">{communityDetails.title}</h4>
         <a
-            href="/community/{communityDetails.eid}"
+            href="{Community.url(communityDetails)}"
             class="btn btn-primary float-end">Go to community</a
         >
     </div>

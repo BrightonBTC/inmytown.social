@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
-    import type { EventMeta } from './event';
+    import { MeetupEvent, type EventMeta } from './event';
     export let eventData: EventMeta | null;
 </script>
 {#if eventData}
@@ -21,7 +21,7 @@
                     {eventData.brief}
                 </p>
                 <p class="card-text">
-                    <a href="/event/{eventData.community.eid}/{eventData.uid}" class="btn btn-primary"
+                    <a href="{MeetupEvent.url(eventData)}" class="btn btn-primary"
                         >View event page</a
                     >
                 </p>

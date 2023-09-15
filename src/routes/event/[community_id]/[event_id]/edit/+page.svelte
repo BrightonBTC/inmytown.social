@@ -7,7 +7,7 @@
     import Loading from "$lib/Loading.svelte";
     import { community, meetupStore } from "./stores";
     import EventCard from "$lib/event/EventCard.svelte";
-    import { type EventMeta, EventSubscriptions } from "$lib/event/event";
+    import { type EventMeta, EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
     import Form from "./Form.svelte";
@@ -21,7 +21,8 @@
 
     let eventSubs = new EventSubscriptions(ndk);
     let communitySubs = new CommunitySubscriptions(ndk);
-    community.set(new Community(ndk))
+
+    $: eid, community.set(new Community(ndk)), meetupStore.set(new MeetupEvent(ndk))
     
     onMount(async () => {
         await login(ndk)
@@ -37,7 +38,12 @@
     async function fetchCommunity(){
         communitySubs.subscribeByID(data.community_id, async (data) => {
             $community.meta = data;
-            fetchMeetup();
+            if(eid==='new' && $userHex){
+                meetupStore.set(MeetupEvent.new(ndk, $community.meta))
+                console.log($meetupStore)
+                authorised = true;
+            }
+            else fetchMeetup();
         });
     }
 

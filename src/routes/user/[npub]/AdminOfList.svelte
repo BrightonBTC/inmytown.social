@@ -4,7 +4,7 @@
     import { addCommunity, communitiesStore, meetupUser, sortedCommunities } from "./stores";
     import { userHex } from "$lib/stores";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
-    import { CommunitySubscriptions } from "$lib/community/community";
+    import { Community, CommunitySubscriptions } from "$lib/community/community";
     import ndk from "$lib/ndk";
 
     let communitySubs = new CommunitySubscriptions(ndk);
@@ -60,7 +60,7 @@
                     />
                 </td>
                 <td>
-                    <a href="/community/{community.eid}"
+                    <a href="{Community.url(community)}"
                         >{community.title}</a
                     >
                     <br><small class="text-muted">updated: {dateStringFull(community.updated)}</small>

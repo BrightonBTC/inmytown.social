@@ -85,7 +85,7 @@
         </div>
         <div class="col-sm-8">
             {#if $userNpub && $userNpub === $meetupStore.meta.author}
-                <AdminPanel {data} />
+                <AdminPanel data={$meetupStore.meta} />
             {/if}
             <Header />
             <Rsvp {hasRsvp} />

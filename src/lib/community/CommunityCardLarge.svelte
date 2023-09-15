@@ -2,13 +2,13 @@
     import { imgUrlOrDefault } from "$lib/helpers";
     import Location from "$lib/location/Location.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import type { CommunityMeta } from "./community";
+    import { Community, type CommunityMeta } from "./community";
 
     export let communityDetails: CommunityMeta;
 </script>
 
 <div class="card mb-4 shadow d-flex" style="width: 100%;">
-    <a href="/community/{communityDetails.eid}">
+    <a href="{Community.url(communityDetails)}">
         <img
             class="card-img-top header-image"
             src={imgUrlOrDefault(communityDetails.image, 'community')}
@@ -19,7 +19,7 @@
         <h4 class="card-title overflow-e">
             <a
                 class="text-decoration-none text-muted"
-                href="/community/{communityDetails.eid}"
+                href="{Community.url(communityDetails)}"
                 >{communityDetails.title}</a
             >
         </h4>
