@@ -69,7 +69,7 @@ userStatus.subscribe((value) => {
 
 export let uStatus: UserStatus;
 userStatus.subscribe((value) => {
-    uStatus = value !== undefined ? JSON.parse(value) : [];
+    uStatus = value !== undefined ? JSON.parse(value) : {communities:[], interests:[]};
 });
 
 export let myCommunities: Array<NDKTag>;
