@@ -258,8 +258,7 @@ export class EventSubscriptions {
                     kinds: [31923], 
                     "#d": [id],
                     "#e": [community.eid],
-                    "authors": [community.authorhex],
-                    "#l": ["meetup"]
+                    "authors": [community.authorhex]
                 }
             );
             communitySub.on("event", (event: NDKEvent) =>  {
@@ -275,7 +274,6 @@ export class EventSubscriptions {
 
     public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
         filter.kinds = [31923]
-        filter["#l"] = ["meetup"]
         try {
             const sub = this.ndk.subscribe(
                 filter,
