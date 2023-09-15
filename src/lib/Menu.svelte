@@ -12,7 +12,7 @@
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow p-0">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="/">
 			<img src="/img/meetup-logo.png" alt="home" />

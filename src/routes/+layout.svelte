@@ -33,7 +33,7 @@
 <style lang="scss">
 .main{
     min-height: 100vh;
-    padding-top:80px;
+    padding-top:70px;
 }
 :global([data-bs-theme="dark"]) {
     --bs-secondary-rgb: 47,54,61;
