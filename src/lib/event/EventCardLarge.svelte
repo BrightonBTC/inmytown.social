@@ -44,11 +44,6 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 <p class="card-text">
                     {eventData.brief}
                 </p>
-                <p class="card-text">
-                    <a href="{MeetupEvent.url(eventData)}" class="btn btn-primary float-end"
-                        >View event page</a
-                    >
-                </p>
             </div>
         </div>
         <div class="col-md-4 bg-secondary border rounded d-flex">

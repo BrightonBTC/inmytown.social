@@ -13,26 +13,23 @@
     <div class="row g-0">
         <div class="col-md-8">
             <div class="card-body">
-                <h4 class="card-title">{eventData.title}</h4>
+                <h4 class="card-title"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a></h4>
                 <p class="card-text text-muted">
                     <i class="bi bi-geo-alt me-2 text-primary"></i> {eventData.city}, {eventData.country}
                 </p>
                 <p class="card-text">
                     {eventData.brief}
                 </p>
-                <p class="card-text">
-                    <a href="{MeetupEvent.url(eventData)}" class="btn btn-primary"
-                        >View event page</a
-                    >
-                </p>
             </div>
         </div>
         <div class="col-md-4">
-            <img
+            <a href="{MeetupEvent.url(eventData)}"><img
                 src={imgUrlOrDefault(eventData.image)}
                 alt="musig"
                 class="rounded event-image"
             />
+            </a>
+            
         </div>
     </div>
 </div>
