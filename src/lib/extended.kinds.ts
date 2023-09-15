@@ -5,7 +5,6 @@ declare module 'nostr-tools/lib/event' {
         MeetupCommunityCreation = 1037,
         MeetupFollowsList = 10037,
         MeetupCommunityMetadata = 30037,
-        MeetupEventCreation = 1073,
         CalendarEvent = 31923,
         CalendarRSVP = 31925
     }

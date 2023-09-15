@@ -1,11 +1,11 @@
-import { CommunityMetaDefaults, type CommunityMeta, Community, CommunitySubscriptions } from "$lib/community/community"
+import { CommunityMetaDefaults, type CommunityMeta, CommunitySubscriptions } from "$lib/community/community"
 import NDK, { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
 
 
 export interface EventMeta{
-    uid: string 
     eid: string 
+    uid: string 
     author: string 
     authorhex: string 
     title: string
@@ -26,9 +26,9 @@ export interface EventMeta{
     created: number
 }
 
-export const EventMetaDefaults: Pick<EventMeta, 'uid' | 'eid' | 'title' | 'brief' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'content' | 'image' | 'country' | 'city' |  'venue' | 'starts' | 'ends' | 'community' | 'status' | 'updated' | 'created'> = {
-    uid: "",
+export const EventMetaDefaults: Pick<EventMeta, 'eid' | 'uid' | 'title' | 'brief' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'content' | 'image' | 'country' | 'city' |  'venue' | 'starts' | 'ends' | 'community' | 'status' | 'updated' | 'created'> = {
     eid: "",
+    uid: "",
     title: "Draft event",
     brief: "",
     tags: [],
@@ -71,17 +71,10 @@ export class MeetupEvent {
         })
     }
 
-
-    public static async create(ndk: NDK, community: CommunityMeta){
-        const event = new NDKEvent(ndk);
-        event.kind = 1073;
-        event.tags = [["e", community.eid]];
-        event.content = ""
-        await event.publish();
+    public static new(ndk: NDK, community: CommunityMeta){
         let meta = {
             ...EventMetaDefaults,
-            eid: event.id,
-            uid: event.id,
+            uid: parseInt((Date.now() / 1000).toString()).toString(),
             community: community,
         }
         meta.latitude = community.latitude;
@@ -91,6 +84,9 @@ export class MeetupEvent {
         return new MeetupEvent(ndk, meta);
     }
 
+    public static url(event: EventMeta){
+        return '/event/'+event.community.eid+'/'+event.uid
+    }
 
     public async fetchRSVPs(cb: (data: NDKEvent) => void){
         if(this.rsvpSubscription) return;
@@ -98,7 +94,7 @@ export class MeetupEvent {
             this.rsvpSubscription = this.ndk.subscribe(
                 {
                     kinds: [31925],
-                    "#d": [this.meta.eid],
+                    "#d": [this.meta.uid],
                 },
                 {
                     closeOnEose: false,
@@ -118,7 +114,7 @@ export class MeetupEvent {
         ndkEvent.kind = 31925;
         ndkEvent.tags = [
             ["a", this.meta.eid+':'+this.meta.authorhex+':'+this.meta.uid],
-            ["d", this.meta.eid],
+            ["d", this.meta.uid],
             ['L', 'status'],
             ['l', state, 'status']
         ];
@@ -135,7 +131,6 @@ export class MeetupEvent {
                 ["name", this.meta.title],
                 ["brief", this.meta.brief],
                 ["d", this.meta.uid],
-                ["e", this.meta.eid],
                 ["e", this.meta.community.eid],
                 ["start", this.meta.starts.toString()],
                 ["end", this.meta.ends.toString()],
@@ -178,14 +173,14 @@ export class MeetupEvent {
             };
         }
         
+        meta.eid = data.id
         meta.content = data.content
         meta.updated = data.created_at || 0
         meta.author = data.author.npub
         meta.authorhex = data.author.hexpubkey()
         
         let etags = data.tags.filter(t => t[0] === 'e')
-        if(etags.length > 0) meta.eid = etags[0][1]
-        if(etags.length > 1) meta.community.eid = etags[1][1]
+        if(etags.length > 0) meta.community.eid = etags[1][1]
 
         meta.tags = [];
         let ttags = data.tags.filter(t => t[0] === 't')
@@ -253,72 +248,6 @@ export class EventSubscriptions {
 
     public constructor(ndk: NDK){
         this.ndk = ndk
-    }
-
-    public async subscribeByID(id: string, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
-        let meta: EventMeta = {
-            ...EventMetaDefaults,
-            eid: id
-        };
-        try {
-            let communitySub = this.ndk.subscribe(
-                {
-                    kinds: [1073],
-                    "ids": [id],
-                },
-                opts
-            );
-            if(opts && opts.closeOnEose === false){
-                this.subscriptions.push(communitySub)
-            }
-            communitySub.on("event", (event: NDKEvent) =>  {
-                meta.created = event.created_at ? event.created_at : 0;
-                this.subscribeMeta(meta, cb)
-            });
-        } catch (err) {
-            console.log("An ERROR occured when subscribing to event", err);
-        } 
-    }
-
-    // public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
-    //     filter.kinds = [1073]
-    //     try {
-    //         const sub = this.ndk.subscribe(
-    //             filter,
-    //             opts
-    //         );
-    //         if(opts && opts.closeOnEose === false){
-    //             this.subscriptions.push(sub)
-    //         }
-    //         sub.on("event", (event: NDKEvent) =>  {
-    //             let meta: EventMeta = {
-    //                 ...EventMetaDefaults,
-    //                 eid: event.id,
-    //                 created: event.created_at ? event.created_at : 0
-    //             };
-                
-    //             this.subscribeMeta(meta, cb)
-    //         });
-    //     } catch (err) {
-    //         console.log("An ERROR occured when subscribing to events", err);
-    //     } 
-    // }
-
-    public async subscribeMeta(meta: EventMeta, cb: (data: EventMeta) => void) {
-        let lastUpd = 0
-        try {
-            const communitySub = this.ndk.subscribe(
-                { kinds: [31923], "#e": [meta.eid] }
-            );
-            communitySub.on("event", (event: NDKEvent) =>  {
-                if(event.created_at && event.created_at > lastUpd){
-                    lastUpd = event.created_at
-                    cb(MeetupEvent.parseNostrEvent(event, meta))
-                }
-            });
-        } catch (err) {
-            console.log("An ERROR occured when subscribing to community", err);
-        } 
     }
 
     public async subscribeOne(community:CommunityMeta, id: string, cb: (data: EventMeta) => void) {
