@@ -33,7 +33,7 @@
 <style lang="scss">
 .main{
     min-height: 100vh;
-    padding-top:70px;
+    padding-top:80px;
 }
 :global([data-bs-theme="dark"]) {
     --bs-secondary-rgb: 47,54,61;
@@ -57,5 +57,10 @@
   line-height: 1.2;
   color: var(--bs-heading-color);
   font-family: 'Ubuntu', sans-serif;
+}
+:global([data-bs-theme="dark"] .page-home .nav-home, .page-discover .nav-discover, .page-about .nav-about){
+    background: rgb(var(--bs-dark-rgb));
+    border-radius: 10px;
+    font-weight: bold;
 }
 </style>

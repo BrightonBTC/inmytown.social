@@ -1,15 +1,21 @@
-<script>
+<script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
 	import { derivedProfile, userNpub } from "$lib/stores";
 	import Login from "./Login.svelte";
 	import { imgUrlOrDefault } from "./helpers";
+    import Relays from "./Relays.svelte";
+    import { goto } from "$app/navigation";
+
+	import { page } from '$app/stores';  
+
+	let currentPage:string;
+	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
 </script>
 
-<nav class="navbar navbar-expand-lg bg-black navbar-dark fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="/">
-			<img src="/img/meetupicon.png" alt="home" />
-			InMyTown.<small class="text-muted"><em>social</em></small>
+			<img src="/img/meetup-logo.png" alt="home" />
 		</a>
 		<button
 			class="navbar-toggler"
@@ -23,17 +29,22 @@
 			<span class="navbar-toggler-icon" />
 		</button>
 		<div class="collapse navbar-collapse  justify-content-between" id="navbarSupportedContent">
-			<ul class="navbar-nav">
+			<ul class="navbar-nav page-{currentPage}">
 				<li class="nav-item">
-					<a class="nav-link" href="/discover"
+					<a class="nav-link nav-home text-white" href="/"
+						><i class="bi bi-house text-success"></i> Home</a
+					>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link nav-discover text-white" href="/discover"
 						><i class="bi bi-eye text-success"></i> Discover</a
 					>
 				</li>
 				<li class="nav-item">
 					<a
-						class="nav-link"
-						href="/relays"
-						><i class="bi bi-arrow-down-up text-success"  /> Relays</a
+						class="nav-link nav-about text-white"
+						href="/about"
+						><i class="bi bi-info-circle text-success"  /> About</a
 					>
 				</li>
 			</ul>
@@ -56,11 +67,44 @@
 						<Login />
 					{/if}
 				</li>
+				<li class="nav-item">
+					<a href="#top" class="nav-link bg-dark rounded" data-bs-toggle="modal" data-bs-target="#relayModal">
+						<i class="bi bi-arrow-down-up text-light"  />
+					</a>
+				</li>
 			</ul>
 		</div>
 		
 	</div>
 </nav>
+
+
+<div class="modal" id="relayModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Current Relays</h4>
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="modal"
+				/>
+			</div>
+			<div class="modal-body">
+				<Relays />
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" data-bs-dismiss="modal" on:click={() => goto('/relays')}>Edit Relays</button>
+				<button
+					type="button"
+					class="btn btn-danger"
+					data-bs-dismiss="modal">Close</button
+				>
+			</div>
+		</div>
+	</div>
+</div>
+
 <!-- The Modal -->
 <div class="modal" id="loginModal">
 	<div class="modal-dialog">
@@ -137,7 +181,7 @@
 		object-fit: cover;
 	}
 	.navbar{
-		opacity: 0.8;
+		background-color: #323d48;
 	}
 	.navbar:hover{
 		opacity: 1;

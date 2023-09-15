@@ -3,7 +3,9 @@
     import type { NDKRelay } from '@nostr-dev-kit/ndk';
     import { NDKRelayStatus } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
+    import { navigating } from '$app/stores';
 
+    $: if($navigating) update();
 
     let relays: NDKRelay[] = [];
     let notices: Map<NDKRelay, string[]> = new Map();
@@ -38,6 +40,7 @@
 
     function update() {
         relays = Array.from(ndk.pool.relays.values());
+        console.log(relays)
     }
 
     let expandSubscriptionList: Record<string, boolean> = {};
@@ -48,7 +51,7 @@
     }
 </script>
 
-<ul class="list-group list-group-flush">
+<ul class="list-group list-group-flush small">
     {#each relays as relay}
         <li class="list-group-item">
             <button
@@ -67,22 +70,16 @@
                     <span class="relay-status relay-status--flapping" />
                 {/if}
                 <span class="relay-name">{relay.url}</span>
-                <!-- {#if relay.activeSubscriptions.size > 0}
+                {#if relay.activeSubscriptions.size > 0}
                     <div class="relay-subscriptions">
                         {relay.activeSubscriptions.size} subscriptions
                     </div>
-                {/if} -->
+                {/if}
             </button>
 
-            <!-- {#if notices.has(relay)}
-                <ul>
-                    {#each notices.get(relay) as notice}
-                        <li class="relay-notice">{notice}</li>
-                    {/each}
-                </ul>
-            {/if} -->
+            
 
-            <!-- {#if expandSubscriptionList[relay.url]}
+            {#if expandSubscriptionList[relay.url]}
                 <ul>
                     {#each Array.from(relay.activeSubscriptions) as subscription}
                         <li><p>{subscription.subId}</p>
@@ -99,7 +96,7 @@
                         </li>
                     {/each}
                 </ul>
-            {/if} -->
+            {/if}
         </li>
     {/each}
 </ul>
