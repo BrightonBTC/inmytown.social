@@ -15,7 +15,6 @@
 
     async function publishEvent(){
         await $meetupStore.publish();
-        console.log($meetupStore.error)
         //if(!$meetupStore.error) 
         //goto('/event/'+eid)
     }

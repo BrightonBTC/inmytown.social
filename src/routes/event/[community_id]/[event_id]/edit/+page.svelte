@@ -40,7 +40,6 @@
             $community.meta = data;
             if(eid==='new' && $userHex){
                 meetupStore.set(MeetupEvent.new(ndk, $community.meta))
-                console.log($meetupStore)
                 authorised = true;
             }
             else fetchMeetup();

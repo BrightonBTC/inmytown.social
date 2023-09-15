@@ -46,17 +46,10 @@
 
     async function fetchEvents() {
         eventSubs.subscribe({"#e": [community_id]}, async (event) => {
-            console.log(event)
             addEvent(event);
         })
     }
 
-    // async function createEvent() {
-    //     let newMeetupEvent = await MeetupEvent.create(ndk, communityDetails);
-    //     console.log('newMeetupEvent', newMeetupEvent)
-    //     await newMeetupEvent.publish();
-    //     goto("/event/" + newMeetupEvent.meta.eid + "/edit");
-    // }
 </script>
 
 {#if authorised === true}
@@ -71,13 +64,6 @@
                 <a href="/event/{community_id}/new/edit" class="btn btn-success">
                     + New Event
                 </a>
-                <!-- <button
-                    type="button"
-                    class="btn btn-success"
-                    on:click|preventDefault={() => createEvent()}
-                >
-                    + New Event
-                </button> -->
                 <table class="table table-hover mt-5">
                     <thead>
                         <tr>
