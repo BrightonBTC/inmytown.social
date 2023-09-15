@@ -26,7 +26,6 @@ export class MeetupUser extends NDKUser {
             kinds: [10037]
         }, {})
         if(events && events.size > 0){
-            console.log(events)
             this.status = MeetupUser.parseStatus([...events][0])
         }
     }

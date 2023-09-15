@@ -40,7 +40,6 @@
 
     function update() {
         relays = Array.from(ndk.pool.relays.values());
-        console.log(relays)
     }
 
     let expandSubscriptionList: Record<string, boolean> = {};
