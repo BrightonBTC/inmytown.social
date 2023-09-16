@@ -78,7 +78,6 @@
             break;
             case 'people':
                 userSubs.subscribeStatuses({...cityFilter, ...topicFilter}, (data) => {
-                    console.log('person', data)
                     addPerson(data)
                 }, {closeOnEose: false, groupable: false})
             break;
