@@ -1,27 +1,19 @@
 <script lang="ts">
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKUser } from "@nostr-dev-kit/ndk";
-    import { fetchUser } from "$lib/user/user";
     import UserCardSmallRow from "$lib/user/UserCardSmallRow.svelte";
+    import { meetupUser } from "./stores";
 
-    export let ndk: NDK;
-    export let npub: string;
-
-    let user: NDKUser | undefined;
-    let follows: Set<NDKUser> | undefined;
-
-    $: fetchFollows(), npub
+    let follows: Set<NDKUser>;
 
     async function fetchFollows(){
-        if(ndk && npub){
-            user = await fetchUser(ndk, npub);
-            follows = await user?.follows()
-        } 
+        follows = await $meetupUser.follows();
     }
+
+    $: fetchFollows(), $meetupUser
 
 </script>
 {#if follows}
-{#each follows as f}
-<UserCardSmallRow {ndk} npub={f.npub} />
-{/each}
+    {#each follows as f}
+        <UserCardSmallRow npub={f.npub} />
+    {/each}
 {/if}

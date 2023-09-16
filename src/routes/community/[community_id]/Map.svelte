@@ -5,40 +5,43 @@
     import TileLayer from "ol/layer/Tile.js";
     import View from "ol/View.js";
     import {useGeographic} from 'ol/proj.js';
-    import PointerInteraction from 'ol/interaction/Pointer.js';
+    import {community} from "./store.community";
 
-    import { onMount } from "svelte";
     import { defaults } from "ol/interaction/defaults";
-    import type { CommunityMeta } from "$lib/community/community";
+    import { onMount } from "svelte";
 
-    export let communityDetails: CommunityMeta;
+    let map:Map;
 
+    $: updMap(), $community.meta
 
-    onMount(() => {
-        console.log(communityDetails)
-        if(communityDetails.latitude && communityDetails.longitude && communityDetails.zoom){
-            useGeographic();
-            const map = new Map({
-                target: "map",
-                layers: [
-                    new TileLayer({
-                        source: new OSM(),
-                    }),
-                ],
-                view: new View({
-                    center: [communityDetails.longitude, communityDetails.latitude],
-                    zoom: communityDetails.zoom,
+    function initMap(){
+        useGeographic();
+        map = new Map({
+            target: "map",
+            layers: [
+                new TileLayer({
+                    source: new OSM(),
                 }),
-                interactions: defaults({mouseWheelZoom: false})
-            });
-            
-        }
-        
-    });
+            ],
+            view: new View({
+                center: [$community.meta.longitude, $community.meta.latitude],
+                zoom: 9,
+            }),
+            interactions: defaults({mouseWheelZoom: false})
+        });
+    }
+    onMount(() => {
+        initMap()
+    })
+
+    function updMap(){
+        if(!map) initMap()
+        map.getView().animate({zoom: 9}, {center: [$community.meta.longitude, $community.meta.latitude]});
+    };
+
 </script>
-{#if communityDetails.latitude && communityDetails.longitude && communityDetails.zoom}
+
 <div id="map" class="mb-4 mt-5" />
-{/if}
 
 <style>
     #map {

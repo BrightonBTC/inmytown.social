@@ -34,6 +34,7 @@
 		"date-fns": "^2.30.0",
 		"date-picker-svelte": "^2.6.0",
 		"esm": "^3.2.25",
+		"js-sha256": "^0.10.1",
 		"latlon-geohash": "^2.0.0",
 		"marked": "^6.0.0",
 		"ol": "^7.4.0",

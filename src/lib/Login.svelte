@@ -21,7 +21,7 @@
     Login
 </a>
 {:else}
-<button
+<button 
     type="button"
     class="nav-link border border-secondary rounded"
     data-bs-toggle="modal"

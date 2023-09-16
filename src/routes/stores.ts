@@ -19,7 +19,7 @@ export function addEvent(e: EventMeta){
     events.update(items => {
         let inList = items.filter(v => v.eid === e.eid)
         // check if we have an earlier version of the event and replace it
-        if(inList.length > 0 && e.created_at && e.created_at > inList[0].created_at){
+        if(inList.length > 0 && e.updated && e.updated > inList[0].updated){
             items = items.filter(v => v.eid !== inList[0].eid)
             items.push(e)
         }

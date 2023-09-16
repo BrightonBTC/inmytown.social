@@ -1,14 +1,34 @@
 <script lang="ts">
+    import { Community, CommunitySubscriptions } from '$lib/community/community';
     import { dateStringFull } from '$lib/formatDates';
-    import type { EventMeta } from './event';
-    export let eventData: EventMeta | null;
+    import { imgUrlOrDefault } from '$lib/helpers';
+    import ndk from '$lib/ndk';
+    import Tags from '$lib/topics/Tags.svelte';
+    import { MeetupEvent, type EventMeta } from './event';
+
+    export let eventData: EventMeta;
+    export let eid:string | undefined = undefined
+
+    $: setData(), eid
+
+    let communitySubs = new CommunitySubscriptions(ndk); 
+
+    function setData(){
+        communitySubs.subscribeByID(eventData.community.eid, async (data) => {
+            if(data.eid === eventData.community.eid) eventData.community = data;
+        })
+    }
 </script>
 {#if eventData}
 
 
-<div class="card mb-3">
-    <div class="card-header">
-        <h4 class="card-title mb-1"><a href="/event/{eventData.eid}" class="text-decoration-none">{eventData.title} <small><i class="bi bi-link-45deg text-muted"></i></small></a> </h4>
+<div class="card mb-3 shadow">
+    <div class="card-header d-flex align-items-center">
+        <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
+        <div class="ps-2">
+            <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
+            <small>An event by <a href="{Community.url(eventData.community)}">{eventData.community.title}</a></small>
+        </div>
     </div>
     <div class="card-body">
         <p class="card-text">
@@ -33,6 +53,9 @@
                 </small>
             </li>
         </ul>
+    </div>
+    <div class="card-footer">
+        <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
 {/if}

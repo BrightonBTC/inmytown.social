@@ -1,17 +1,12 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type NDK from "@nostr-dev-kit/ndk";
     import { getBadgeClassByStatus } from "$lib/helpers";
     import Loading from "$lib/Loading.svelte";
     import { dateStringFull } from "$lib/formatDates";
-    import { type EventMeta, subEventMeta } from "$lib/event/event";
-    export let eid: string;
-    export let ndk: NDK;
-    let event: EventMeta | null;
+    import { MeetupEvent, type EventMeta } from "$lib/event/event";
+    export let event: EventMeta ;
+    export let community_id: string ;
 
-    subEventMeta(ndk, eid, async (data) => {
-        event = data
-    })
 </script>
 
 <tr>
@@ -22,9 +17,9 @@
                 >{dateStringFull(event.starts)}</small
             ></td
         >
-        <td><a href="/event/{event.eid}">{event.title}</a></td>
+        <td><a href="{MeetupEvent.url(event)}">{event.title}</a></td>
         <td
-            ><a href="/event/{event.eid}/edit">
+            ><a href="{MeetupEvent.url(event)}/edit">
                 <i class="bi bi-pencil-square text-primary" />
             </a></td
         >

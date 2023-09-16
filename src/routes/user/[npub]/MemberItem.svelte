@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { subCommunity, type CommunityMeta } from "$lib/community/community";
+    import { type CommunityMeta, CommunitySubscriptions, Community } from "$lib/community/community";
     import { imgUrlOrDefault } from "$lib/helpers";
-    import type NDK from "@nostr-dev-kit/ndk";
+    import ndk from "$lib/ndk";
 
-    export let ndk: NDK | undefined;
     export let id: string;
 
     let communityDetails: CommunityMeta;
 
     if (ndk) {
-        subCommunity(ndk, id, async (data) => {
+        let communitySubs = new CommunitySubscriptions(ndk)
+        communitySubs.subscribeByID(id, async (data) => {
             communityDetails = data;
         });
     }
@@ -22,7 +22,7 @@
             alt={communityDetails.title}
             class="mini-banner rounded-circle me-3"
         />
-        <a href="/community/{id}">{communityDetails.title}</a>
+        <a href="{Community.url(communityDetails)}">{communityDetails.title}</a>
     </li>
 {:else}
     <li class="list-group-item list-group-item-warning d-flex">

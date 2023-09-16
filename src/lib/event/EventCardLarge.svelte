@@ -3,18 +3,22 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
     import Tags from '$lib/topics/Tags.svelte';
     import Location from "$lib/location/Location.svelte";
-    import type NDK from '@nostr-dev-kit/ndk';
-    import { onMount } from 'svelte';
-    import type { EventMeta } from './event';
-    import { subCommunity } from '$lib/community/community';
-    export let eventData: EventMeta;
-    export let ndk: NDK ;
-    onMount(async () => {
+    import { MeetupEvent, type EventMeta } from './event';
+    import { Community, CommunitySubscriptions } from '$lib/community/community';
+    import ndk from '$lib/ndk';
 
-        subCommunity(ndk, eventData.community.eid, async (data) => {
-            eventData.community = data;
-        });
-    })
+    export let eventData: EventMeta;
+    export let eid:string | undefined = undefined
+
+    let communitySubs = new CommunitySubscriptions(ndk);
+
+    $: setData(), eid
+
+    function setData(){
+        communitySubs.subscribeByID(eventData.community.eid, async (data) => {
+            if(data.eid === eventData.community.eid) eventData.community = data;
+        })
+    }
 
 </script>
 {#if eventData}
@@ -29,8 +33,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 <div class="d-flex align-items-center">
                     <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
                     <div class="ps-2">
-                        <h4 class="card-title mb-1"><a href="/event/{eventData.eid}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
-                        <small>An event by <a href="/community/{eventData.community.eid}">{eventData.community.title}</a></small>
+                        <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
+                        <small>An event by <a href="{Community.url(eventData.community)}">{eventData.community.title}</a></small>
                     </div>
                 </div>
                 <hr />
@@ -40,17 +44,12 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 <p class="card-text">
                     {eventData.brief}
                 </p>
-                <p class="card-text">
-                    <a href="/event/{eventData.eid}" class="btn btn-primary float-end"
-                        >View event page</a
-                    >
-                </p>
             </div>
         </div>
         <div class="col-md-4 bg-secondary border rounded d-flex">
-            <a href="/event/{eventData.eid}" class="d-flex ">
+            <a href="{MeetupEvent.url(eventData)}" class="d-flex ">
                 <img
-                    src={imgUrlOrDefault(eventData.image)}
+                    src={imgUrlOrDefault(eventData.image, 'event')}
                     alt="musig"
                     class="rounded event-image"
                 />
@@ -58,8 +57,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
         </div>
     </div>
 
-    <div class="mt-2 bg-secondary p-2 border-top">
-        <small><Tags tags={eventData.tags} linked={true} /></small>
+    <div class="mt-2 p-2 pt-3 border-top">
+        <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
 {/if}

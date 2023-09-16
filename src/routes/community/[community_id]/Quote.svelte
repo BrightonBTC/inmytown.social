@@ -1,11 +1,10 @@
 <script lang="ts">
     import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import { chatCommentsStore } from "./stores";
-    import type NDK from "@nostr-dev-kit/ndk";
+    import { chatCommentsStore } from "./store.chat";
     import PfpIcon from "$lib/user/PFPIcon.svelte";
+    import ndk from "$lib/ndk";
 
     export let id: string;
-    export let ndk: NDK;
     let comment: NDKEvent;
 
     $: setQuote(), id

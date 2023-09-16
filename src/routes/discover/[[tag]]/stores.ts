@@ -1,6 +1,6 @@
 
-import { parseCommunityData, type CommunityMeta } from '$lib/community/community';
-import { parseEventData, type EventMeta } from '$lib/event/event';
+import type { CommunityMeta } from '$lib/community/community';
+import type { EventMeta } from '$lib/event/event';
 import type { NDKEvent } from '@nostr-dev-kit/ndk';
 import { derived, writable } from 'svelte/store';
 
@@ -26,32 +26,54 @@ export function removeTopic(tag:string){
     })
 }
 
-export function addCommunity(e:NDKEvent){
-    communityList.update(items => {
-        let d = parseCommunityData(e)
-        if(!d.image || d.image.length < 1) d.image = '/img/default.jpeg'
-        items.push(d)
-        return [...new Map(items.map(v => [v.eid, v])).values()]
-    })
-}
-export function addEvent(e:NDKEvent){
-    //console.log('evnt', e)
-    let d = parseEventData(e)
-    //console.log('-- evnt', d)
-    if(d.status !=='draft'){
-        eventList.update(items => {
-            let dupes = items.filter(x => x.uid === d.uid);
-            if(dupes.length === 0 || dupes[0].created_at < d.created_at){
-                items.push(d)
+
+export function addCommunity(item: CommunityMeta) {
+    communityList.update((items) => {
+        let matches = items.filter(v => v.uid === item.uid && v.author === item.author)
+        if(matches.length > 0){
+            if(matches[0].updated < item.updated){
+                items = items.filter(v => v.uid !== item.uid && v.author !== item.author)
+                items.push(item)
             }
-            return [...new Map(items.map(v => [v.eid, v])).values()]
+        }
+        else{
+            items.push(item)
+        }
+        return items
+    });
+  }
+
+export function addEvent(item:EventMeta){
+    if(item.status !=='draft'){
+        eventList.update(items => {
+            let matches = items.filter(v => v.uid === item.uid && v.author === item.author)
+            if(matches.length > 0){
+                if(matches[0].updated < item.updated){
+                    items = items.filter(v => v.uid !== item.uid && v.author !== item.author)
+                    items.push(item)
+                }
+            }
+            else{
+                items.push(item)
+            }
+            return items
         })
     }
 }
-export function addPerson(e:NDKEvent){
+
+export function addPerson(item:NDKEvent){
     personList.update(items => {
-        items.push(e)
-        return [...new Map(items.map(v => [v.pubkey, v])).values()]
+        let matches = items.filter(v => v.pubkey === item.pubkey)
+        if(matches.length > 0){
+            if(matches[0].created_at && item.created_at && matches[0].created_at < item.created_at){
+                items = items.filter(v => v.pubkey !== item.pubkey)
+                items.push(item)
+            }
+        }
+        else{
+            items.push(item)
+        }
+        return items
     })
 }
 

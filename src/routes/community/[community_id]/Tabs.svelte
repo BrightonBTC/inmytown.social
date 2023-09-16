@@ -1,14 +1,7 @@
 <script lang="ts">
-    import type { CommunityMeta } from "$lib/community/community";
-    import type NDK from "@nostr-dev-kit/ndk";
-
     import About from "./About.svelte";
     import Chat from "./Chat.svelte";
     import Events from "./Events.svelte";
-    export let ndk: NDK;
-
-    export let communityDetails: CommunityMeta;
-
 </script>
 <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
@@ -55,7 +48,7 @@
         role="tabpanel"
         aria-labelledby="about-tab"
     >
-        <About {communityDetails} />
+        <About />
     </div>
     <div
         class="tab-pane fade"
@@ -71,6 +64,6 @@
         role="tabpanel"
         aria-labelledby="chat-tab"
     >
-        <Chat {ndk} community={communityDetails.eid} />
+        <Chat />
     </div>
 </div>

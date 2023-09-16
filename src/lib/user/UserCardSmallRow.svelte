@@ -1,36 +1,30 @@
 <script lang="ts">
     import Loading from "$lib/Loading.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import UserName from "./UserName.svelte";
-    import { fetchUser, parseUserStatusData } from "./user";
+    import { MeetupUser, fetchUser } from "./user";
     import LinkedPfpIcon from "./LinkedPFPIcon.svelte";
     import type {UserStatus} from "./user";
     import Location from "$lib/location/Location.svelte";
     import { onMount } from "svelte";
     import Tags from "$lib/topics/Tags.svelte";
+    import ndk from "$lib/ndk";
 
-    export let ndk: NDK | undefined;
-    export let npub: string | undefined;
+    export let npub: string;
     let user: NDKUser | undefined;
     let status: UserStatus | undefined;
 
-    $: setUser(), npub
-
     async function setUser(){
-        if(ndk && npub){
-            user = await fetchUser(ndk, npub);
+        user = await fetchUser(ndk, npub);
             let hexk = user?.hexpubkey()
             if(hexk){
                 const statusSub = ndk.subscribe(
-                    {kinds: [10037], authors: [hexk]},
-                    { closeOnEose: false }
+                    {kinds: [10037], authors: [hexk]}
                 );
                 statusSub.on("event", (event: NDKEvent) => {
-                    status = parseUserStatusData(event)
+                    status = MeetupUser.parseStatus(event)
                 });
             }
-        } 
     }
 
     function lazyLoad() {
@@ -55,7 +49,7 @@
     })
 </script>
 
-<div class="card mb-3 p-2 user-{npub}">
+<div class="card mb-3 p-2 user-{npub} shadow">
     {#if user}
     <div class="d-flex">
         <div>
@@ -88,6 +82,7 @@
     {/if}
 </div>
 <style>
+    .card{min-height: 100px;}
     i{
         font-size: .8rem;
     }

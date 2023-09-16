@@ -1,10 +1,8 @@
 <script lang="ts">
     import EventCardLarge from "$lib/event/EventCardLarge.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
     
     import { sortedPast, sortedUpcoming } from "./stores";
 
-    export let ndk: NDK;
 </script>
 
 <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
@@ -42,7 +40,7 @@
     >
         {#each Object.values($sortedUpcoming) as eventData}
             <div class="mb-3 rounded">
-                <EventCardLarge {ndk} {eventData} />
+                <EventCardLarge eid={eventData.eid} {eventData} />
             </div>
         {/each}
     </div>
@@ -54,7 +52,7 @@
     >
         {#each Object.values($sortedPast) as eventData}
             <div class="mb-3 rounded">
-                <EventCardLarge {ndk} {eventData} />
+                <EventCardLarge eid={eventData.eid} {eventData} />
             </div>
         {/each}
     </div>

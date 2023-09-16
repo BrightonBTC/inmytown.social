@@ -7,7 +7,7 @@
     import {useGeographic} from 'ol/proj.js';
 
     import { onMount } from "svelte";
-    import { communityMetaStore, signalUpdMap } from "./stores";
+    import { community, signalUpdMap } from "./stores";
     import { defaults } from "ol/interaction/defaults";
 
     let map: Map;
@@ -15,8 +15,8 @@
 
     export const updMap = function(){
 
-        if (map && $communityMetaStore.longitude && $communityMetaStore.latitude){
-            map.getView().animate({zoom: $communityMetaStore.zoom}, {center: [$communityMetaStore.longitude, $communityMetaStore.latitude]});
+        if (map && $community.meta.longitude && $community.meta.latitude){
+            map.getView().animate({zoom: 9}, {center: [$community.meta.longitude, $community.meta.latitude]});
         }
         
     };
@@ -31,40 +31,37 @@
                 }),
             ],
             view: new View({
-                center: [$communityMetaStore.longitude, $communityMetaStore.latitude],
-                zoom: $communityMetaStore.zoom,
+                center: [$community.meta.longitude, $community.meta.latitude],
+                zoom: 9,
                 minZoom: 1,
                 maxZoom: 20
             }),
             interactions: defaults({mouseWheelZoom: false})
         });
-        map.getView().on('change:resolution', (event) => {
-            let z = map.getView().getZoom();
-            if(z){
-                $communityMetaStore.zoom = z
-                $communityMetaStore = $communityMetaStore
-            }
-        });
+        // map.getView().on('change:resolution', (event) => {
+        //     let z = map.getView().getZoom();
+        //     if(z){
+        //         $community.meta.zoom = z
+        //         $community.meta = $community.meta
+        //     }
+        // });
         map.getView().on('change:center', (event) => {
             let c = map.getView().getCenter();
-            console.log('longitude', c !== undefined ? c[0] : 0)
-            console.log('latitude', c !== undefined ? c[1] : 0)
-            $communityMetaStore.longitude = (c !== undefined ? c[0] : 0); 
-            $communityMetaStore.latitude = (c !== undefined ? c[1] : 0); 
-            $communityMetaStore = $communityMetaStore
+            $community.meta.longitude = (c !== undefined ? c[0] : 0); 
+            $community.meta.latitude = (c !== undefined ? c[1] : 0); 
         });
     });
 </script>
 
 <div id="map" class="mb-1 mt-5" />
 <small class="text-muted mb-5">
-    Lat: {$communityMetaStore.latitude} <br>
-    Lon: {$communityMetaStore.longitude}  <br>
-    Zoom: {$communityMetaStore.zoom}
+    Lat: {$community.meta.latitude} <br>
+    Lon: {$community.meta.longitude}  <br>
+    <!-- Zoom: {$community.meta.zoom} -->
 </small>
 <style>
     #map {
-        height: 500px;
+        height: 300px;
         width: 100%;
     }
 </style>

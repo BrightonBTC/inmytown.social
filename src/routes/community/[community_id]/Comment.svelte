@@ -3,11 +3,10 @@
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import UserName from "$lib/user/UserName.svelte";
     import { fetchUser } from "$lib/user/user";
-    import type NDK from "@nostr-dev-kit/ndk";
-    import type { NDKEvent, NDKTag, NDKUser } from "@nostr-dev-kit/ndk";
+    import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import Quote from "./Quote.svelte";
+    import ndk from "$lib/ndk";
 
-    export let ndk: NDK;
     export let comment: NDKEvent;
 
     let ts = '';
@@ -37,16 +36,10 @@
             <small class="mt-2 overflow-e"><UserName {user} /></small>
         </div>
         <div class="flex-grow-1 bubble-wrap">
-            <div class="speech-bubble p-4 rounded-4 ">
+            <div class="speech-bubble p-4 rounded-4 shadow-sm">
                 {#if replyTo}
-                    <Quote {ndk} id={replyTo} />
+                    <Quote id={replyTo} />
                 {/if}
-                <!-- {#if respondingTo != ""}
-                    <div class="bg-light p-1 rounded mb-1">
-                        <small class="text-muted">Responding to Carlito:</small>
-                        <small>{respondingTo}</small>
-                    </div>
-                {/if} -->
                 <div class="text-light">{comment.content}</div>
                 <button
                     class="btn btn-dark d-flex align-items-center float-end clearfix border small"

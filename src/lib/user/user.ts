@@ -1,5 +1,6 @@
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile } from "$lib/stores"
-import NDK, { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk"
+import ndk from "$lib/ndk"
+import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores"
+import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 
 export interface UserStatus{
     communities: string[]
@@ -8,6 +9,94 @@ export interface UserStatus{
     locationStatus?: LocationStatus
     country?: string
     city?: string
+}
+
+export class MeetupUser extends NDKUser {
+
+    public status?: UserStatus;
+
+    public constructor(opts: {}){
+        super(opts)
+        this.ndk = ndk
+    }
+
+    public async fetchStatus(){
+        let events = await this.ndk?.fetchEvents({
+            authors: [this.hexpubkey()],
+            kinds: [10037]
+        }, {})
+        if(events && events.size > 0){
+            this.status = MeetupUser.parseStatus([...events][0])
+        }
+    }
+
+    public async publishStatus(){
+
+    }
+
+    public static parseStatus(event: NDKEvent){
+        let data: UserStatus = {
+            communities: [],
+            interests: []
+        };
+        data.communities = event.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
+        if(event && event.content.trim().length > 0){
+            data.status = event.content;
+        }
+        let tags = event.tags.filter((t) => t[0] !== 'e')
+        tags?.forEach(function(t){
+            switch(t[0]){
+                case 'g':
+                    const locationParts = t[1].split(':')
+                    data.country = locationParts[0]
+                    data.city = locationParts[1]
+                break;
+                case 't':
+                    data.interests.push(t[1]);
+                break;
+                case 'status':
+                    data.status = t[1];
+                break;
+                case 'locationStatus':
+                    data.locationStatus = t[1] as LocationStatus;
+                break;
+            }
+        })
+        return data;
+    }
+}
+
+export class UserSubscriptions {
+    public ndk: NDK;
+    private subscriptions: NDKSubscription[] = [];
+
+    public constructor(ndk: NDK){
+        this.ndk = ndk
+    }
+
+    public async subscribeStatuses(filter: NDKFilter, cb: (data: NDKEvent) => void, opts?: NDKSubscriptionOptions){
+        filter.kinds = [10037]
+        try {
+            const sub = this.ndk.subscribe(
+                filter,
+                opts
+            );
+            if(opts && opts.closeOnEose === false){
+                this.subscriptions.push(sub)
+            }
+            sub.on("event", (event: NDKEvent) =>  {
+                cb(event)
+            });
+        } catch (err) {
+            console.log("An ERROR occured when subscribing to events", err);
+        } 
+    }
+
+    public closeSubscriptions(){
+        this.subscriptions.forEach(function(sub){
+            sub.stop()
+        })
+    }
 }
 
 
@@ -23,7 +112,7 @@ export async function login(ndk: NDK) {
                 );
                 userNpub.set(user.npub)
                 userHex.set(user.hexpubkey())
-                let u = await ndk.getUser({npub: user?.npub})
+                let u = ndk.getUser({npub: user?.npub})
                 await u.fetchProfile();
                 userProfile.set(JSON.stringify(u.profile));
                 loggedin = true
@@ -51,69 +140,7 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     }
 };
 
-export async function subUserStatus(ndk: NDK, npub: string, cb: (data: UserStatus) => void) {
-    let lastUpd = 0;
-    try {
-        const communitySub = ndk.subscribe(
-            { kinds: [10037], "authors": [npub] },
-            {
-                closeOnEose: false,
-            }
-        );
-        communitySub.on("event", (event: NDKEvent) =>  {
-            if (event.created_at && event.created_at > lastUpd) {
-                lastUpd = event.created_at;
-                cb(parseUserStatusData(event));
-            }
-        });
-    } catch (err) {
-        console.log("An ERROR occured when subscribing to user status", err);
-    } 
-}
-
-export async function fetchFollows(ndk: NDK, npub: string){
-    let out: NDKUser[] = [];
-    if(ndk && npub){
-        let user = await fetchUser(ndk, npub);
-        let f = await user?.follows()
-        if(f) out = [...f]
-    } 
-    return out;
-}
-
-export function parseUserStatusData(result:NDKEvent){
-    let data: UserStatus = {
-        communities: [],
-        interests: []
-    };
-    data.communities = result?.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
-    if(result && result?.content.trim().length > 0){
-        data.status = result?.content;
-    }
-    let tags = result?.tags.filter((t) => t[0] !== 'e')
-    tags?.forEach(function(t){
-        switch(t[0]){
-            case 'c':
-                let c = t[1].trim().split(' ');
-                data.city = c[0];
-                if(c.length > 1) data.country = c[1];
-            break;
-            case 't':
-                data.interests.push(t[1]);
-            break;
-            case 'status':
-                data.status = t[1];
-            break;
-            case 'locationStatus':
-                data.locationStatus = t[1] as LocationStatus;
-            break;
-        }
-    })
-    return data;
-}
-
 export async function publishUserStatus(ndk:NDK, data: UserStatus) {
-    let response: NDKEvent | string | null = null;
     try{
         const ndkEvent = new NDKEvent(ndk);
         ndkEvent.kind = 10037;
@@ -129,13 +156,13 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
         }
         if(data.status) ndkEvent.content = data.status
         if(data.locationStatus && data.city && data.country){
-            ndkEvent.tags.push(["c", data.city + ' ' + data.country]);
-            //ndkEvent.tags.push(["n", data.country]);
+            ndkEvent.tags.push(["g", data.country + ':' + data.city, 'city']);
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();
+        userStatus.set(JSON.stringify(data));
         return ndkEvent
-    }catch (err) {
+    } catch (err) {
         return "An ERROR occured publishing the community metadata:"+ err;
     } 
 }

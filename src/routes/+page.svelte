@@ -1,20 +1,32 @@
 <script lang="ts"> 
     import ndk from '$lib/ndk';
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
-    import { subCommunities } from '$lib/community/community';
+    import { CommunitySubscriptions } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
-    import { subEvents } from '$lib/event/event';
+    import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
+    let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions(ndk);
+
     onMount(() => {
-        subCommunities(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+        communitySubs.subscribe({limit:50}, async (data) => {
             addCommunity(data)
-        });
-        subEvents(ndk, {limit:50}, {closeOnEose: false}, async (data) => {
+        }, {closeOnEose: false});
+
+        eventSubs.subscribe({limit:50, '#l':['meetup']}, async (data) => {
             addEvent(data)
-        });
+        }, {closeOnEose: false});
+
     });
+
+    onDestroy(() => {
+
+        communitySubs.closeSubscriptions();
+        eventSubs.closeSubscriptions();
+
+    })
 
 </script>
 <div class="row">
@@ -42,7 +54,7 @@
             <div class="card-header"><h5>Upcoming Events (Global)</h5></div>
             <div class="card-body">
                 {#each Object.values($sortedEvents) as eventData}
-                    <EventCardSmall {eventData} />
+                    <EventCardSmall eid={eventData.eid} {eventData} />
                 {/each}
             </div>
         </div>

@@ -4,7 +4,7 @@
     export let tags: string[] | undefined;
     export let linked: boolean;
 </script>
-<div class="d-flex">
+<div class="d-flex align-items-center">
     <i class="bi bi-tag me-2 text-primary" />
     <div>
         {#if tags}

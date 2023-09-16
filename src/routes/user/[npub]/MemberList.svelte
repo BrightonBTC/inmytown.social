@@ -1,23 +1,13 @@
 <script lang="ts">
-    import type { UserStatus } from "$lib/user/user";
-    import type NDK from "@nostr-dev-kit/ndk";
     import MemberItem from "./MemberItem.svelte";
-
-    export let statusData: UserStatus | undefined;
-    export let ndk: NDK | undefined;
-
-    
-    
-    
+    import { meetupUser } from "./stores";
 </script>
 
 <h3>Member of:</h3>
-{#if statusData && ndk}
+{#if $meetupUser.status}
     <ul class="list-group">
-        {#each statusData.communities as id}
-            <MemberItem {ndk} {id} />
+        {#each $meetupUser.status?.communities as id}
+            <MemberItem {id} />
         {/each}
     </ul>
 {/if}
-
-

@@ -1,119 +1,80 @@
 <script lang="ts">
-    import type { Community } from "./+page";
-    export let data: Community;
+    import type { CommunityID } from "./+page";
+    export let data: CommunityID;
     import Header from "./Header.svelte";
     import Map from "./Map.svelte";
     import MemberList from "./MemberList.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
-    import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
-    import { onMount } from "svelte";
+    import type { NDKUser } from "@nostr-dev-kit/ndk";
+    import { onDestroy, onMount } from "svelte";
     import {
-        addEvent,
-        addEventMeta,
         addMember,
-        communityEvents,
-        communityEventsDraft,
-        communityEventsPast,
-        communityEventsUpcoming,
         communityMembers,
-    } from "./stores";
+        community,
+    } from "./store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
     import { userNpub } from "$lib/stores";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { type CommunityMeta, subCommunity } from "$lib/community/community";
-    import { subEventMeta } from "$lib/event/event";
+    import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
+    import { addEventMeta, communityEvents } from "./store.events";
 
     $: community_id = data.community_id;
-    let communityDetails: CommunityMeta | undefined | null = undefined;
+
     let host: NDKUser | undefined;
 
+    let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions(ndk);
+
+    community.set(new Community(ndk))
     communityMembers.set([]);
     communityEvents.set([]);
-    communityEventsUpcoming.set([]);
-    communityEventsPast.set([]);
-    communityEventsDraft.set([]);
 
     onMount(async () => {
         
-        subCommunity(ndk, community_id, async (data) => {
-            communityDetails = data
+        communitySubs.subscribeByID(community_id, async (data) => {
+            $community.meta = data
+            fetchEvents(data.authorhex)
             if(!host) host = await fetchUser(ndk, data.author);
-            console.log('host', host)
+            $community.fetchMembers((user) => {
+                addMember(user.npub)
+            })
         });
-        fetchMembers();
-        fetchEvents();
+
     });
 
-    async function fetchMembers() {
-        try {
-            const membersSub = ndk.subscribe(
-                {
-                    kinds: [10037],
-                    "#e": [community_id],
-                },
-                {
-                    closeOnEose: false,
-                }
-            );
-            membersSub.on("event", (event: NDKEvent) => {
-                if (!$communityMembers.includes(event.author.npub)) {
-                    addMember(event.author.npub);
-                }
-            });
-        } catch (err) {
-            console.log("An ERROR occured", err);
-        }
-    }
-
-    async function fetchEvents() {
-        try {
-            const eventsSub = ndk.subscribe(
-                {
-                    kinds: [1073],
-                    "#e": [community_id],
-                },
-                {
-                    closeOnEose: false,
-                }
-            );
-            eventsSub.on("event", (event: NDKEvent) => {
-                if (!$communityEvents.includes(event.id)) {
-                    fetchEventMeta(event.id);
-                }
-                addEvent(event.id);
-            });
-        } catch (err) {
-            console.log("An ERROR occured", err);
-        }
-    }
-
-    async function fetchEventMeta(id: string) {
-        subEventMeta(ndk, id, async (data) => {
-            addEventMeta(data);
+    async function fetchEvents(author: string) {
+        eventSubs.subscribe({"#e": [community_id], authors:[author]}, async (data) => {
+            addEventMeta(data)
         });
     }
+
+    onDestroy(() => {
+        communitySubs.closeSubscriptions()
+        eventSubs.closeSubscriptions()
+        $community.destroy()
+    })
 </script>
 
-{#if communityDetails}
-    <Header {ndk} {communityDetails} {community_id} {host} />
+{#if $community.meta.eid.length > 0}
+    <Header {host} />
     {#if $userNpub && host && $userNpub === host.npub}
         <AdminPanel {community_id} />
     {/if}
     <div class="row me-1">
         <div class="col-sm-8">
-            <Tabs {ndk} {communityDetails} />
+            <Tabs />
         </div>
 
         <div class="col-sm-4 bg-secondary rounded shadow-sm">
-            <Map {communityDetails} />
+            <Map />
 
-            <Tags tags={communityDetails.tags} linked={true} />
+            <Tags tags={$community.meta.tags} linked={true} />
 
-            <MemberList {ndk} />
+            <MemberList />
         </div>
     </div>
 {:else}

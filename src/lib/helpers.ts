@@ -1,6 +1,19 @@
-export function imgUrlOrDefault(img: string | undefined) {
-	if (img && img.length > 0) return img;
-	return '/img/default.jpeg';
+export function imgUrlOrDefault(img: string | undefined, type?: string) {
+	if (!img || img.length < 1){
+        
+        switch(type){
+            case 'community':
+                img = '/img/default-community.png'
+            break;
+            case 'event':
+                img = '/img/default-event.png'
+            break;
+            default:
+                img = '/img/default.jpeg';
+            break;
+        }
+    }
+	return img;
 }
 
 export function isValidUrl(value: string | undefined) {

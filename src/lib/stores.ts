@@ -3,12 +3,16 @@ import type { NDKTag, NDKUserProfile } from "@nostr-dev-kit/ndk";
 import type { UserStatus } from "./user/user";
 import { derived } from "svelte/store";
 export let suggestedRelays: string[] = [
-    "wss://eden.nostr.land",
+    "wss://relay.primal.net",
+    "wss://nostr-pub.wellorder.net",
+    "wss://nos.lol", 
+    "wss://relay.current.fyi",
+    "wss://relay.nostr.band",
+    "wss://nostr.orangepill.dev",
     "wss://nostr.fmt.wiz.biz",
     "wss://relay.damus.io",
-    "wss://nostr-pub.wellorder.net",
     "wss://offchain.pub",
-    "wss://nos.lol", 
+    "wss://eden.nostr.land",
     "wss://relay.snort.social",
     "wss://relay.current.fyi",
     "wss://relay.nostrati.com",
@@ -20,7 +24,6 @@ export let suggestedRelays: string[] = [
     "wss://relay.nostr.bg",
     "wss://nostr.mompill.dev",
     "wss://nostr.milou.lol",
-    "wss://nostr.orangepill.dev",
     "wss://puravida.nostr.land",
     "wss://relay.nostr.info",
     "wss://atlas.nostr.land",
@@ -42,7 +45,7 @@ export let userNpub = writable<string | undefined>("userNpub", undefined);
 export let userHex = writable<string | undefined>("userHex", undefined);
 
 export let userProfile = writable<string | undefined>("userProfile", undefined);
-export let userStatus = writable<string>("userStatus", '[]'); // communities the logged in user follows
+export let userStatus = writable<string>("userStatus", JSON.stringify({communities:[], interests:[]})); // communities the logged in user follows
 //export let userFollows = writable<string>("userFollows", '[]'); // communities the logged in user follows
 export let userCreated = writable<string>("userCreated", '[]'); // communities the logged in user created
 export let hasSigner = writable<boolean>("hasSigner", false);
@@ -50,7 +53,7 @@ export let hasSigner = writable<boolean>("hasSigner", false);
 export const searchCountry = writable<string>("searchCountry", "");
 export const searchCity = writable<string>("searchCity", "");
 
-export const selectedRelays = writable<string>("relays", JSON.stringify(suggestedRelays.slice(0, 10)));
+export const selectedRelays = writable<string>("relays", JSON.stringify(suggestedRelays.slice(0, 9)));
 
 
 export let profile: NDKUserProfile | undefined;
@@ -69,7 +72,7 @@ userStatus.subscribe((value) => {
 
 export let uStatus: UserStatus;
 userStatus.subscribe((value) => {
-    uStatus = value !== undefined ? JSON.parse(value) : [];
+    uStatus = value !== undefined ? JSON.parse(value) : {communities:[], interests:[]};
 });
 
 export let myCommunities: Array<NDKTag>;

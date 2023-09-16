@@ -1,26 +1,38 @@
 <script lang="ts">
     import LocationSearch from "./LocationSearch.svelte";
-    import type { NDKEvent, NDKFilter } from "@nostr-dev-kit/ndk";
+    import type { NDKFilter } from "@nostr-dev-kit/ndk";
     import { addCommunity, addEvent, addPerson, addTopic, communityList, eventList, personList, searchType, sortedCommunities, topics } from "./stores";
     import { searchCity, searchCountry } from "$lib/stores";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import TypeSwitch from "./TypeSwitch.svelte";
     import EventTabs from "./EventTabs.svelte";
     import type { Tag } from "./+page";
+    export let data:Tag;  
     import TopicSelector from "./TopicSelector.svelte";
     import ResultsInfo from "./ResultsInfo.svelte";
     import UserList from "./UserList.svelte";
     import ndk from "$lib/ndk";
-    export let data:Tag;  
+    import { CommunitySubscriptions } from "$lib/community/community";
+    import { EventSubscriptions } from "$lib/event/event";
+    import { UserSubscriptions } from "$lib/user/user";
+
+    let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions(ndk);
+    let userSubs = new UserSubscriptions(ndk);
 
     $: tag = data.tag;
 
     $: fetchSearch(), $searchCountry, $searchCity, $searchType, tag
 
-    onMount(async () => {
-        fetchSearch();
-    });
+    // onMount(async () => {
+    //     fetchSearch();
+    // });
+    onDestroy(() => {
+        communitySubs.closeSubscriptions();
+        eventSubs.closeSubscriptions();
+        userSubs.closeSubscriptions();
+    })
 
     function setTopics(){
         topics.set([])
@@ -37,43 +49,40 @@
         eventList.set([])
         personList.set([])
         setTopics();
-        let kind:number = 30037
-        if($searchType === 'events'){
-            kind = 30073;
-        }
-        else if($searchType === 'people'){
-            kind = 10037;
-        }
-        let f: NDKFilter = {
-            kinds: [kind],
-        }
+        let cityFilter: NDKFilter = {}
+        let topicFilter: NDKFilter = {}
         
         if($searchCountry.length > 0 && $searchCity.length > 0){
-            f = {
-                kinds: [kind],
-                "#c": [$searchCity + ' ' + $searchCountry]
+            cityFilter = {
+                "#g": [$searchCountry + ':' + $searchCity]
             }
         }
-        
         
         if($topics.length){
-            let tf = {'#t': $topics}
-            f = {...f, ...tf}
+            topicFilter = {'#t': $topics}
         }
-        const communitiesSub = ndk.subscribe(
-            f,
-            { closeOnEose: false }
-        );
-        communitiesSub.on("event", (event: NDKEvent) => {
-            if(event.kind === 30037) addCommunity(event);
-            else if (event.kind === 30073){
-                addEvent(event);
-            } 
-            else{
-                console.log('p', event)
-                addPerson(event)
-            }
-        });
+
+        switch($searchType){
+            case 'communities':
+                communitySubs.subscribeMetaMulti({...cityFilter, ...topicFilter}, (data) => {
+                    addCommunity(data)
+                }, {closeOnEose: false, groupable: false})
+            break;
+            case 'events':
+                communitySubs.subscribeMetaMulti(cityFilter, (data) => {
+                    eventSubs.subscribe({...topicFilter, '#e':[data.eid]}, (data) => {
+                        addEvent(data)
+                    })
+                }, {closeOnEose: false, groupable: false})
+                
+            break;
+            case 'people':
+                userSubs.subscribeStatuses({...cityFilter, ...topicFilter}, (data) => {
+                    addPerson(data)
+                }, {closeOnEose: false, groupable: false})
+            break;
+        }
+
         if(typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 </script>
@@ -98,9 +107,9 @@
                 
             </div>
             {:else if  $searchType === 'events'}
-                <EventTabs {ndk} />
+                <EventTabs />
             {:else}
-                <UserList {ndk} />
+                <UserList />
             {/if}
         </div>
     </div>

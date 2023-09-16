@@ -1,52 +1,41 @@
 <script lang="ts">
-    import type NDK from "@nostr-dev-kit/ndk";
     import Comment from "./Comment.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
     import {
-        addComment,
-        chatCommentsStore,
-        chatStore,
-        sortedComments,
-    } from "./stores";
+        community
+    } from "./store.community";
     import { relays } from "$lib/stores";
     import Quote from "./Quote.svelte";
+    import ndk from "$lib/ndk";
+    import { addComment, chatCommentsStore, chatStore, sortedComments } from "./store.chat";
 
-    export let ndk: NDK;
-    export let community: string;
-
-    $: getChat(), community;
+    $: getChat(), $community.meta;
     $: getComments(), $chatStore;
 
     async function getChat() {
         chatStore.set(undefined);
 
-        if (ndk) {
-            const chatSub = ndk.subscribe(
-                {
-                    kinds: [40],
-                    "#e": [community],
-                },
-                {
-                    closeOnEose: true,
-                }
-            );
-            chatSub.on("event", (event: NDKEvent) => {
-                chatStore.set(event.id);
-            });
-        }
+        const chatSub = ndk.subscribe(
+            {
+                kinds: [40],
+                "#e": [$community.meta.eid],
+                authors: [$community.meta.authorhex]
+            }
+        );
+        chatSub.on("event", (event: NDKEvent) => {
+            chatStore.set(event.id);
+        });
     }
+    getChat()
 
     async function getComments() {
         chatCommentsStore.set([]);
 
-        if (ndk && $chatStore) {
+        if ($chatStore) {
             const chatSub = ndk.subscribe(
                 {
                     kinds: [42],
                     "#e": [$chatStore],
-                },
-                {
-                    closeOnEose: false,
                 }
             );
             chatSub.on("event", (event: NDKEvent) => {
@@ -79,38 +68,18 @@
 
 <div class="p-2 mt-3">
     {#if $chatStore}
-    <div class="text-center">
-        <button
-            class="btn btn-dark d-flex align-items-center mx-auto"
-            data-bs-toggle="modal"
-            data-bs-target="#commentModal"
-            on:click|preventDefault={() => setRespondingTo(null)}
-            ><span>New comment</span><i class="bi bi-chat-text ps-2" />
-        </button>
-    </div>
-        
-        <!-- <form on:submit|preventDefault={postComment}>
-            <div class="mb-3">
-                <label for="comment">What's on your mind?</label>
-                <textarea
-                    class="form-control"
-                    rows="5"
-                    maxlength="500"
-                    id="comment"
-                    name="text"
-                    bind:value={commentText}
-                />
-            </div>
-            <div class="clearfix">
-                <button type="submit" class="btn btn-primary float-end"
-                    >Submit</button
-                >
-            </div>
-        </form> -->
-
+        <div class="text-center">
+            <button
+                class="btn btn-dark d-flex align-items-center mx-auto"
+                data-bs-toggle="modal"
+                data-bs-target="#commentModal"
+                on:click|preventDefault={() => setRespondingTo(null)}
+                ><span>New comment</span><i class="bi bi-chat-text ps-2" />
+            </button>
+        </div>
         <h3 class="mt-3">Recent Comments:</h3>
         {#each $sortedComments as comment}
-            <Comment {ndk} {comment} callback={setRespondingTo} />
+            <Comment {comment} callback={setRespondingTo} />
         {/each}
     {/if}
 </div>
@@ -125,7 +94,7 @@
   
         <div class="modal-body">
             {#if respondingTo}
-                <Quote {ndk} id={respondingTo} />
+                <Quote id={respondingTo} />
             {/if}
             <textarea
                 class="form-control"
