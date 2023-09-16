@@ -1,12 +1,6 @@
 
 <h1>About</h1>
 <p>
-    <strong
-        >This site is currently under construction. It should be mostly working
-        but things may break at times.</strong
-    >
-</p>
-<p>
     InMyTown uses the NOSTR protocol to allow users to create meetup communities
     and events. NOSTR is a decentralised, permissionless protocol upon which a
     nbumber of different social applications have been built. You can find out

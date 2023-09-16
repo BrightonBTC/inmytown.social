@@ -3,7 +3,7 @@ import type { NDKTag, NDKUserProfile } from "@nostr-dev-kit/ndk";
 import type { UserStatus } from "./user/user";
 import { derived } from "svelte/store";
 export let suggestedRelays: string[] = [
-    "wss://relay.primal",
+    "wss://relay.primal.net",
     "wss://nostr-pub.wellorder.net",
     "wss://nos.lol", 
     "wss://relay.current.fyi",

@@ -13,12 +13,15 @@
     let page: string = 'status'
     let loaded:boolean
 
+    let loadingMessage = "Fetching User Profile..."
+
     $: npub = data.npub;
     $: isLoggedInUser = data.npub === $userNpub
 
     async function setUser(){
         let user = new MeetupUser({npub: npub})
         await user.fetchProfile()
+        loadingMessage = "Fetching User Status..."
         await user.fetchStatus()
         meetupUser.set(user)
         loaded = true;
@@ -58,5 +61,5 @@
         </div>
     </div>
 {:else}
-<Loading t="Fetching User Profile..." />
+<Loading t={loadingMessage} />
 {/if}

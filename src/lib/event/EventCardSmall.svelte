@@ -11,11 +11,11 @@
 
     $: setData(), eid
 
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions(ndk); 
 
     function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {
-            if(data.eid === eid) eventData.community = data;
+            if(data.eid === eventData.community.eid) eventData.community = data;
         })
     }
 </script>
