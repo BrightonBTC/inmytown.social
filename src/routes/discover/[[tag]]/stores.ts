@@ -63,10 +63,10 @@ export function addEvent(item:EventMeta){
 
 export function addPerson(item:NDKEvent){
     personList.update(items => {
-        let matches = items.filter(v => v.author === item.author)
+        let matches = items.filter(v => v.pubkey === item.pubkey)
         if(matches.length > 0){
             if(matches[0].created_at && item.created_at && matches[0].created_at < item.created_at){
-                items = items.filter(v => v.author !== item.author)
+                items = items.filter(v => v.pubkey !== item.pubkey)
                 items.push(item)
             }
         }
