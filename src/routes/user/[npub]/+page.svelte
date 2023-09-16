@@ -43,7 +43,7 @@
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('admin')}>Communities (admin)</a>
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('member')}>Communities (member)</a>
                     <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('follows')}>Follows</a>
-                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('del')}>DEL</a>
+                    <!-- <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('del')}>DEL</a> -->
                 </div>
             </div>
             
@@ -58,7 +58,7 @@
             {:else if page==='follows'}
             <Follows />
             {:else if page==='del'}
-            <Del {npub} />
+            <!-- <Del {npub} /> -->
             {/if}
         </div>
     </div>
