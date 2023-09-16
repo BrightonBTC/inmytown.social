@@ -27,29 +27,53 @@ export function removeTopic(tag:string){
 }
 
 
-export function addCommunity(e:CommunityMeta){
-    communityList.update(items => {
-        items.push(e)
-        return [...new Map(items.map(v => [v.eid, v])).values()]
-    })
-}
-
-export function addEvent(event:EventMeta){
-    if(event.status !=='draft'){
-        eventList.update(items => {
-            let dupes = items.filter(x => x.uid === event.uid);
-            if(dupes.length === 0 || dupes[0].updated < event.updated){
-                items.push(event)
+export function addCommunity(item: CommunityMeta) {
+    communityList.update((items) => {
+        let matches = items.filter(v => v.uid === item.uid && v.author === item.author)
+        if(matches.length > 0){
+            if(matches[0].updated < item.updated){
+                items = items.filter(v => v.uid !== item.uid && v.author !== item.author)
+                items.push(item)
             }
-            return [...new Map(items.map(v => [v.eid, v])).values()]
+        }
+        else{
+            items.push(item)
+        }
+        return items
+    });
+  }
+
+export function addEvent(item:EventMeta){
+    if(item.status !=='draft'){
+        eventList.update(items => {
+            let matches = items.filter(v => v.uid === item.uid && v.author === item.author)
+            if(matches.length > 0){
+                if(matches[0].updated < item.updated){
+                    items = items.filter(v => v.uid !== item.uid && v.author !== item.author)
+                    items.push(item)
+                }
+            }
+            else{
+                items.push(item)
+            }
+            return items
         })
     }
 }
 
-export function addPerson(e:NDKEvent){
+export function addPerson(item:NDKEvent){
     personList.update(items => {
-        items.push(e)
-        return [...new Map(items.map(v => [v.pubkey, v])).values()]
+        let matches = items.filter(v => v.author === item.author)
+        if(matches.length > 0){
+            if(matches[0].created_at && item.created_at && matches[0].created_at < item.created_at){
+                items = items.filter(v => v.author !== item.author)
+                items.push(item)
+            }
+        }
+        else{
+            items.push(item)
+        }
+        return items
     })
 }
 

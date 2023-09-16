@@ -15,7 +15,7 @@
             addCommunity(data)
         }, {closeOnEose: false});
 
-        eventSubs.subscribe({limit:50}, async (data) => {
+        eventSubs.subscribe({limit:50, '#l':['meetup']}, async (data) => {
             addEvent(data)
         }, {closeOnEose: false});
 
@@ -54,7 +54,7 @@
             <div class="card-header"><h5>Upcoming Events (Global)</h5></div>
             <div class="card-body">
                 {#each Object.values($sortedEvents) as eventData}
-                    <EventCardSmall {eventData} />
+                    <EventCardSmall eid={eventData.eid} {eventData} />
                 {/each}
             </div>
         </div>

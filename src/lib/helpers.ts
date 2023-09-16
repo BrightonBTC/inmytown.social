@@ -5,6 +5,9 @@ export function imgUrlOrDefault(img: string | undefined, type?: string) {
             case 'community':
                 img = '/img/default-community.png'
             break;
+            case 'event':
+                img = '/img/default-event.png'
+            break;
             default:
                 img = '/img/default.jpeg';
             break;

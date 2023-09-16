@@ -49,31 +49,35 @@
         eventList.set([])
         personList.set([])
         setTopics();
-        let f: NDKFilter = {}
+        let cityFilter: NDKFilter = {}
+        let topicFilter: NDKFilter = {}
         
         if($searchCountry.length > 0 && $searchCity.length > 0){
-            f = {
+            cityFilter = {
                 "#g": [$searchCountry + ':' + $searchCity]
             }
         }
         
         if($topics.length){
-            f = {...f, ...{'#t': $topics}}
+            topicFilter = {'#t': $topics}
         }
 
         switch($searchType){
             case 'communities':
-                communitySubs.subscribeMetaMulti(f, (data) => {
+                communitySubs.subscribeMetaMulti({...cityFilter, ...topicFilter}, (data) => {
                     addCommunity(data)
                 }, {closeOnEose: false, groupable: false})
             break;
             case 'events':
-                eventSubs.subscribe(f, (data) => {
-                    addEvent(data)
+                communitySubs.subscribeMetaMulti(cityFilter, (data) => {
+                    eventSubs.subscribe({...topicFilter, '#e':[data.eid]}, (data) => {
+                        addEvent(data)
+                    })
                 }, {closeOnEose: false, groupable: false})
+                
             break;
             case 'people':
-                userSubs.subscribeStatuses(f, (data) => {
+                userSubs.subscribeStatuses({...cityFilter, ...topicFilter}, (data) => {
                     addPerson(data)
                 }, {closeOnEose: false, groupable: false})
             break;

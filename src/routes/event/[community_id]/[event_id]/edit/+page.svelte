@@ -70,7 +70,7 @@
         </div>
 
         <div class="col-sm-8">
-            <Form {eid} />
+            <Form />
         </div>
     </div>
 {:else if authorised === false}

@@ -23,10 +23,10 @@ export interface EventMeta{
     community: CommunityMeta
     status: string
     updated: number
-    created: number
+    hasCommunity: boolean
 }
 
-export const EventMetaDefaults: Pick<EventMeta, 'eid' | 'uid' | 'title' | 'brief' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'content' | 'image' | 'country' | 'city' |  'venue' | 'starts' | 'ends' | 'community' | 'status' | 'updated' | 'created'> = {
+export const EventMetaDefaults: Pick<EventMeta, 'eid' | 'uid' | 'title' | 'brief' | 'tags' | 'author' | 'authorhex' | 'latitude' | 'longitude' | 'content' | 'image' | 'country' | 'city' |  'venue' | 'starts' | 'ends' | 'community' | 'status' | 'updated' | 'hasCommunity'> = {
     eid: "",
     uid: "",
     title: "Draft event",
@@ -46,7 +46,7 @@ export const EventMetaDefaults: Pick<EventMeta, 'eid' | 'uid' | 'title' | 'brief
     community: CommunityMetaDefaults,
     status: "draft",
     updated: 0,
-    created: 0
+    hasCommunity: true
 };
 
 export class MeetupEvent {
@@ -180,7 +180,7 @@ export class MeetupEvent {
         meta.authorhex = data.author.hexpubkey()
         
         let etags = data.tags.filter(t => t[0] === 'e')
-        if(etags.length > 0) meta.community.eid = etags[1][1]
+        if(etags.length > 0) meta.community.eid = etags[0][1]
 
         meta.tags = [];
         let ttags = data.tags.filter(t => t[0] === 't')
@@ -202,6 +202,12 @@ export class MeetupEvent {
                 meta.city = locationParts[1]
             }
         })
+
+        let ltags = data.tags.filter(t => t[0] === 'l' && t[1] === 'meetup' && t[2] === 'kind')
+        let lltags = data.tags.filter(t => t[0] === 'L' && t[1] === 'kind') 
+        if(ltags.length < 1 || lltags.length < 1){
+            meta.hasCommunity = false
+        }
 
         data.tags.forEach(function (itm) {
             if(!meta) return;

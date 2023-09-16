@@ -24,7 +24,7 @@
 
     myEvents.set([]);
 
-    $: authorised ? fetchEvents(): void
+    $: authorised ? fetchEvents(): null
 
     onMount(async () => {
         await login(ndk);
@@ -45,7 +45,7 @@
     }
 
     async function fetchEvents() {
-        eventSubs.subscribe({"#e": [community_id]}, async (event) => {
+        eventSubs.subscribe({"#e": [community_id], authors:[communityDetails?.authorhex]}, async (event) => {
             addEvent(event);
         })
     }

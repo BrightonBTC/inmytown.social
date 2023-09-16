@@ -16,7 +16,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
 
     function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {
-            eventData.community = data;
+            if(data.eid === eventData.community.eid) eventData.community = data;
         })
     }
 
@@ -49,7 +49,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
         <div class="col-md-4 bg-secondary border rounded d-flex">
             <a href="{MeetupEvent.url(eventData)}" class="d-flex ">
                 <img
-                    src={imgUrlOrDefault(eventData.image)}
+                    src={imgUrlOrDefault(eventData.image, 'event')}
                     alt="musig"
                     class="rounded event-image"
                 />

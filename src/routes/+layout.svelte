@@ -60,7 +60,8 @@
 }
 :global([data-bs-theme="dark"] .page-home .nav-home, .page-discover .nav-discover, .page-about .nav-about){
     background: rgb(var(--bs-dark-rgb));
-    border-radius: 10px;
+    border-radius: 7px;
     font-weight: bold;
 }
+
 </style>

@@ -37,17 +37,20 @@
         
         communitySubs.subscribeByID(community_id, async (data) => {
             $community.meta = data
+            fetchEvents(data.authorhex)
             if(!host) host = await fetchUser(ndk, data.author);
             $community.fetchMembers((user) => {
                 addMember(user.npub)
             })
         });
 
-        eventSubs.subscribe({"#e": [community_id]}, async (data) => {
+    });
+
+    async function fetchEvents(author: string) {
+        eventSubs.subscribe({"#e": [community_id], authors:[author]}, async (data) => {
             addEventMeta(data)
         });
-
-    });
+    }
 
     onDestroy(() => {
         communitySubs.closeSubscriptions()

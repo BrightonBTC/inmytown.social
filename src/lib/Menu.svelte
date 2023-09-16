@@ -31,24 +31,29 @@
 		<div class="collapse navbar-collapse  justify-content-between" id="navbarSupportedContent">
 			<ul class="navbar-nav page-{currentPage}">
 				<li class="nav-item">
-					<a class="nav-link nav-home text-white" href="/"
+					<a class="nav-link nav-home text-white px-2" href="/"
 						><i class="bi bi-house text-success"></i> Home</a
 					>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link nav-discover text-white" href="/discover"
+					<a class="nav-link nav-discover text-white px-2" href="/discover"
 						><i class="bi bi-eye text-success"></i> Discover</a
 					>
 				</li>
 				<li class="nav-item">
 					<a
-						class="nav-link nav-about text-white"
+						class="nav-link nav-about text-white px-2"
 						href="/about"
 						><i class="bi bi-info-circle text-success"  /> About</a
 					>
 				</li>
 			</ul>
 			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a href="#top" class="nav-link bg-secondary rounded px-2" data-bs-toggle="modal" data-bs-target="#relayModal">
+						<i class="bi bi-arrow-down-up text-light"  />
+					</a>
+				</li>
 				<li class="nav-item">
 					{#if $userNpub}
 						{#if $derivedProfile}
@@ -66,11 +71,6 @@
 					{:else}
 						<Login />
 					{/if}
-				</li>
-				<li class="nav-item">
-					<a href="#top" class="nav-link bg-dark rounded" data-bs-toggle="modal" data-bs-target="#relayModal">
-						<i class="bi bi-arrow-down-up text-light"  />
-					</a>
 				</li>
 			</ul>
 		</div>
@@ -95,11 +95,6 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-primary" data-bs-dismiss="modal" on:click={() => goto('/relays')}>Edit Relays</button>
-				<button
-					type="button"
-					class="btn btn-danger"
-					data-bs-dismiss="modal">Close</button
-				>
 			</div>
 		</div>
 	</div>

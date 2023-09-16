@@ -10,13 +10,12 @@
     import TitleInput from "./TitleInput.svelte";
     import { meetupStore } from "./stores";
     import { goto } from "$app/navigation";
-
-    export let eid: string;
+    import { MeetupEvent } from "$lib/event/event";
 
     async function publishEvent(){
         await $meetupStore.publish();
         //if(!$meetupStore.error) 
-        //goto('/event/'+eid)
+        goto(MeetupEvent.url($meetupStore.meta))
     }
 
     function updateTags(tags: string[]){

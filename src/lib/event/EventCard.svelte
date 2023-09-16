@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-4">
             <a href="{MeetupEvent.url(eventData)}"><img
-                src={imgUrlOrDefault(eventData.image)}
+                src={imgUrlOrDefault(eventData.image, 'event')}
                 alt="musig"
                 class="rounded event-image"
             />

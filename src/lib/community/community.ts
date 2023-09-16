@@ -71,6 +71,10 @@ export class Community {
         await ndkEvent.publish();
     }
 
+    public newUID(){
+        this.meta.uid = parseInt((Date.now() / 1000).toString()).toString()
+    } 
+
     public async publishMeta(){
         try{
             const ndkEvent = new NDKEvent(this.ndk);

@@ -16,6 +16,7 @@
 
     $: isFollower = (uStatus.communities?.find(el => el === $community.meta.eid)) ? true: false, $communityMembers;
 
+    console.log('uStatus', uStatus)
     async function joinNow(){
         uStatus.communities.push($community.meta.eid);
         publishUserStatus(ndk, uStatus)

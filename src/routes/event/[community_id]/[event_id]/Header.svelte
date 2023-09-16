@@ -4,7 +4,7 @@
 </script>
 
 <img
-    src={imgUrlOrDefault($meetupStore.meta.image)}
+    src={imgUrlOrDefault($meetupStore.meta.image, 'event')}
     alt={$meetupStore.meta.title}
     class="img-fluid rounded e-im"
 />
