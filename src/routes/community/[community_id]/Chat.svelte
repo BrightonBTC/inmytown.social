@@ -19,6 +19,7 @@
             {
                 kinds: [40],
                 "#e": [$community.meta.eid],
+                authors: [$community.meta.authorhex]
             }
         );
         chatSub.on("event", (event: NDKEvent) => {
