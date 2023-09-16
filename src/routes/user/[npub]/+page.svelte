@@ -23,7 +23,6 @@
         await user.fetchStatus()
         meetupUser.set(user)
         loaded = true;
-        console.log(user.hexpubkey())
     }
 
     function setPage(p:string){
