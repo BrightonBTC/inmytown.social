@@ -1,5 +1,5 @@
 import ndk from "$lib/ndk"
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile } from "$lib/stores"
+import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores"
 import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 
 export interface UserStatus{
@@ -160,6 +160,7 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();
+        userStatus.set(JSON.stringify(data));
         return ndkEvent
     } catch (err) {
         return "An ERROR occured publishing the community metadata:"+ err;

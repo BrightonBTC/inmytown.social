@@ -1,7 +1,7 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { communityMembers, removeMember } from "./store.community";
-    import { uStatus, userStatus, userNpub } from "$lib/stores";
+    import { uStatus, userNpub } from "$lib/stores";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
     import UserName from "$lib/user/UserName.svelte";
@@ -20,12 +20,10 @@
     async function joinNow(){
         uStatus.communities.push($community.meta.eid);
         publishUserStatus(ndk, uStatus)
-        userStatus.set(JSON.stringify(uStatus));
     }
     async function leaveNow(){
         uStatus.communities.splice(uStatus.communities?.findIndex(e => e[1] === $community.meta.eid),1);
         publishUserStatus(ndk, uStatus)
-        userStatus.set(JSON.stringify(uStatus));
         if($userNpub) removeMember($userNpub)
     }
 
