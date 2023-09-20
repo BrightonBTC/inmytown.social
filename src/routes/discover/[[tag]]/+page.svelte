@@ -87,7 +87,7 @@
     }
 </script>
 {#if $searchCity && $searchCountry}  
-    <div class="row me-1">
+    <div class="row">
         <div class="col-lg-3 pt-2 pb-4">
             <LocationSearch />
             <TypeSwitch />

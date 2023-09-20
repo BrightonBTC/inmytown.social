@@ -28,7 +28,7 @@
 <Menu />
 <div class="container mt-1 main">
     {#if !noticeDismissed}
-    <div class="alert alert-info d-flex me-4">
+    <div class="alert alert-info d-flex">
         <span>Please note that this app is still in early development stages. It should be mostly working
             but things may break at times. Please report any bugs <a href ="https://github.com/BrightonBTC/inmytown.social" target="_blank">here</a>.
         </span>  

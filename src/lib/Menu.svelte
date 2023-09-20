@@ -7,6 +7,7 @@
     import { goto } from "$app/navigation";
 
 	import { page } from '$app/stores';  
+    import Logo from "./Logo.svelte";
 
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
@@ -15,7 +16,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow p-0">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="/">
-			<img src="/img/meetup-logo.png" alt="home" />
+			<Logo height={40} />
 		</a>
 		<button
 			class="navbar-toggler"
@@ -58,7 +59,7 @@
 					{#if $userNpub}
 						{#if $derivedProfile}
 						<a
-							class="d-flex nav-link "
+							class="d-flex nav-link p-0"
 							href="/user/{$userNpub}"
 						>
 							<img
@@ -171,8 +172,8 @@
 		font-size: 1em;
 	}
 	.nav-uim {
-		width: 24px;
-		height: 24px;
+		width: 40px;
+		height: 40px;
 		object-fit: cover;
 	}
 	.navbar{

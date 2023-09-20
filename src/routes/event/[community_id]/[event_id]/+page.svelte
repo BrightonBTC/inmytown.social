@@ -72,18 +72,20 @@
     }
 </script>
 {#if loaded}
-    <div class="row me-1">
-        <div class="col-sm-4 bg-secondary rounded p-0 border">
-            <h1 class="card-title text-light rounded-top mb-3 bg-secondary p-3">
-                {$meetupStore.meta.title}
-            </h1>
-            <div class="m-3">
-                <CommunityWidget />
-                <Details />
-                <Attendees />
+    <div class="row">
+        <div class="col-md-4">
+            <div class=" bg-secondary rounded p-0 border">
+                <h1 class="card-title text-light rounded-top mb-3 bg-secondary p-3">
+                    {$meetupStore.meta.title}
+                </h1>
+                <div class="m-3">
+                    <CommunityWidget />
+                    <Details />
+                    <Attendees />
+                </div>
             </div>
         </div>
-        <div class="col-sm-8">
+        <div class="col-md-8">
             {#if $userNpub && $userNpub === $meetupStore.meta.author}
                 <AdminPanel data={$meetupStore.meta} />
             {/if}
