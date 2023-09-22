@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { hasSigner } from "$lib/stores/persistent";
+    import { loggedInUser } from "$lib/stores/user";
     import { meetupStore } from "./stores";
 
     export let hasRsvp:string;
@@ -12,7 +12,7 @@
     $: setUI(), hasRsvp
 
     async function rsvp(state: string){
-        if($hasSigner){
+        if($loggedInUser){
             $meetupStore.rsvp(state)
             overide = false;
         }

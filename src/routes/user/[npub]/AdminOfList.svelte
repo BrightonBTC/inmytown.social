@@ -2,10 +2,10 @@
     import { dateStringFull } from "$lib/formatDates";
     import { imgUrlOrDefault } from "$lib/helpers";
     import { addCommunity, communitiesStore, meetupUser, sortedCommunities } from "./stores";
-    import { userHex } from "$lib/stores/persistent";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
     import ndk from "$lib/ndk";
+    import { loggedInUser } from "$lib/stores/user";
 
     let communitySubs = new CommunitySubscriptions($ndk);
 
@@ -17,7 +17,7 @@
         communitiesStore.set([])
         let hex: string | undefined;
         if(isLoggedInUser){
-            hex = $userHex
+            hex = $loggedInUser?.hexpubkey()
         }
         else{
             hex = $meetupUser.hexpubkey();

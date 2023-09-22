@@ -3,7 +3,6 @@
     import type { URLVars } from "./+page";
     export let data: URLVars;
     import { onMount } from "svelte";
-    import { userHex, userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import { community, meetupStore } from "./stores";
     import EventCard from "$lib/event/EventCard.svelte";
@@ -12,6 +11,7 @@
     import ndk from "$lib/ndk";
     import Form from "./Form.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { loggedInUser } from "$lib/stores/user";
 
     let eid = data.event_id
     let authorised: boolean;
@@ -27,7 +27,7 @@
     onMount(async () => {
         await login($ndk)
         
-        if($userHex){
+        if($loggedInUser){
             fetchCommunity()
         }
         else{
@@ -38,7 +38,7 @@
     async function fetchCommunity(){
         communitySubs.subscribeByID(data.community_id, async (data) => {
             $community.meta = data;
-            if(eid==='new' && $userHex){
+            if(eid==='new' && $loggedInUser){
                 meetupStore.set(MeetupEvent.new($ndk, $community.meta))
                 authorised = true;
             }
@@ -50,7 +50,7 @@
         loadingMessage = 'Fetching event...'
         eventSubs.subscribeOne($community.meta, eid, async (data) => {
             eventMeta = data
-            if (eventMeta.author === $userNpub) {
+            if (eventMeta.author === $loggedInUser?.npub) {
                 authorised = true;
                 $meetupStore.meta = eventMeta
                 

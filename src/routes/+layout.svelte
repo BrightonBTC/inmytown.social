@@ -1,8 +1,10 @@
 <script>
     import Footer from "$lib/Footer.svelte";
     import Menu from "$lib/Menu.svelte";
+    import { login } from "$lib/user/user";
     import { onMount } from "svelte";
     import { onDestroy } from "svelte";
+    import ndk from "$lib/ndk";
 
     let inactiveFor = 0;
     let noticeDismissed = false;
@@ -11,13 +13,14 @@
         inactiveFor++;
     }, 60000)
 
-    onMount(() => {
+    onMount(async () => {
         document.onmousemove = (e) => {
             if(inactiveFor > 30){
                 location.reload()
             }
             inactiveFor = 0;
         }
+        await login($ndk)
     })
 
     onDestroy(() => {

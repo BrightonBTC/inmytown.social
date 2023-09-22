@@ -2,18 +2,17 @@
     import type { Community } from "./+page";
     export let data: Community;
     import { onMount } from "svelte";
-
-    import { userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { goto } from "$app/navigation";
     import { myEvents } from "./stores";
     import EventRow from "./EventRow.svelte";
     import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
-    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    import { EventSubscriptions } from "$lib/event/event";
     import { login } from "$lib/user/user";
     import ndk from "$lib/ndk";
     import { addEvent } from "./stores";
+    import { loggedInUser } from "$lib/stores/user";
 
     let communitySubs = new CommunitySubscriptions($ndk)
     let eventSubs = new EventSubscriptions($ndk)
@@ -29,7 +28,7 @@
     onMount(async () => {
         await login($ndk);
 
-        if ($userNpub) {
+        if ($loggedInUser) {
             await fetchCommunity();
         }
         else{
@@ -40,7 +39,7 @@
     async function fetchCommunity() {
         communitySubs.subscribeByID(community_id, async (data) => {
             communityDetails = data;
-            authorised = communityDetails?.author === $userNpub;
+            authorised = communityDetails?.author === $loggedInUser?.npub;
         });
     }
 

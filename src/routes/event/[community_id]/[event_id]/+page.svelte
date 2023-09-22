@@ -13,7 +13,6 @@
     } from "./stores";
     
     import ndk from "$lib/ndk";
-    import { userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import Attendees from "./Attendees.svelte";
     import Header from "./Header.svelte";
@@ -25,6 +24,7 @@
     import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { loggedInUser } from "$lib/stores/user";
     let eventSubs = new EventSubscriptions($ndk);
     let communitySubs = new CommunitySubscriptions($ndk);
 
@@ -65,7 +65,7 @@
                 .filter((x) => x[0] === "l" && x[2] === 'status')[0][1]
                 .toString();
             addAttendee(event.author.npub, rsvp);
-            if (event.author.npub == $userNpub) {
+            if (event.author.npub == $loggedInUser?.npub) {
                 hasRsvp = rsvp;
             }
         })
@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="col-md-8">
-            {#if $userNpub && $userNpub === $meetupStore.meta.author}
+            {#if $loggedInUser && $loggedInUser.npub === $meetupStore.meta.author}
                 <AdminPanel data={$meetupStore.meta} />
             {/if}
             <Header />

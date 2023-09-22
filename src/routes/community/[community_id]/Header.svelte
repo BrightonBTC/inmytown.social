@@ -1,7 +1,6 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { communityMembers, removeMember } from "./store.community";
-    import { uStatus, userNpub } from "$lib/stores/persistent";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
     import UserName from "$lib/user/UserName.svelte";
@@ -10,20 +9,28 @@
     import Location from "$lib/location/Location.svelte";
     import ndk from "$lib/ndk";
     import {community} from "./store.community";
+    import { onMount } from "svelte";
+    import { loggedInUser } from "$lib/stores/user";
 
     export let host: NDKUser | undefined;
     let isFollower: boolean = false;
 
-    $: isFollower = (uStatus.communities?.find(el => el === $community.meta.eid)) ? true: false, $communityMembers;
+    $: isFollower = ($loggedInUser?.status?.communities?.find(el => el === $community.meta.eid)) ? true: false, $communityMembers;
+
+    onMount(async () => {
+        await $loggedInUser?.fetchStatus()
+    })
 
     async function joinNow(){
-        uStatus.communities.push($community.meta.eid);
-        publishUserStatus($ndk, uStatus)
+        if(!$loggedInUser?.status) return
+        $loggedInUser?.status?.communities.push($community.meta.eid);
+        publishUserStatus($ndk, $loggedInUser?.status)
     }
     async function leaveNow(){
-        uStatus.communities.splice(uStatus.communities?.findIndex(e => e[1] === $community.meta.eid),1);
-        publishUserStatus($ndk, uStatus)
-        if($userNpub) removeMember($userNpub)
+        if(!$loggedInUser?.status) return
+        $loggedInUser?.status?.communities.splice($loggedInUser?.status?.communities?.findIndex(e => e[1] === $community.meta.eid),1);
+        publishUserStatus($ndk, $loggedInUser?.status)
+        removeMember($loggedInUser?.npub)
     }
 
 </script>

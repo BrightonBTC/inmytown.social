@@ -17,19 +17,3 @@ export function addCommunity(community:CommunityMeta){
         return [...new Map(items.map(v => [v.eid, v])).values()]
     })
 }
-
-export const currentUserFollows = writable<NDKUser[]>([]);
-
-export function addFollow(u:NDKUser){
-    currentUserFollows.update(items => {
-        items.push(u)
-        return [...new Map(items.map(v => [v.npub, v])).values()]
-    })
-}
-
-export function removeFollow(npub:string){
-    currentUserFollows.update(items => items.filter((v) => v.npub !== npub))
-}
-
-export const currentUserFollowsNpubs = derived(currentUserFollows, f => f.map(u => u.npub))
-export const currentUserFollowsHexs = derived(currentUserFollows, f => f.map(u => u.hexpubkey()))

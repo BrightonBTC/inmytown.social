@@ -1,5 +1,8 @@
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores/persistent"
-import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
+import { browser } from "$app/environment"
+import { npub } from "$lib/stores/persistent"
+import { loggedInUser } from "$lib/stores/user"
+import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions, type NostrEvent, NDKKind } from "@nostr-dev-kit/ndk"
+import { get } from "svelte/store"
 
 export interface UserStatus{
     communities: string[]
@@ -12,11 +15,13 @@ export interface UserStatus{
 
 export class MeetupUser extends NDKUser {
 
-    public status?: UserStatus;
+    public status?: UserStatus= {
+        communities: [],
+        interests: []
+    }
 
-    public constructor(ndk:NDK, opts: {}){
+    public constructor(opts: {}){
         super(opts)
-        this.ndk = ndk
     }
 
     public async fetchStatus(){
@@ -31,6 +36,32 @@ export class MeetupUser extends NDKUser {
 
     public async publishStatus(){
 
+    }
+
+    public async unfollow(
+        userToUnfollow: NDKUser,
+        currentFollowList?: Set<NDKUser>): Promise<boolean>{
+            if (!this.ndk) throw new Error("No NDK instance found");
+
+            this.ndk.assertSigner();
+    
+            if (!currentFollowList) {
+                currentFollowList = await this.follows();
+            }
+
+            let reducedList = [...currentFollowList].filter((v) => v.npub !== userToUnfollow.npub)
+
+            const event = new NDKEvent(this.ndk, {
+                kind: NDKKind.Contacts,
+            } as NostrEvent);
+
+            for (const follow of reducedList) {
+                event.tag(follow);
+            }
+    
+            await event.publish();
+    
+            return true;
     }
 
     public static parseStatus(event: NDKEvent){
@@ -99,29 +130,38 @@ export class UserSubscriptions {
 }
 
 
+
 export async function login(ndk: NDK) {
-    if(!userHasSigner) return false;
-    let loggedin = false
-    if(!uNpub || !uHex || !profile){
-        await ndk.signer?.user().then(async (user) => {
-            if (!!user.npub) {
-                console.log(
-                    "Permission granted to read their public key:",
-                    user.npub
-                );
-                userNpub.set(user.npub)
-                userHex.set(user.hexpubkey())
-                let u = ndk.getUser({npub: user?.npub})
-                await u.fetchProfile();
-                userProfile.set(JSON.stringify(u.profile));
-                loggedin = true
-            }
-        });
+    if(browser && !window.nostr) return false
+
+    let _loggedInUser = get(loggedInUser)
+    if(_loggedInUser)  return true
+
+    let _npub:string = get(npub)
+    if (_npub.length > 0){
+        setLoggedInUserByNpub(ndk, _npub)
+        return true
     }
-    else{
-        loggedin = true
-    }
-    return loggedin;
+
+    await ndk.signer?.user().then(async (user) => {
+        if (user.npub) {
+            console.log(
+                "Permission granted to read public key:",
+                user.npub
+            );
+            npub.set(user.npub)
+            setLoggedInUserByNpub(ndk, user.npub)
+            return true
+        }
+        else{
+            return false
+        }
+    })
+}
+function setLoggedInUserByNpub(ndk:NDK, npub: string){
+    let meetupUser = new MeetupUser({npub:npub})
+    meetupUser.ndk = ndk
+    loggedInUser.set(meetupUser)
 }
 
 
@@ -159,7 +199,7 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();
-        userStatus.set(JSON.stringify(data));
+        //userStatus.set(JSON.stringify(data));
         return ndkEvent
     } catch (err) {
         return "An ERROR occured publishing the community metadata:"+ err;

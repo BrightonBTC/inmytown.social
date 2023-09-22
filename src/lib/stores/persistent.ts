@@ -1,7 +1,5 @@
 import { writable } from "@macfja/svelte-persistent-store";
-import type { NDKTag, NDKUserProfile } from "@nostr-dev-kit/ndk";
-import type { UserStatus } from "../user/user";
-import { derived } from "svelte/store";
+
 export let suggestedRelays: string[] = [
     "wss://relay.primal.net",
     "wss://nostr-pub.wellorder.net",
@@ -41,59 +39,16 @@ export let suggestedRelays: string[] = [
     "wss://nostr.rocks",
     "wss://relayable.org"
 ]
-export let userNpub = writable<string | undefined>("userNpub", undefined);
-export let userHex = writable<string | undefined>("userHex", undefined);
 
-export let userProfile = writable<string | undefined>("userProfile", undefined);
-export let userStatus = writable<string>("userStatus", JSON.stringify({communities:[], interests:[]})); // communities the logged in user follows
-//export let userFollows = writable<string>("userFollows", '[]'); // communities the logged in user follows
-export let userCreated = writable<string>("userCreated", '[]'); // communities the logged in user created
-export let hasSigner = writable<boolean>("hasSigner", false);
+export const npub = writable<string>("npub", "");
 
 export const searchCountry = writable<string>("searchCountry", "");
 export const searchCity = writable<string>("searchCity", "");
 
 export const selectedRelays = writable<string>("relays", JSON.stringify(suggestedRelays.slice(0, 9)));
 
-
-export let profile: NDKUserProfile | undefined;
-userProfile.subscribe((value) => {
-    profile = value !== undefined ? JSON.parse(value) : undefined;
-});
-
-export const derivedProfile = derived(userProfile, (v) => {
-    return v !== undefined ? JSON.parse(v) : undefined;
-})
-
-export let follows: string[];
-userStatus.subscribe((value) => {
-    follows = value !== undefined ? JSON.parse(value).communities : [];
-});
-
-export let uStatus: UserStatus;
-userStatus.subscribe((value) => {
-    uStatus = value !== undefined ? JSON.parse(value) : {communities:[], interests:[]};
-});
-
-export let myCommunities: Array<NDKTag>;
-userCreated.subscribe((value) => {
-    myCommunities = value !== undefined ? JSON.parse(value) : [];
-});
-
 export let relays: Array<string>;
 selectedRelays.subscribe((value) => {
     relays = value !== undefined ? JSON.parse(value) : [];
 });
 
-export let userHasSigner: boolean;
-hasSigner.subscribe((value) => {
-    userHasSigner = value;
-});
-export let uNpub: string | undefined;
-userNpub.subscribe((value) => {
-    uNpub = value;
-});
-export let uHex: string | undefined;;
-userHex.subscribe((value) => {
-    uHex = value;
-});

@@ -13,7 +13,6 @@
     } from "./store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
-    import { userNpub } from "$lib/stores/persistent";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
@@ -21,6 +20,7 @@
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
     import { addEventMeta, communityEvents } from "./store.events";
+    import { loggedInUser } from "$lib/stores/user";
 
     $: community_id = data.community_id;
 
@@ -61,7 +61,7 @@
 
 {#if $community.meta.eid.length > 0}
     <Header {host} />
-    {#if $userNpub && host && $userNpub === host.npub}
+    {#if $loggedInUser && host && $loggedInUser.npub === host.npub}
         <AdminPanel {community_id} />
     {/if}
     <div class="row me-1">

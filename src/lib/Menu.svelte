@@ -1,6 +1,5 @@
 <script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
-	import { derivedProfile, userNpub } from "$lib/stores/persistent";
 	import Login from "./Login.svelte";
 	import { imgUrlOrDefault } from "./helpers";
     import Relays from "./Relays.svelte";
@@ -8,9 +7,14 @@
 
 	import { page } from '$app/stores';  
     import Logo from "./Logo.svelte";
+    import { loggedInUser } from "./stores/user";
+    import Loading from "./Loading.svelte";
+	import ndk from "$lib/ndk";
 
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
+
+
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow p-0">
@@ -56,19 +60,23 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					{#if $userNpub}
-						{#if $derivedProfile}
-						<a
-							class="d-flex nav-link p-0"
-							href="/user/{$userNpub}"
-						>
-							<img
-								src={imgUrlOrDefault($derivedProfile.image)}
-								class="rounded-circle nav-uim align-self-center me-2 ms-2"
-								alt="{$derivedProfile.name} pfp"
-							/>
-						</a>
-						{/if}
+					{#if $ndk && $loggedInUser}
+						{#await $loggedInUser.fetchProfile()}
+							<Loading />
+						{:then}
+							<a
+								class="d-flex nav-link p-0"
+								href="/user/{$loggedInUser.npub}"
+							>
+								<img
+									src={imgUrlOrDefault($loggedInUser.profile?.image)}
+									class="rounded-circle nav-uim align-self-center me-2 ms-2"
+									alt="{$loggedInUser.profile?.name} pfp"
+								/>
+							</a>
+						{:catch error}
+							<span style="color: red">{error.message}</span>
+						{/await}
 					{:else}
 						<Login />
 					{/if}

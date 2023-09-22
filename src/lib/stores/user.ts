@@ -1,4 +1,4 @@
-import type { NDKUser } from "@nostr-dev-kit/ndk";
+import type { MeetupUser } from "$lib/user/user";
 import { writable } from "svelte/store";
 
-export const loggedInUser = writable<NDKUser | undefined>(undefined);
+export const loggedInUser = writable<MeetupUser | undefined>(undefined);

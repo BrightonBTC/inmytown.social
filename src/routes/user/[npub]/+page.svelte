@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { UserID } from "./proxy+page";
-    import { userNpub } from "$lib/stores/persistent";
     import Status from "./Status.svelte";
     import MemberList from "./MemberList.svelte";
     import AdminOfList from "./AdminOfList.svelte";
@@ -10,6 +9,7 @@
     import { meetupUser } from "./stores";
     import Loading from "$lib/Loading.svelte";
     import ndk from "$lib/ndk";
+    import { loggedInUser } from "$lib/stores/user";
     export let data:UserID;   
     let page: string = 'status'
     let loaded:boolean
@@ -17,10 +17,11 @@
     let loadingMessage = "Fetching User Profile..."
 
     $: npub = data.npub;
-    $: isLoggedInUser = data.npub === $userNpub
+    $: isLoggedInUser = data.npub === $loggedInUser?.npub
 
     async function setUser(){
-        let user = new MeetupUser($ndk, {npub: npub})
+        let user = new MeetupUser({npub: npub})
+        user.ndk = $ndk
         await user.fetchProfile()
         loadingMessage = "Fetching User Status..."
         await user.fetchStatus()

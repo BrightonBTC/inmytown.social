@@ -1,9 +1,8 @@
 <script lang="ts">
     import { imgUrlOrDefault } from "$lib/helpers";
     import type { NDKUser } from "@nostr-dev-kit/ndk";
-    import type NDK from "@nostr-dev-kit/ndk";
     import { fetchUser } from "./user";
-    import { userNpub } from "$lib/stores/persistent";
+    import { loggedInUser } from "$lib/stores/user";
 
     import ndk from "$lib/ndk";
 
@@ -15,7 +14,7 @@
     async function setUser(){
         if($ndk && npub){
             user = await fetchUser($ndk, npub);
-            if(npub === $userNpub) cls += ' border-success border-3'
+            if(npub === $loggedInUser?.npub) cls += ' border-success border-3'
         } 
     }
 </script>

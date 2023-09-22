@@ -1,44 +1,32 @@
 <script lang="ts">
-    import ndk from "$lib/ndk";
-    import { addFollow, currentUserFollowsHexs, currentUserFollowsNpubs, currentUserFollows, removeFollow } from "./stores";
-    import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
-
-    export let npub: string | undefined;
+    import { loggedInUser } from "$lib/stores/user";
+    import { meetupUser } from "./stores";
 
     let amFollowing: boolean = false;
+    let followsList: string[] | undefined = undefined;
 
-    $: checkFollowing(), npub, $currentUserFollows
+    $: checkFollowing(), $meetupUser
 
-    function checkFollowing(){
-        if(npub && $currentUserFollowsNpubs.includes(npub)){
-            amFollowing = true;
+
+    async function checkFollowing() {
+        let f = await $loggedInUser?.follows()
+        if(f) followsList = [...f].map(item => item.npub)
+        if(followsList?.includes($meetupUser?.npub)){
+            amFollowing = true
         }
-        else{
-            amFollowing = false;
-        }
-    } 
+    }
 
     async function follow(){
-        let user = new NDKUser({npub: npub})
-        addFollow(user)
-
-        const ndkEvent = new NDKEvent($ndk);
-		ndkEvent.kind = 3;
-        $currentUserFollowsHexs.forEach(function(hex){
-            ndkEvent.tags.push(["p", hex])
-        })
-		ndkEvent.publish()
+        if($loggedInUser){
+            let follow = await $loggedInUser.follow($meetupUser)
+            if(follow) amFollowing = true
+        }
     }
     async function unfollow(){
-        if(npub) removeFollow(npub)
-        else return
-
-        const ndkEvent = new NDKEvent($ndk);
-		ndkEvent.kind = 3;
-        $currentUserFollowsHexs.forEach(function(hex){
-            ndkEvent.tags.push(["p", hex])
-        })
-		ndkEvent.publish()
+        if($loggedInUser){
+            let unfollow = await $loggedInUser.unfollow($meetupUser)
+            if(unfollow) amFollowing = false
+        }
     }
 
 </script>
