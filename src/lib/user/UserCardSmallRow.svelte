@@ -15,10 +15,10 @@
     let status: UserStatus | undefined;
 
     async function setUser(){
-        user = await fetchUser(ndk, npub);
+        user = await fetchUser($ndk, npub);
             let hexk = user?.hexpubkey()
             if(hexk){
-                const statusSub = ndk.subscribe(
+                const statusSub = $ndk.subscribe(
                     {kinds: [10037], authors: [hexk]}
                 );
                 statusSub.on("event", (event: NDKEvent) => {
@@ -53,7 +53,7 @@
     {#if user}
     <div class="d-flex">
         <div>
-            <LinkedPfpIcon {ndk} npub={user.npub} />
+            <LinkedPfpIcon npub={user.npub} />
         </div>
         <div>
             <div class="card-body">

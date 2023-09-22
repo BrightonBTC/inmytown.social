@@ -1,5 +1,4 @@
 <script lang="ts">
-    import ndk from "$lib/ndk";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { attendees, interested } from "./stores";
 </script>
@@ -12,7 +11,7 @@
             </div>
             {#each Object.values($attendees) as a}
                 <div class="p-1 float-start">
-                    <LinkedPfpIcon {ndk} npub={a[0]} />
+                    <LinkedPfpIcon npub={a[0]} />
                 </div>
             {/each}
         </li>
@@ -25,7 +24,7 @@
             </div>
             {#each Object.values($interested) as a}
                 <div class="p-1 float-start">
-                    <LinkedPfpIcon {ndk} npub={a[0]} />
+                    <LinkedPfpIcon npub={a[0]} />
                 </div>
             {/each}
         </li>

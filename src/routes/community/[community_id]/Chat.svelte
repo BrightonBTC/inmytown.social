@@ -4,7 +4,7 @@
     import {
         community
     } from "./store.community";
-    import { relays } from "$lib/stores";
+    import { relays } from "$lib/stores/persistent";
     import Quote from "./Quote.svelte";
     import ndk from "$lib/ndk";
     import { addComment, chatCommentsStore, chatStore, sortedComments } from "./store.chat";
@@ -15,7 +15,7 @@
     async function getChat() {
         chatStore.set(undefined);
 
-        const chatSub = ndk.subscribe(
+        const chatSub = $ndk.subscribe(
             {
                 kinds: [40],
                 "#e": [$community.meta.eid],
@@ -32,7 +32,7 @@
         chatCommentsStore.set([]);
 
         if ($chatStore) {
-            const chatSub = ndk.subscribe(
+            const chatSub = $ndk.subscribe(
                 {
                     kinds: [42],
                     "#e": [$chatStore],
@@ -50,14 +50,14 @@
     async function postComment() {
         if (!commentText || commentText.length < 1 || !$chatStore) return;
         if (!relays || relays.length < 1) return;
-        const ndkEvent = new NDKEvent(ndk);
-        ndkEvent.kind = 42;
-        ndkEvent.content = commentText;
-        ndkEvent.tags.push(["e", $chatStore, relays[0], "root"]);
+        const event = new NDKEvent($ndk);
+        event.kind = 42;
+        event.content = commentText;
+        event.tags.push(["e", $chatStore, relays[0], "root"]);
         if(respondingTo){
-            ndkEvent.tags.push(["e", respondingTo, relays[0], "reply"]);
+            event.tags.push(["e", respondingTo, relays[0], "reply"]);
         }
-        await ndkEvent.publish();
+        await event.publish();
         commentText = "";
     }
 

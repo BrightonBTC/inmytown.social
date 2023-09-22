@@ -1,17 +1,16 @@
 <script lang="ts">
-    import type NDK from "@nostr-dev-kit/ndk";
+    import ndk from "$lib/ndk";
     import { addFollow, currentUserFollowsHexs, currentUserFollowsNpubs, currentUserFollows, removeFollow } from "./stores";
     import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
 
-    export let npub: string;
-    export let ndk: NDK;
+    export let npub: string | undefined;
 
     let amFollowing: boolean = false;
 
     $: checkFollowing(), npub, $currentUserFollows
 
     function checkFollowing(){
-        if($currentUserFollowsNpubs.includes(npub)){
+        if(npub && $currentUserFollowsNpubs.includes(npub)){
             amFollowing = true;
         }
         else{
@@ -23,7 +22,7 @@
         let user = new NDKUser({npub: npub})
         addFollow(user)
 
-        const ndkEvent = new NDKEvent(ndk);
+        const ndkEvent = new NDKEvent($ndk);
 		ndkEvent.kind = 3;
         $currentUserFollowsHexs.forEach(function(hex){
             ndkEvent.tags.push(["p", hex])
@@ -31,9 +30,10 @@
 		ndkEvent.publish()
     }
     async function unfollow(){
-        removeFollow(npub)
+        if(npub) removeFollow(npub)
+        else return
 
-        const ndkEvent = new NDKEvent(ndk);
+        const ndkEvent = new NDKEvent($ndk);
 		ndkEvent.kind = 3;
         $currentUserFollowsHexs.forEach(function(hex){
             ndkEvent.tags.push(["p", hex])

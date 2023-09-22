@@ -13,7 +13,7 @@
     } from "./store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
-    import { userNpub } from "$lib/stores";
+    import { userNpub } from "$lib/stores/persistent";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
@@ -26,10 +26,10 @@
 
     let host: NDKUser | undefined;
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
+    let eventSubs = new EventSubscriptions($ndk);
 
-    community.set(new Community(ndk))
+    community.set(new Community($ndk))
     communityMembers.set([]);
     communityEvents.set([]);
 
@@ -38,7 +38,7 @@
         communitySubs.subscribeByID(community_id, async (data) => {
             $community.meta = data
             fetchEvents(data.authorhex)
-            if(!host) host = await fetchUser(ndk, data.author);
+            if(!host) host = await fetchUser($ndk, data.author);
             $community.fetchMembers((user) => {
                 addMember(user.npub)
             })

@@ -1,6 +1,6 @@
 import { writable } from "@macfja/svelte-persistent-store";
 import type { NDKTag, NDKUserProfile } from "@nostr-dev-kit/ndk";
-import type { UserStatus } from "./user/user";
+import type { UserStatus } from "../user/user";
 import { derived } from "svelte/store";
 export let suggestedRelays: string[] = [
     "wss://relay.primal.net",

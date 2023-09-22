@@ -1,6 +1,6 @@
 <script lang="ts">
     import { communityList, eventListUpcoming, personList, searchType, topics } from "./stores";
-    import { searchCity, searchCountry } from "$lib/stores";
+    import { searchCity, searchCountry } from "$lib/stores/persistent";
     let n:number = 0;
     let resType: string = 'results';
     let filterStrings: Array<[string, string]> = [];

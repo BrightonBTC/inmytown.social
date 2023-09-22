@@ -3,7 +3,7 @@
     export let data: Community;
     import { onMount } from "svelte";
 
-    import { userNpub } from "$lib/stores";
+    import { userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { goto } from "$app/navigation";
@@ -15,8 +15,8 @@
     import ndk from "$lib/ndk";
     import { addEvent } from "./stores";
 
-    let communitySubs = new CommunitySubscriptions(ndk)
-    let eventSubs = new EventSubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions($ndk)
+    let eventSubs = new EventSubscriptions($ndk)
 
     let community_id = data.community_id;
     let communityDetails: CommunityMeta;
@@ -27,7 +27,7 @@
     $: authorised ? fetchEvents(): null
 
     onMount(async () => {
-        await login(ndk);
+        await login($ndk);
 
         if ($userNpub) {
             await fetchCommunity();
@@ -75,7 +75,7 @@
                     </thead>
                     <tbody>
                         {#each $myEvents as event}
-                            <EventRow {community_id} {event} />
+                            <EventRow {event} />
                         {/each}
                     </tbody>
                 </table>

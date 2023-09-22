@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Loading from "$lib/Loading.svelte";
-    import { userNpub, userProfile } from "$lib/stores";
+    import { userNpub, userProfile } from "$lib/stores/persistent";
     import type NDK from "@nostr-dev-kit/ndk";
     import type { NDKUser } from "@nostr-dev-kit/ndk";
     import { imgUrlOrDefault } from "$lib/helpers";

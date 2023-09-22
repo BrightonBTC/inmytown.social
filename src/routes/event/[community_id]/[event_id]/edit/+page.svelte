@@ -3,7 +3,7 @@
     import type { URLVars } from "./+page";
     export let data: URLVars;
     import { onMount } from "svelte";
-    import { userHex, userNpub } from "$lib/stores";
+    import { userHex, userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import { community, meetupStore } from "./stores";
     import EventCard from "$lib/event/EventCard.svelte";
@@ -19,13 +19,13 @@
 
     let loadingMessage:string = 'Fetching community...';
 
-    let eventSubs = new EventSubscriptions(ndk);
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions($ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
-    $: eid, community.set(new Community(ndk)), meetupStore.set(new MeetupEvent(ndk))
+    $: eid, community.set(new Community($ndk)), meetupStore.set(new MeetupEvent($ndk))
     
     onMount(async () => {
-        await login(ndk)
+        await login($ndk)
         
         if($userHex){
             fetchCommunity()
@@ -39,7 +39,7 @@
         communitySubs.subscribeByID(data.community_id, async (data) => {
             $community.meta = data;
             if(eid==='new' && $userHex){
-                meetupStore.set(MeetupEvent.new(ndk, $community.meta))
+                meetupStore.set(MeetupEvent.new($ndk, $community.meta))
                 authorised = true;
             }
             else fetchMeetup();

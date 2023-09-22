@@ -2,7 +2,7 @@
     import LocationSearch from "./LocationSearch.svelte";
     import type { NDKFilter } from "@nostr-dev-kit/ndk";
     import { addCommunity, addEvent, addPerson, addTopic, communityList, eventList, personList, searchType, sortedCommunities, topics } from "./stores";
-    import { searchCity, searchCountry } from "$lib/stores";
+    import { searchCity, searchCountry } from "$lib/stores/persistent";
     import { onDestroy, onMount } from "svelte";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import TypeSwitch from "./TypeSwitch.svelte";
@@ -17,9 +17,9 @@
     import { EventSubscriptions } from "$lib/event/event";
     import { UserSubscriptions } from "$lib/user/user";
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
-    let userSubs = new UserSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
+    let eventSubs = new EventSubscriptions($ndk);
+    let userSubs = new UserSubscriptions($ndk);
 
     $: tag = data.tag;
 

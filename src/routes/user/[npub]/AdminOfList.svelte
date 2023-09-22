@@ -2,12 +2,12 @@
     import { dateStringFull } from "$lib/formatDates";
     import { imgUrlOrDefault } from "$lib/helpers";
     import { addCommunity, communitiesStore, meetupUser, sortedCommunities } from "./stores";
-    import { userHex } from "$lib/stores";
+    import { userHex } from "$lib/stores/persistent";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
     import ndk from "$lib/ndk";
 
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
     export let isLoggedInUser: boolean;
 

@@ -7,8 +7,8 @@
     import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
+    let eventSubs = new EventSubscriptions($ndk);
 
     onMount(() => {
         communitySubs.subscribe({limit:50}, async (data) => {

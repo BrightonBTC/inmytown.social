@@ -11,7 +11,7 @@
 
     $: setData(), eid
 
-    let communitySubs = new CommunitySubscriptions(ndk); 
+    let communitySubs = new CommunitySubscriptions($ndk); 
 
     function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {

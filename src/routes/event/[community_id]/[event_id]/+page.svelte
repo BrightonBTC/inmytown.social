@@ -13,7 +13,7 @@
     } from "./stores";
     
     import ndk from "$lib/ndk";
-    import { userNpub } from "$lib/stores";
+    import { userNpub } from "$lib/stores/persistent";
     import Loading from "$lib/Loading.svelte";
     import Attendees from "./Attendees.svelte";
     import Header from "./Header.svelte";
@@ -25,8 +25,8 @@
     import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
-    let eventSubs = new EventSubscriptions(ndk);
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let eventSubs = new EventSubscriptions($ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
     let hasRsvp: string;
     let event_id = data.event_id;
@@ -35,8 +35,8 @@
     let loadingMessage:string = 'Fetching community...';
 
     attendeeStore.set([]);
-    community.set(new Community(ndk))
-    meetupStore.set(new MeetupEvent(ndk))
+    community.set(new Community($ndk))
+    meetupStore.set(new MeetupEvent($ndk))
 
     onMount(async () => {
         communitySubs.subscribeByID(data.community_id, async (data) => {

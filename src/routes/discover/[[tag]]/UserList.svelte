@@ -10,13 +10,13 @@
 
 {#each Object.values($personList) as statusData}
     <div class="mb-3">
-        {#await fetchUser(ndk, statusData.author.npub)}
+        {#await fetchUser($ndk, statusData.author.npub)}
             <Loading />
         {:then user}
         <div class="card mb-3 p-2 bg-secondary border-0 shadow">
             <div class="d-flex align-items-center">
                 <div class="p-4">
-                    <LinkedPfpIcon {ndk} npub={statusData.author.npub} cls='lg' />
+                    <LinkedPfpIcon npub={statusData.author.npub} cls='lg' />
                 </div>
                 <div class="flex-grow-1">
                     <div class="card-body">

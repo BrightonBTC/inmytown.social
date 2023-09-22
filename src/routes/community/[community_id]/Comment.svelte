@@ -16,7 +16,7 @@
     $: setComment(), comment
     async function setComment(){
         ts = comment.created_at ? dateStringFull(comment.created_at): '';
-        if(ndk && comment.author) user = await fetchUser(ndk, comment.author.npub);
+        if($ndk && comment.author) user = await fetchUser($ndk, comment.author.npub);
         let etags = comment.tags.filter((t) => t[0] === 'e' && t[3] === 'reply')
         if(etags.length > 0) replyTo = etags[0][1]
         else replyTo = undefined
@@ -32,7 +32,7 @@
 <div class="container-fluid">
     <div class="d-flex align-items-center">
         <div class="ps-2 pe-2 user-section text-center">
-            <LinkedPfpIcon {ndk} npub={comment.author.npub} cls='sm' />
+            <LinkedPfpIcon npub={comment.author.npub} cls='sm' />
             <small class="mt-2 overflow-e"><UserName {user} /></small>
         </div>
         <div class="flex-grow-1 bubble-wrap">

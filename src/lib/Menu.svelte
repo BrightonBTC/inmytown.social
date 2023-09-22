@@ -1,6 +1,6 @@
 <script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
-	import { derivedProfile, userNpub } from "$lib/stores";
+	import { derivedProfile, userNpub } from "$lib/stores/persistent";
 	import Login from "./Login.svelte";
 	import { imgUrlOrDefault } from "./helpers";
     import Relays from "./Relays.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { hasSigner } from "$lib/stores";
+    import { hasSigner } from "$lib/stores/persistent";
     import { meetupStore } from "./stores";
 
     export let hasRsvp:string;

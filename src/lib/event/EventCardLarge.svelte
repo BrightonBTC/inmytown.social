@@ -10,7 +10,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     export let eventData: EventMeta;
     export let eid:string | undefined = undefined
 
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
     $: setData(), eid
 

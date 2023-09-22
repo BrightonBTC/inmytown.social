@@ -7,12 +7,10 @@
 
     let communityDetails: CommunityMeta;
 
-    if (ndk) {
-        let communitySubs = new CommunitySubscriptions(ndk)
-        communitySubs.subscribeByID(id, async (data) => {
-            communityDetails = data;
-        });
-    }
+    let communitySubs = new CommunitySubscriptions($ndk)
+    communitySubs.subscribeByID(id, async (data) => {
+        communityDetails = data;
+    });
 </script>
 
 {#if communityDetails}

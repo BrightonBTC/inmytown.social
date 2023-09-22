@@ -1,7 +1,7 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { communityMembers, removeMember } from "./store.community";
-    import { uStatus, userNpub } from "$lib/stores";
+    import { uStatus, userNpub } from "$lib/stores/persistent";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import { imgUrlOrDefault } from "$lib/helpers";
     import UserName from "$lib/user/UserName.svelte";
@@ -18,11 +18,11 @@
 
     async function joinNow(){
         uStatus.communities.push($community.meta.eid);
-        publishUserStatus(ndk, uStatus)
+        publishUserStatus($ndk, uStatus)
     }
     async function leaveNow(){
         uStatus.communities.splice(uStatus.communities?.findIndex(e => e[1] === $community.meta.eid),1);
-        publishUserStatus(ndk, uStatus)
+        publishUserStatus($ndk, uStatus)
         if($userNpub) removeMember($userNpub)
     }
 
@@ -53,7 +53,7 @@
                     <li class="list-group-item">
                         <i class="bi bi-person me-2 text-primary"></i> 
                         <span>Hosted by</span>
-                        <span><UserName user={host} /> <LinkedPfpIcon {ndk} cls="tiny" npub={host.npub} /> </span> 
+                        <span><UserName user={host} /> <LinkedPfpIcon cls="tiny" npub={host.npub} /> </span> 
                     </li>
                     {/if}
                 </ul>

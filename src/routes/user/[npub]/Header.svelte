@@ -1,36 +1,19 @@
 <script lang="ts">
     import Loading from "$lib/Loading.svelte";
-    import type NDK from "@nostr-dev-kit/ndk";
-    import type { NDKUser } from "@nostr-dev-kit/ndk";
     import { imgUrlOrDefault } from "$lib/helpers";
     import UserName from "$lib/user/UserName.svelte";
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import UserWebsite from "$lib/user/UserWebsite.svelte";
-    import { fetchUser } from "$lib/user/user";
-    import UserFollowBtn from "./UserFollowBtn.svelte";
-    import ndk from "$lib/ndk";
     import { meetupUser } from "./stores";
-
-    // export let ndk: NDK | undefined;
-    // export let npub: string | undefined;
-    // let user: NDKUser | undefined;
-
-
-    // $: setUser(), npub
-
-    // async function setUser(){
-    //     user = undefined
-    //     if(ndk && npub) user = await fetchUser(ndk, npub);
-    // }
-
+    import UserFollowBtn from "./UserFollowBtn.svelte";
 </script>
 {#if $meetupUser?.profile}
 <div class="card shadow-sm">
-    <!-- <UserFollowBtn {ndk} {npub} /> -->
+    <!-- <UserFollowBtn npub={$meetupUser.npub} /> -->
     <img class="card-img-top" src={imgUrlOrDefault($meetupUser.profile.banner)} alt="{$meetupUser.profile.name}" />
     <div class="card-body row ms-0 me-0 bg-secondary">
         <div class="uim text-center mb-3 col-lg-2">
-            <LinkedPfpIcon {ndk} npub={$meetupUser.npub} cls="lg"/>
+            <LinkedPfpIcon npub={$meetupUser.npub} cls="lg"/>
         </div>
         <div class="ps-4 col-lg-10">
             <h3 class="card-title mb-2"><span class="userName"><UserName user={$meetupUser} /></span></h3>

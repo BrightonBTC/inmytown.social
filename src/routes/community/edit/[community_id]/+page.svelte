@@ -4,7 +4,7 @@
 	export let data: CommunityID;
 	import { onMount } from "svelte";
 	import { community } from "./stores";
-	import { userHex, userNpub } from "$lib/stores";
+	import { userHex, userNpub } from "$lib/stores/persistent";
 	import Loading from "$lib/Loading.svelte";
 	import CommunityCard from "./CommunityCard.svelte";
     import Form from "./Form.svelte";
@@ -14,14 +14,14 @@
 	import { login } from "$lib/user/user";
 	import ndk from "$lib/ndk";
 
-	let communitySubs = new CommunitySubscriptions(ndk);
+	let communitySubs = new CommunitySubscriptions($ndk);
 
 	let loggedin: boolean;
 	let isNew: boolean = false;
 	let authorised: boolean | undefined;
 
 	onMount(async () => {
-		loggedin = await login(ndk);
+		loggedin = await login($ndk);
 
 		if (loggedin && $userHex) {
 			if (data.community_id === "new") {

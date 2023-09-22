@@ -6,7 +6,7 @@
 
     let communityDetails: CommunityMeta;
 
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
     communitySubs.subscribeByID($meetupStore.meta.community.eid, async (data) => {
         communityDetails = data;

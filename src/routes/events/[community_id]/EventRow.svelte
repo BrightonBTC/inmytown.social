@@ -5,7 +5,6 @@
     import { dateStringFull } from "$lib/formatDates";
     import { MeetupEvent, type EventMeta } from "$lib/event/event";
     export let event: EventMeta ;
-    export let community_id: string ;
 
 </script>
 

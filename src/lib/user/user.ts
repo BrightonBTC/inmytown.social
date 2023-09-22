@@ -1,5 +1,4 @@
-import ndk from "$lib/ndk"
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores"
+import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores/persistent"
 import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 
 export interface UserStatus{
@@ -15,7 +14,7 @@ export class MeetupUser extends NDKUser {
 
     public status?: UserStatus;
 
-    public constructor(opts: {}){
+    public constructor(ndk:NDK, opts: {}){
         super(opts)
         this.ndk = ndk
     }
@@ -24,7 +23,7 @@ export class MeetupUser extends NDKUser {
         let events = await this.ndk?.fetchEvents({
             authors: [this.hexpubkey()],
             kinds: [10037]
-        }, {})
+        }, {closeOnEose:true})
         if(events && events.size > 0){
             this.status = MeetupUser.parseStatus([...events][0])
         }
