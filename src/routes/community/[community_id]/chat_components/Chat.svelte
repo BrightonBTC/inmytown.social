@@ -12,7 +12,7 @@
     $: getChat(), $community.meta;
     $: getComments(), $chatStore;
 
-    async function getChat() {
+    function getChat() {
         chatStore.set(undefined);
 
         const chatSub = $ndk.subscribe(
@@ -28,7 +28,7 @@
     }
     getChat()
 
-    async function getComments() {
+    function getComments() {
         chatCommentsStore.set([]);
 
         if ($chatStore) {

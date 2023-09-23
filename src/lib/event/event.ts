@@ -63,12 +63,16 @@ export class MeetupEvent {
         }
     }
 
-    public async fetchCommunity(){
-        const sub = new CommunitySubscriptions(this.ndk);
-        const that = this
-        await sub.subscribeByID(this.meta.community.eid, (data) => {
-            that.meta.community = data
-        })
+    public async fetchCommunity(): Promise<void>{
+        try{
+            const sub = new CommunitySubscriptions(this.ndk);
+            await sub.subscribeByID(this.meta.community.eid, (data) => {
+                this.meta.community = data
+            })
+        }
+        catch(error){
+            console.log('An error occurred fetching community: '+error)
+        }
     }
 
     public static new(ndk: NDK, community: CommunityMeta){
@@ -88,7 +92,7 @@ export class MeetupEvent {
         return '/event/'+event.community.eid+'/'+event.uid
     }
 
-    public async fetchRSVPs(cb: (data: NDKEvent) => void){
+    public async fetchRSVPs(cb: (data: NDKEvent) => void): Promise<void>{
         if(this.rsvpSubscription) return;
         try {
             this.rsvpSubscription = this.ndk.subscribe(
@@ -109,19 +113,25 @@ export class MeetupEvent {
         }
     }
 
-    public async rsvp(state:string){
-        const ndkEvent = new NDKEvent(this.ndk);
-        ndkEvent.kind = 31925;
-        ndkEvent.tags = [
-            ["a", this.meta.eid+':'+this.meta.authorhex+':'+this.meta.uid],
-            ["d", this.meta.uid],
-            ['L', 'status'],
-            ['l', state, 'status']
-        ];
-        await ndkEvent.publish();
+    public async rsvp(state:string): Promise<void>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 31925;
+            ndkEvent.tags = [
+                ["a", this.meta.eid+':'+this.meta.authorhex+':'+this.meta.uid],
+                ["d", this.meta.uid],
+                ['L', 'status'],
+                ['l', state, 'status']
+            ];
+            await ndkEvent.publish();
+        }
+        catch(error){
+            console.log('Something went wrong with the RSVP: '+error)
+        }
+
     }
 
-    public async publish(){
+    public async publish(): Promise<void>{
         this.error = undefined;
         try {
             const ndkEvent = new NDKEvent(this.ndk);
@@ -256,7 +266,7 @@ export class EventSubscriptions {
         this.ndk = ndk
     }
 
-    public async subscribeOne(community:CommunityMeta, id: string, cb: (data: EventMeta) => void) {
+    public async subscribeOne(community:CommunityMeta, id: string, cb: (data: EventMeta) => void): Promise<void> {
         let lastUpd = 0
         try {
             const communitySub = this.ndk.subscribe(
@@ -278,7 +288,7 @@ export class EventSubscriptions {
         } 
     }
 
-    public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions){
+    public async subscribe(filter: NDKFilter, cb: (data: EventMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         filter.kinds = [31923]
         try {
             const sub = this.ndk.subscribe(

@@ -24,7 +24,7 @@
         if(!showStatus){
             $meetupUser.status.city, $meetupUser.status.country, $meetupUser.status.locationStatus = undefined;
         }
-        let r = await publishUserStatus($ndk, $meetupUser.status);
+        await publishUserStatus($ndk, $meetupUser.status);
         $editStatus = false
     }
 

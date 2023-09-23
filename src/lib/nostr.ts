@@ -7,7 +7,6 @@ export async function deleteEvent(ndk: NDK, id: string): Promise<void>{
         ["e", id]
     ];
     await ndkEvent.publish();
-    await Promise.resolve()
 }
 
 

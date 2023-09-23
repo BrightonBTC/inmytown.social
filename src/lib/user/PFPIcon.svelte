@@ -12,7 +12,7 @@
 
     $: setUser(), npub
     async function setUser(){
-        if($ndk && npub){
+        if(npub){
             user = await fetchUser($ndk, npub);
             if(npub === $loggedInUser?.npub) cls += ' border-success border-3'
         } 

@@ -49,7 +49,7 @@
 
     });
 
-    async function fetchEvents(author: string) {
+    function fetchEvents(author: string) {
         eventSubs.subscribe({"#e": [community_id], authors:[author]}, async (data) => {
             addEventMeta(data)
         });

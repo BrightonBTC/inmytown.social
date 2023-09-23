@@ -50,32 +50,42 @@ export class Community {
         }
     }
 
-    public async create(){
-        const ndkEvent = new NDKEvent(this.ndk);
-		ndkEvent.kind = 1037;
-		await ndkEvent.publish();
-        this.meta.eid = ndkEvent.id;
-        this.meta.uid = ndkEvent.id;
-        return ndkEvent.created_at;
+    public async create(): Promise<number | undefined>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 1037;
+            await ndkEvent.publish();
+            this.meta.eid = ndkEvent.id;
+            this.meta.uid = ndkEvent.id;
+            return ndkEvent.created_at;
+        }
+        catch(error){
+            console.log('An error occurred creating the community: '+error)
+        }
     }
 
-    public async createChat(){
-        const ndkEvent = new NDKEvent(this.ndk);
-        ndkEvent.kind = 40;
-        ndkEvent.tags.push(["e", this.meta.eid])
-        ndkEvent.content = JSON.stringify({
-            name: this.meta.title,
-            about: 'Public channel for meetup group: '+this.meta.title,
-            picture: this.meta.image
-        })
-        await ndkEvent.publish();
+    public async createChat(): Promise<void>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 40;
+            ndkEvent.tags.push(["e", this.meta.eid])
+            ndkEvent.content = JSON.stringify({
+                name: this.meta.title,
+                about: 'Public channel for meetup group: '+this.meta.title,
+                picture: this.meta.image
+            })
+            await ndkEvent.publish();
+        }
+        catch(error){
+            console.log('An error occurred creating the chat: '+error)
+        }
     }
 
     public newUID(){
         this.meta.uid = parseInt((Date.now() / 1000).toString()).toString()
     } 
 
-    public async publishMeta(){
+    public async publishMeta(): Promise<void>{
         try{
             const ndkEvent = new NDKEvent(this.ndk);
             ndkEvent.kind = 30037;
@@ -177,7 +187,7 @@ export class Community {
         return '/community/'+community.eid
     }
 
-    public async fetchMembers(cb: (user: NDKUser) => void){
+    public async fetchMembers(cb: (user: NDKUser) => void): Promise<void>{
         if(this.membersSubscription) return;
         try {
             this.membersSubscription = this.ndk.subscribe(
@@ -208,7 +218,7 @@ export class CommunitySubscriptions {
         this.ndk = ndk
     }
 
-    public async subscribeByID(community_id: string, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+    public async subscribeByID(community_id: string, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         let community: CommunityMeta = {
             ...CommunityMetaDefaults,
             eid: community_id
@@ -233,7 +243,7 @@ export class CommunitySubscriptions {
         } 
     }
 
-    public async subscribe(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+    public async subscribe(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         filter.kinds = [1037]
         try {
             const communitiesSub = this.ndk.subscribe(
@@ -256,7 +266,7 @@ export class CommunitySubscriptions {
         } 
     }
 
-    public async subscribeMeta(community: CommunityMeta, cb: (data: CommunityMeta) => void){
+    public async subscribeMeta(community: CommunityMeta, cb: (data: CommunityMeta) => void): Promise<void>{
         let lastUpdCommunity = 0;
         try {
             const communityMetaSub = this.ndk.subscribe(
@@ -277,7 +287,7 @@ export class CommunitySubscriptions {
         } 
     }
 
-    public async subscribeMetaMulti(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions){
+    public async subscribeMetaMulti(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         filter.kinds = [30037]
         try {
             const sub = this.ndk.subscribe(
