@@ -1,6 +1,4 @@
 <script lang="ts">
-    import type { CommunityID } from "./+page";
-    export let data: CommunityID;
     import Header from "./header_components/Header.svelte";
     import Map from "./details_components/Map.svelte";
     import MemberList from "./details_components/MemberList.svelte";
@@ -22,29 +20,32 @@
     import { addEventMeta, communityEvents } from "./stores/store.events";
     import { loggedInUser } from "$lib/stores/user";
 
-    $: community_id = data.community_id;
+    export let data;
+
+    $: community_id = data.eid;
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
 
     community.set(new Community($ndk))
+    $community.meta = data
+
     host.set(undefined);
     communityMembers.set(undefined);
     communityEvents.set([]);
 
+    let domready = false;
+
     onMount(async () => {
-        
-        communitySubs.subscribeByID(community_id, async (data) => {
-            $community.meta = data
-            fetchEvents(data.authorhex)
-            if(!$host){
-                let h = await fetchUser($ndk, data.author);
-                host.set(h)
-            }
-            $community.fetchMembers((user) => {
-                addMember(user.npub)
-            })
-        });
+        domready = true;
+        fetchEvents(data.authorhex)
+        if(!$host){
+            let h = await fetchUser($ndk, data.author);
+            host.set(h)
+        }
+        $community.fetchMembers((user) => {
+            addMember(user.npub)
+        })
 
     });
 
@@ -61,7 +62,7 @@
     })
 </script>
 
-{#if $community.meta.eid.length > 0}
+{#if domready}
     <Header />
     {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
