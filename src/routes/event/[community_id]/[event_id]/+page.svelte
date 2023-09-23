@@ -1,14 +1,11 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type { URLVars } from "./+page";
-    export let data: URLVars;
 
     import { onDestroy, onMount } from "svelte";
 
     import {
         addAttendee,
         attendeeStore,
-        community,
         meetupStore,
     } from "./stores";
     
@@ -21,43 +18,29 @@
     import CommunityWidget from "./CommunityWidget.svelte";
     import Rsvp from "./Rsvp.svelte";
 
-    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    import {  MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
-    import { Community, CommunitySubscriptions } from "$lib/community/community";
     import { loggedInUser } from "$lib/stores/user";
-    let eventSubs = new EventSubscriptions($ndk);
-    let communitySubs = new CommunitySubscriptions($ndk);
+
+    export let data;
 
     let hasRsvp: string;
-    let event_id = data.event_id;
     let loaded:boolean = false;
 
     let loadingMessage:string = 'Fetching community...';
 
     attendeeStore.set([]);
-    community.set(new Community($ndk))
     meetupStore.set(new MeetupEvent($ndk))
 
     onMount(async () => {
-        communitySubs.subscribeByID(data.community_id, async (data) => {
-            $community.meta = data;
-            fetchEvent();
-        });
+        $meetupStore.meta = data;
+        subscribeRsvp();
+        loaded = true
     });
 
     onDestroy(() => {
         $meetupStore.destroy()
     })
-
-    async function fetchEvent(){
-        loadingMessage = 'Fetching event...'
-        eventSubs.subscribeOne($community.meta, event_id, async (data) => {
-            $meetupStore.meta = data;
-            // await $meetupStore.fetchCommunity()
-            loaded = true;
-            subscribeRsvp();
-        })
-    }
 
     function subscribeRsvp() {
         $meetupStore.fetchRSVPs(async (event) => {
@@ -71,6 +54,36 @@
         })
     }
 </script>
+
+<svelte:head>
+    <title>{data.title} | Events InMyTown</title>
+    <meta
+        name="description"
+        content={data.brief}
+    />
+
+    <meta property="og:title" content={data.title} />
+    <meta property="og:type" content="website" />
+    <meta
+        property="og:url"
+        content="https://inmytown.social/community/{data.eid}"
+    />
+    <meta property="og:image" content={data.image} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="inmytown.social" />
+    <meta name="twitter:title" content={data.title} />
+    <meta
+        name="twitter:description"
+        content={data.brief}
+    />
+    <meta
+        property="twitter:url"
+        content="https://inmytown.social/community/{data.eid}"
+    />
+    <meta name="twitter:image" content={data.image} />
+</svelte:head>
+
 {#if loaded}
     <div class="row">
         <div class="col-md-4">
