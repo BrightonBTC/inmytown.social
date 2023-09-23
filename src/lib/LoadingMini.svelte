@@ -1,0 +1,1 @@
+<div class="spinner-border spinner-border-sm text-muted"></div>

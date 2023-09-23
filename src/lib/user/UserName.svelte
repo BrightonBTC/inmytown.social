@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type { NDKUser } from "@nostr-dev-kit/ndk";
+    import LoadingMini from "$lib/LoadingMini.svelte";
+import type { NDKUser } from "@nostr-dev-kit/ndk";
     export let user: NDKUser | undefined = undefined;
 
     let npub: string = '';
@@ -11,7 +12,7 @@
     {#if user}
     <a href="/user/{user.npub}" class="text-decoration-none">
         {#await user.fetchProfile()}
-                {npub}
+                <LoadingMini />
         {:then value}
             {user.profile?.displayName ||
                     user.profile?.name ||

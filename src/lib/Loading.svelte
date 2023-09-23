@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let t:string | undefined = undefined;
+    export let t:string | undefined = undefined
 </script>
 
 {#if t}

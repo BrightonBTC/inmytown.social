@@ -5,7 +5,7 @@
     import TileLayer from "ol/layer/Tile.js";
     import View from "ol/View.js";
     import {useGeographic} from 'ol/proj.js';
-    import {community} from "./store.community";
+    import {community} from "../stores/store.community";
 
     import { defaults } from "ol/interaction/defaults";
     import { onMount } from "svelte";

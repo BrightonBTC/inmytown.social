@@ -1,16 +1,16 @@
 <script lang="ts">
     import type { CommunityID } from "./+page";
     export let data: CommunityID;
-    import Header from "./Header.svelte";
-    import Map from "./Map.svelte";
-    import MemberList from "./MemberList.svelte";
-    import type { NDKUser } from "@nostr-dev-kit/ndk";
+    import Header from "./header_components/Header.svelte";
+    import Map from "./details_components/Map.svelte";
+    import MemberList from "./details_components/MemberList.svelte";
     import { onDestroy, onMount } from "svelte";
     import {
         addMember,
         communityMembers,
         community,
-    } from "./store.community";
+        host
+    } from "./stores/store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
     import AdminPanel from "./AdminPanel.svelte";
@@ -19,18 +19,17 @@
     import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
-    import { addEventMeta, communityEvents } from "./store.events";
+    import { addEventMeta, communityEvents } from "./stores/store.events";
     import { loggedInUser } from "$lib/stores/user";
 
     $: community_id = data.community_id;
-
-    let host: NDKUser | undefined;
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
 
     community.set(new Community($ndk))
-    communityMembers.set([]);
+    host.set(undefined);
+    communityMembers.set(undefined);
     communityEvents.set([]);
 
     onMount(async () => {
@@ -38,7 +37,10 @@
         communitySubs.subscribeByID(community_id, async (data) => {
             $community.meta = data
             fetchEvents(data.authorhex)
-            if(!host) host = await fetchUser($ndk, data.author);
+            if(!$host){
+                let h = await fetchUser($ndk, data.author);
+                host.set(h)
+            }
             $community.fetchMembers((user) => {
                 addMember(user.npub)
             })
@@ -60,8 +62,8 @@
 </script>
 
 {#if $community.meta.eid.length > 0}
-    <Header {host} />
-    {#if $loggedInUser && host && $loggedInUser.npub === host.npub}
+    <Header />
+    {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
     {/if}
     <div class="row me-1">
