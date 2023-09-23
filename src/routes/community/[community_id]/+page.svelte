@@ -19,6 +19,7 @@
     import ndk from "$lib/ndk";
     import { addEventMeta, communityEvents } from "./stores/store.events";
     import { loggedInUser } from "$lib/stores/user";
+    import MetaTags from "$lib/MetaTags.svelte";
 
     export let data;
 
@@ -61,35 +62,12 @@
         $community.destroy()
     })
 </script>
-
-<svelte:head>
-    <title>{data.title} | InMyTown</title>
-    <meta
-        name="description"
-        content="{data.title}, a Nostr Meetup Community in {data.city} {data.country} with a focus on {data.tags.join(', ')}"
-    />
-
-    <meta property="og:title" content={data.title} />
-    <meta property="og:type" content="website" />
-    <meta
-        property="og:url"
-        content="https://inmytown.social/community/{data.eid}"
-    />
-    <meta property="og:image" content={data.image} />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="inmytown.social" />
-    <meta name="twitter:title" content={data.title} />
-    <meta
-        name="twitter:description"
-        content="{data.title} a Nostr Meetup Community in {data.city} {data.country} with a focus on {data.tags.join(', ')}"
-    />
-    <meta
-        property="twitter:url"
-        content="https://inmytown.social/community/{data.eid}"
-    />
-    <meta name="twitter:image" content={data.image} />
-</svelte:head>
+<MetaTags 
+    title="{data.title} | Community @ InMyTown"
+    description="{data.title}, a Nostr Meetup Community in {data.city} {data.country} with a focus on {data.tags.join(', ')}"
+    url="{Community.url(data)}"
+    image={data.image}
+/>
 
 {#if domready}
     <Header />

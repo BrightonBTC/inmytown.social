@@ -21,6 +21,7 @@
     import {  MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
     import { loggedInUser } from "$lib/stores/user";
+    import MetaTags from "$lib/MetaTags.svelte";
 
     export let data;
 
@@ -54,6 +55,13 @@
         })
     }
 </script>
+
+<MetaTags 
+    title="{data.title} | Events InMyTown"
+    description={data.brief}
+    url="{MeetupEvent.url(data)}"
+    image={data.image}
+/>
 
 <svelte:head>
     <title>{data.title} | Events InMyTown</title>

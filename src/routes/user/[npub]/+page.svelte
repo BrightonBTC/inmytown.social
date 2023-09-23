@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { UserID } from "./proxy+page";
     import Status from "./Status.svelte";
     import MemberList from "./MemberList.svelte";
     import AdminOfList from "./AdminOfList.svelte";
@@ -10,22 +9,24 @@
     import Loading from "$lib/Loading.svelte";
     import ndk from "$lib/ndk";
     import { loggedInUser } from "$lib/stores/user";
-    export let data:UserID;   
+    import MetaTags from "$lib/MetaTags.svelte";
+
+    export let data;
+
     let page: string = 'status'
     let loaded:boolean
 
     let loadingMessage = "Fetching User Profile..."
 
-    $: npub = data.npub;
     $: isLoggedInUser = data.npub === $loggedInUser?.npub
 
     async function setUser(){
-        let user = new MeetupUser({npub: npub})
+        let user = new MeetupUser({npub: data.npub})
+        user.profile = data.profile
         user.ndk = $ndk
-        await user.fetchProfile()
-        loadingMessage = "Fetching User Status..."
-        await user.fetchStatus()
         meetupUser.set(user)
+        loadingMessage = "Fetching User Status..."
+        await $meetupUser.fetchStatus()
         loaded = true;
     }
 
@@ -33,9 +34,20 @@
         page = p
     }
 
-    $: loaded = false, setUser(), setPage('status'), npub
+    $: loaded = false, setUser(), setPage('status'), data.npub
 
 </script>
+
+<MetaTags 
+    title="{data.profile?.displayName ||
+        data.profile?.name ||
+        data.profile?.nip05 ||
+        data.npub} | User Profile @ InMyTown"
+    description={data.profile?.about}
+    url="/user/{data.npub}"
+    image={data.profile?.image}
+/>
+
 {#if loaded}
     <Header />
     <div class="row">
