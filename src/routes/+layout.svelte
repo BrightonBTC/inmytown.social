@@ -5,6 +5,8 @@
     import { onMount } from "svelte";
     import { onDestroy } from "svelte";
     import ndk from "$lib/ndk";
+    import { navigating } from "$app/stores";
+    import Loading from "$lib/Loading.svelte";
 
     let inactiveFor = 0;
     let noticeDismissed = false;
@@ -38,7 +40,11 @@
         <button type="button" class="btn-close float-end" on:click={() => noticeDismissed = true}></button>
     </div>
     {/if}
-    <slot />
+    {#if $navigating}
+        <Loading t="Scanning the Nostrverse..." />
+    {:else}
+        <slot />
+    {/if}
 </div>
 
 <Footer />
