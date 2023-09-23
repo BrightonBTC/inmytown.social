@@ -3,11 +3,11 @@
     import { NDKEvent } from "@nostr-dev-kit/ndk";
     import {
         community
-    } from "./stores/store.community";
+    } from "../stores/store.community";
     import { relays } from "$lib/stores/persistent";
     import Quote from "./Quote.svelte";
     import ndk from "$lib/ndk";
-    import { addComment, chatCommentsStore, chatStore, sortedComments } from "./stores/store.chat";
+    import { addComment, chatCommentsStore, chatStore, sortedComments } from "../stores/store.chat";
 
     $: getChat(), $community.meta;
     $: getComments(), $chatStore;

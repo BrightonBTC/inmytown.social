@@ -1,6 +1,6 @@
 <script lang="ts">
     import About from "./About.svelte";
-    import Chat from "./Chat.svelte";
+    import Chat from "./chat_components/Chat.svelte";
     import Events from "./Events.svelte";
 </script>
 <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">

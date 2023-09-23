@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { NDKEvent } from "@nostr-dev-kit/ndk";
-    import { chatCommentsStore } from "./stores/store.chat";
+    import { chatCommentsStore } from "../stores/store.chat";
     import PfpIcon from "$lib/user/PFPIcon.svelte";
 
     export let id: string;
