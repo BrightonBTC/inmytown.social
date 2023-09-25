@@ -2,15 +2,22 @@
     import Location from "$lib/location/Location.svelte";;
     import Tags from "$lib/topics/Tags.svelte";
     import UserName from "$lib/user/UserName.svelte";
+    import { onMount } from "svelte";
     import StatusEdit from "./StatusEdit.svelte";
     import { editStatus, meetupUser } from "./stores";
+    import Loading from "$lib/Loading.svelte";
 
-    export let isLoggedInUser: boolean;
+    export let isLoggedInUser: boolean
+    let ready:boolean = false
+
+    onMount(async () => {
+        await $meetupUser.fetchStatus()
+        $meetupUser = $meetupUser
+        ready = true
+    })
 
 </script>
-{#if isLoggedInUser && !$editStatus}
-    <button class="btn btn-success mb-5" on:click={() => {$editStatus = true}}>Edit Status <i class="bi bi-pencil-fill"></i></button>
-{:else if isLoggedInUser}
+{#if isLoggedInUser}
     <StatusEdit />
 {/if}
 {#if !$editStatus }
@@ -42,7 +49,9 @@
             <Tags tags={$meetupUser.status.interests} linked={true} />
         </div>
     </div>
+    {:else if ready}
+        <p><UserName user={$meetupUser} /> has not set a status or location yet</p>
     {:else}
-    <p><UserName user={$meetupUser} /> has not set a status or location yet</p>
+        <Loading t="Fetching user status" />
     {/if}
 {/if}
