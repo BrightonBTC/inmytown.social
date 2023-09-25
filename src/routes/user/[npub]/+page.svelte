@@ -14,7 +14,9 @@
     export let data;
 
     let page: string = 'status'
-    let loaded:boolean
+
+    type loadingState = 'success' | 'loading' | 'failed'
+    let loadingState:loadingState = 'loading'
 
     let loadingMessage = "Fetching User Profile..."
 
@@ -22,19 +24,36 @@
 
     async function setUser(){
         let user = new MeetupUser({npub: data.npub})
-        user.profile = data.profile
-        user.ndk = $ndk
         meetupUser.set(user)
-        loadingMessage = "Fetching User Status..."
-        await $meetupUser.fetchStatus()
-        loaded = true;
+        $meetupUser.ndk = $ndk
+        // set profile from data we received on the server
+        if(data.profile){
+            $meetupUser.profile = data.profile
+            loadingState = 'success'
+        } 
+        // request profile again based on client side relay settings
+        fetchProfile()
+    }
+
+    async function fetchProfile(){
+        // create a temp user obj so we don't overwrite $meetupUser unless we want to
+        let user = new MeetupUser({npub: data.npub})
+        user.ndk = $ndk
+        await user.fetchProfile()
+        if(user.hasProfile()){
+            if(!$meetupUser.hasProfile() || user.profileCreatedAt() > $meetupUser.profileCreatedAt()){
+                $meetupUser.profile = user.profile
+            }
+            loadingState = 'success'
+        } 
+        else loadingState = 'failed'
     }
 
     function setPage(p:string){
         page = p
     }
 
-    $: loaded = false, setUser(), setPage('status'), data.npub
+    $: loadingState = 'loading', setUser(), setPage('status'), data.npub
 
 </script>
 
@@ -47,8 +66,7 @@
     url="/user/{data.npub}"
     image={data.profile?.image}
 />
-
-{#if loaded}
+{#if loadingState === 'success'}
     <Header />
     <div class="row">
         <div class="col-lg-3">
@@ -74,6 +92,10 @@
             {/if}
         </div>
     </div>
-{:else}
-<Loading t={loadingMessage} />
+{:else if loadingState === 'loading'}
+    <Loading t={loadingMessage} />
+{:else if loadingState === 'failed'}
+    <div class="alert alert-warning">
+        Failed to locate profile for this user
+    </div>
 {/if}

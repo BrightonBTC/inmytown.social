@@ -11,17 +11,23 @@ export interface UserStatus{
     locationStatus?: LocationStatus
     country?: string
     city?: string
+    created?: number
 }
 
 export class MeetupUser extends NDKUser {
 
-    public status?: UserStatus= {
-        communities: [],
-        interests: []
-    }
+    public status?: UserStatus
 
     public constructor(opts: {}){
         super(opts)
+    }
+
+    public hasProfile(){
+        return this.profile && Object.keys(this.profile).length > 0
+    }
+
+    public profileCreatedAt(){
+        return this.profile?.created_at || 0
     }
 
     public async fetchStatus(): Promise<void>{
@@ -74,7 +80,8 @@ export class MeetupUser extends NDKUser {
     public static parseStatus(event: NDKEvent){
         let data: UserStatus = {
             communities: [],
-            interests: []
+            interests: [],
+            created: event.created_at
         };
         data.communities = event.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
         if(event && event.content.trim().length > 0){

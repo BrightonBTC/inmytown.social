@@ -8,23 +8,19 @@ const ndk = get(ndkStore);
 
 type userObj = {
     npub: string,
-    profile: NDKUserProfile
+    profile: NDKUserProfile | undefined
 }
 
 export const load: PageServerLoad = async ({ params }): Promise<userObj> => {
     let meetupUser:MeetupUser = new MeetupUser({npub:params.npub})
+    let userObj:userObj = {npub:params.npub, profile:undefined}
     try {
         meetupUser.ndk = ndk
-        await meetupUser.fetchProfile()
-        if(meetupUser.profile){
-            return Promise.resolve({
-                npub: params.npub,
-                profile: meetupUser.profile
-            } as userObj)
+        let profile = await meetupUser.fetchProfile()
+        if(profile && profile?.size > 0){
+            userObj.profile = meetupUser.profile
         } 
-        else{
-            throw error(404, 'Profile not found');
-        }
+        return Promise.resolve(userObj)
     } 
     catch (e) {
         throw error(500, 'An error occurred processing this request: '+e);
