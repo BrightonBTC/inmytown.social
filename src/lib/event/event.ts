@@ -63,6 +63,35 @@ export class MeetupEvent {
         }
     }
 
+    public async fetch(uid:string, community?:string, author?:string): Promise<boolean>{
+        if(!community){
+            if(this.meta.community.eid.length > 0) community = this.meta.community.eid
+            else{
+                console.log('Community ID is not set but is required to fetch Event')
+                return false
+            }
+        }
+        if(!author){
+            if(this.meta.community.authorhex.length > 0) author = this.meta.community.authorhex
+            else{
+                console.log('Author is not set but is required to fetch Event')
+                return false
+            }
+        }
+        let events = await this.ndk.fetchEvents({ 
+            kinds: [31923], 
+            "#d": [uid],
+            "#e": [community],
+            "authors": [author]
+        })
+        if(events.size > 0){
+            let meta = MeetupEvent.parseNostrEvent([...events][0])
+            if(this.meta.updated < meta.updated) this.meta = meta
+            return true
+        }
+        return false
+    }
+
     public async fetchCommunity(): Promise<void>{
         try{
             const sub = new CommunitySubscriptions(this.ndk);

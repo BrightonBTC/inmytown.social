@@ -5,11 +5,15 @@ import ndkStore from "$lib/ndk";
 import { get } from "svelte/store";
 const ndk = get(ndkStore);
 
-export const load: PageServerLoad = async ({ params }): Promise<CommunityMeta | null> => {
+type resultObj = {
+    community: CommunityMeta | null
+}
+
+export const load: PageServerLoad = async ({ params }): Promise<resultObj> => {
     try {
         let community:Community = new Community(ndk)
-        let result = community.fetchMeta(params.community_id)
-        return result;
+        let result = await community.fetchMeta(params.community_id)
+        return {community: result} as resultObj
     } 
     catch (e) {
         throw error(500, 'An error occurred processing this request: '+e);

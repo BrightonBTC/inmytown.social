@@ -24,7 +24,7 @@
 
     let loadingState:loadingState = 'loading'
 
-    export let data: CommunityMeta | null;
+    export let data
 
     $: community_id = $page.params.community_id;
 
@@ -37,11 +37,10 @@
     communityMembers.set([]);
     communityEvents.set([]);
 
-
     onMount(async () => {
         // set community if we succesfully retrieved server side
-        if(data){
-            $community.meta = data
+        if(data.community){
+            $community.meta = data.community
             loadingState = 'success'
         }
         // fetch community again client side
@@ -49,7 +48,7 @@
         if(result) loadingState = 'success'
         
         // continue if we've successfully retrieved a community, either server or client side
-        if(data || result){
+        if(data.community || result){
             fetchEvents($community.meta.authorhex)
             if(!$host){
                 let h = await fetchUser($ndk, $community.meta.author);
@@ -75,12 +74,12 @@
     })
 </script>
 
-{#if data}
+{#if data.community}
 <MetaTags 
-    title="{data.title} | Community @ InMyTown"
-    description="{data.title}, a Nostr Meetup Community in {data.city} {data.country} with a focus on {data.tags.join(', ')}"
-    url="{Community.url(data)}"
-    image={data.image}
+    title="{data.community.title} | Community @ InMyTown"
+    description="{data.community.title}, a Nostr Meetup Community in {data.community.city} {data.community.country} with a focus on {data.community.tags.join(', ')}"
+    url="{Community.url(data.community)}"
+    image={data.community.image}
 />
 {/if}
 

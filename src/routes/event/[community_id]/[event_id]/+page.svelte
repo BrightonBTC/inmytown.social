@@ -18,15 +18,18 @@
     import CommunityWidget from "./CommunityWidget.svelte";
     import Rsvp from "./Rsvp.svelte";
 
-    import {  MeetupEvent } from "$lib/event/event";
+    import {  MeetupEvent, type EventMeta } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
+    import { Community } from "$lib/community/community";
+    import { page } from "$app/stores";
 
     export let data;
 
+    let loadingState:loadingState = 'loading'
+
     let hasRsvp: string;
-    let loaded:boolean = false;
 
     let loadingMessage:string = 'Fetching community...';
 
@@ -34,9 +37,18 @@
     meetupStore.set(new MeetupEvent($ndk))
 
     onMount(async () => {
-        $meetupStore.meta = data;
+        if(data.event){
+            $meetupStore.meta = data.event;
+            loadingState = 'success'
+        }
+        let community = new Community($ndk)
+        let success = await community.fetchMeta($page.params.community_id)
+        if(success){
+            let success = await $meetupStore.fetch($page.params.event_id, community.meta.eid, community.meta.authorhex)
+            if(success) loadingState = 'success'
+        } 
+        if(!data && !success) loadingState = 'failed'
         subscribeRsvp();
-        loaded = true
     });
 
     onDestroy(() => {
@@ -55,44 +67,16 @@
         })
     }
 </script>
-
+{#if data.event}
 <MetaTags 
-    title="{data.title} | Events InMyTown"
-    description={data.brief}
-    url="{MeetupEvent.url(data)}"
-    image={data.image}
+    title="{data.event.title} | Events InMyTown"
+    description={data.event.brief}
+    url="{MeetupEvent.url(data.event)}"
+    image={data.event.image}
 />
+{/if}
 
-<svelte:head>
-    <title>{data.title} | Events InMyTown</title>
-    <meta
-        name="description"
-        content={data.brief}
-    />
-
-    <meta property="og:title" content={data.title} />
-    <meta property="og:type" content="website" />
-    <meta
-        property="og:url"
-        content="https://inmytown.social/community/{data.eid}"
-    />
-    <meta property="og:image" content={data.image} />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="inmytown.social" />
-    <meta name="twitter:title" content={data.title} />
-    <meta
-        name="twitter:description"
-        content={data.brief}
-    />
-    <meta
-        property="twitter:url"
-        content="https://inmytown.social/community/{data.eid}"
-    />
-    <meta name="twitter:image" content={data.image} />
-</svelte:head>
-
-{#if loaded}
+{#if loadingState === 'success'}
     <div class="row">
         <div class="col-md-4">
             <div class=" bg-secondary rounded p-0 border">
@@ -115,7 +99,11 @@
             <MainContent />
         </div>
     </div>
-{:else}
+{:else if loadingState === 'loading'}
     <Loading t={loadingMessage} />
+{:else if loadingState === 'failed'}
+    <div class="alert alert-warning">
+        Failed to locate meetup event
+    </div>
 {/if}
 
