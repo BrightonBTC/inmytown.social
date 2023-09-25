@@ -7,7 +7,7 @@
     export let image:string | undefined;
 
     url = $page.url.origin+url
-    image = imgUrlOrDefault(image)
+    image = imgUrlOrDefault(image, 'any', $page.url.origin)
     title = title.substring(0, 100)
     description = description?.substring(0, 200) || title?.substring(0, 200)
 </script>

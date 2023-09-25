@@ -1,4 +1,4 @@
-export function imgUrlOrDefault(img: string | undefined, type?: string) {
+export function imgUrlOrDefault(img: string | undefined, type?: string, domain?: string) {
 	if (!img || img.length < 1){
         
         switch(type){
@@ -12,6 +12,7 @@ export function imgUrlOrDefault(img: string | undefined, type?: string) {
                 img = '/img/default.jpeg';
             break;
         }
+        if(domain) img = domain+img
     }
 	return img;
 }
