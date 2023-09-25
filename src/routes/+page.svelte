@@ -6,6 +6,7 @@
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
     import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
+    import MetaTags from '$lib/MetaTags.svelte';
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
@@ -29,6 +30,13 @@
     })
 
 </script>
+<MetaTags 
+    title="Find meetup events and communities in your local area"
+    description="In My Town is a NOSTR based hub for local communities and events"
+    url=""
+    image=""
+    type="community"
+/>
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4 shadow-sm">
