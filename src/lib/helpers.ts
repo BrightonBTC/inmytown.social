@@ -8,6 +8,12 @@ export function imgUrlOrDefault(img: string | undefined, type?: string, domain?:
             case 'event':
                 img = '/img/default-event.png'
             break;
+            case 'user':
+                img = '/img/default-user.png'
+            break;
+            case 'user-banner':
+                img = '/img/default-user-banner.jpg'
+            break;
             default:
                 img = '/img/default.jpeg';
             break;

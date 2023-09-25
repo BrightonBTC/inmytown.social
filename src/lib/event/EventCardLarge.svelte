@@ -31,7 +31,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
         <div class="col-md-8">
             <div class="card-body">
                 <div class="d-flex align-items-center">
-                    <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
+                    <img src="{imgUrlOrDefault(eventData.community.image, 'event')}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
                     <div class="ps-2">
                         <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
                         <small>An event by <a href="{Community.url(eventData.community)}">{eventData.community.title}</a></small>

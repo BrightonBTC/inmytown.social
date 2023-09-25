@@ -20,7 +20,7 @@
 </script>
 {#if user?.profile && npub}
     <img
-        src="{imgUrlOrDefault(user.profile.image)}"
+        src="{imgUrlOrDefault(user.profile.image, 'user')}"
         alt="{user.profile.name}"
         class="uim rounded-circle mx-auto {cls} shadow-sm border"
         data-bs-toggle="toggle"

@@ -10,7 +10,7 @@
 {#if $meetupUser?.profile}
 <div class="card shadow-sm">
     <UserFollowBtn />
-    <img class="card-img-top" src={imgUrlOrDefault($meetupUser.profile.banner)} alt="{$meetupUser.profile.name}" />
+    <img class="card-img-top" src={imgUrlOrDefault($meetupUser.profile.banner, 'user-banner')} alt="{$meetupUser.profile.name}" />
     <div class="card-body row ms-0 me-0 bg-secondary">
         <div class="uim text-center mb-3 col-lg-2">
             <LinkedPfpIcon npub={$meetupUser.npub} cls="lg"/>
