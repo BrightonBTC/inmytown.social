@@ -80,6 +80,7 @@
     description="{data.community.title}, a Nostr Meetup Community in {data.community.city} {data.community.country} with a focus on {data.community.tags.join(', ')}"
     url="{Community.url(data.community)}"
     image={data.community.image}
+    type="community"
 />
 {/if}
 

@@ -73,6 +73,7 @@
     description={data.event.brief}
     url="{MeetupEvent.url(data.event)}"
     image={data.event.image}
+    type="event"
 />
 {/if}
 

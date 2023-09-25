@@ -69,7 +69,7 @@
 								href="/user/{$loggedInUser.npub}"
 							>
 								<img
-									src={imgUrlOrDefault($loggedInUser.profile?.image)}
+									src={imgUrlOrDefault($loggedInUser.profile?.image, 'user')}
 									class="rounded-circle nav-uim align-self-center me-2 ms-2"
 									alt="{$loggedInUser.profile?.name} pfp"
 								/>

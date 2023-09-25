@@ -64,6 +64,7 @@
     description={data.profile?.about}
     url="/user/{data.npub}"
     image={data.profile?.image}
+    type="user-banner"
 />
 {#if loadingState === 'success'}
     <Header />
