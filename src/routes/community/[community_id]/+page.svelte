@@ -13,41 +13,53 @@
     import Tabs from "./Tabs.svelte";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { Community, CommunitySubscriptions, type CommunityMeta } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/ndk";
     import { addEventMeta, communityEvents } from "./stores/store.events";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
+    import { page } from "$app/stores";
 
-    export let data;
+    let loadingState:loadingState = 'loading'
 
-    $: community_id = data.eid;
+    export let data: CommunityMeta | null;
+
+    $: community_id = $page.params.community_id;
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
 
     community.set(new Community($ndk))
-    $community.meta = data
 
     host.set(undefined);
-    communityMembers.set(undefined);
+    communityMembers.set([]);
     communityEvents.set([]);
 
-    let domready = false;
 
     onMount(async () => {
-        domready = true;
-        fetchEvents(data.authorhex)
-        if(!$host){
-            let h = await fetchUser($ndk, data.author);
-            host.set(h)
+        // set community if we succesfully retrieved server side
+        if(data){
+            $community.meta = data
+            loadingState = 'success'
         }
-        $community.fetchMembers((user) => {
-            addMember(user.npub)
-        })
-
+        // fetch community again client side
+        let result = await $community.fetchMeta(community_id)
+        if(result) loadingState = 'success'
+        
+        // continue if we've successfully retrieved a community, either server or client side
+        if(data || result){
+            fetchEvents($community.meta.authorhex)
+            if(!$host){
+                let h = await fetchUser($ndk, $community.meta.author);
+                host.set(h)
+            }
+            $community.fetchMembers((user) => {
+                addMember(user.npub)
+            })
+        }
+        else loadingState = 'failed'
     });
 
     function fetchEvents(author: string) {
@@ -62,14 +74,17 @@
         $community.destroy()
     })
 </script>
+
+{#if data}
 <MetaTags 
     title="{data.title} | Community @ InMyTown"
     description="{data.title}, a Nostr Meetup Community in {data.city} {data.country} with a focus on {data.tags.join(', ')}"
     url="{Community.url(data)}"
     image={data.image}
 />
+{/if}
 
-{#if domready}
+{#if loadingState === 'success'}
     <Header />
     {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
@@ -87,6 +102,10 @@
             <MemberList />
         </div>
     </div>
-{:else}
-    <Loading />
+{:else if loadingState === 'loading'}
+    <Loading t="Searching the Nostrverse for your community" />
+{:else if loadingState === 'failed'}
+    <div class="alert alert-warning">
+        Failed to locate community
+    </div>
 {/if}

@@ -15,7 +15,6 @@
 
     let page: string = 'status'
 
-    type loadingState = 'success' | 'loading' | 'failed'
     let loadingState:loadingState = 'loading'
 
     let loadingMessage = "Fetching User Profile..."

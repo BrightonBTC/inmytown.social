@@ -6,7 +6,7 @@ import { get, writable } from 'svelte/store';
 export const host = writable<NDKUser | undefined>();
 export const community = writable<Community>();
 
-export const communityMembers = writable<string[] | undefined>(undefined);
+export const communityMembers = writable<string[]>([]);
 
 export function addMember(s: string){
     if(get(communityMembers) === undefined){

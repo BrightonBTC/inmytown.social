@@ -7,3 +7,5 @@ type City = {
     lat: string;
     lng: string;
 }
+
+type loadingState = 'success' | 'loading' | 'failed'

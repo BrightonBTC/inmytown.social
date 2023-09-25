@@ -8,6 +8,7 @@
 	import CommunityCard from "./CommunityCard.svelte";
     import Form from "./Form.svelte";
 	import {
+    Community,
 		CommunitySubscriptions,
 	} from "$lib/community/community";
 	import { login } from "$lib/user/user";
@@ -20,6 +21,7 @@
 	let authorised: boolean | undefined;
 
 	onMount(async () => {
+		community.set(new Community($ndk))
 		await login($ndk);
 
 		if ($loggedInUser) {
