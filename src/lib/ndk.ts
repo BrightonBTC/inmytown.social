@@ -11,7 +11,6 @@ const ndk = new NDK({
 if(browser){
     if(window.nostr){
         console.log('HAS SIGNER')
-        //hasSigner.set(true);
         ndk.signer = new NDKNip07Signer();
     }
 }
