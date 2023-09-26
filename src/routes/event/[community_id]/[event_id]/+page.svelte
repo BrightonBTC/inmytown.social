@@ -18,7 +18,7 @@
     import CommunityWidget from "./CommunityWidget.svelte";
     import Rsvp from "./Rsvp.svelte";
 
-    import {  MeetupEvent, type EventMeta } from "$lib/event/event";
+    import {  MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
@@ -44,7 +44,12 @@
         let community = new Community($ndk)
         let success = await community.fetchMeta($page.params.community_id)
         if(success){
-            let success = await $meetupStore.fetch($page.params.event_id, community.meta.eid, community.meta.authorhex)
+            let success = await $meetupStore.fetch(
+                $page.params.event_id, 
+                community.meta.eid, 
+                community.meta.authorhex
+            )
+            $meetupStore.meta.community = community.meta
             if(success) loadingState = 'success'
         } 
         if(!data && !success) loadingState = 'failed'

@@ -18,6 +18,7 @@ export const load: PageServerLoad = async ({ params }): Promise<resultObj> => {
         if(success){
             let event = new MeetupEvent(ndk)
             let success = await event.fetch(params.event_id, community.meta.eid, community.meta.authorhex)
+            event.meta.community = community.meta
             if(success) response.event = event.meta
         } 
         return response
