@@ -1,4 +1,3 @@
-import type { EventMeta } from "$lib/event/event"
 import { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
@@ -52,8 +51,12 @@ export class Community {
     }
 
     public async fetchMeta(id?: string): Promise<CommunityMeta | null> {
-        if (!id && this.meta.eid.length < 1) return null
-        else if (!id) id = this.meta.eid
+        if (!id && this.meta.eid.length < 1){
+            return null
+        } 
+        else if (!id){
+            id = this.meta.eid
+        } 
         let evt = await this.ndk.fetchEvents({ '#e': [id], kinds: [30037] }, { closeOnEose: true });
         if (evt.size > 0 && [...evt][0].created_at as number > this.meta.updated) {
             this.meta = Community.parseNostrEvent([...evt][0])
