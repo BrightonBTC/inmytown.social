@@ -15,7 +15,15 @@ if(browser){
     }
 }
 
-ndk.connect().then(() => console.log('NDK Connected'))
+ndk.connect()
+.then(() => console.log('NDK Connected'))
+.catch((e) => {
+    console.log('NDK Connection Error: '+e)
+    ndk.pool.relays.forEach(function(r){
+        console.log(r.url, r.status, r.connectionStats) 
+    })
+    
+})
 
 const ndkStore = writable(ndk);
 
