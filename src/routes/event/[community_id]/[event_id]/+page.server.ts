@@ -1,6 +1,6 @@
 import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
-import ndkStore from "$lib/ndk";
+import ndkStore from "$lib/stores/ndk";
 import { get } from "svelte/store";
 import { MeetupEvent, type EventMeta } from "$lib/event/event";
 import { Community } from "$lib/community/community";

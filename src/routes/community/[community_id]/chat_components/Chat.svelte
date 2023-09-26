@@ -6,7 +6,7 @@
     } from "../stores/store.community";
     import { relays } from "$lib/stores/persistent";
     import Quote from "./Quote.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { addComment, chatCommentsStore, chatStore, sortedComments } from "../stores/store.chat";
 
     $: getChat(), $community.meta;

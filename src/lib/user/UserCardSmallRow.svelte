@@ -8,7 +8,7 @@
     import Location from "$lib/location/Location.svelte";
     import { onMount } from "svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
 
     export let npub: string;
     let user: NDKUser | undefined;

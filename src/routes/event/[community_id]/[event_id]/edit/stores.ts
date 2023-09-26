@@ -1,7 +1,7 @@
 
 import type { Community } from '$lib/community/community';
 import type { MeetupEvent } from '$lib/event/event';
-import ndk from '$lib/ndk';
+import ndk from '$lib/stores/ndk';
 import { writable } from 'svelte/store';
 
 export const community = writable<Community>();

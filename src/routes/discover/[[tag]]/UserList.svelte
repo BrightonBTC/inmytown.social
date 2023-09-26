@@ -5,7 +5,7 @@
     import LinkedPfpIcon from "$lib/user/LinkedPFPIcon.svelte";
     import UserStatus from "./UserStatus.svelte";
     import { fetchUser } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
 </script>
 
 {#each Object.values($personList) as statusData}

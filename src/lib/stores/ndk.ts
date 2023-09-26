@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import NDK, { NDKNip07Signer } from '@nostr-dev-kit/ndk';
-import { relays } from './stores/persistent';
+import { relays } from './persistent';
 import { browser } from '$app/environment';
 
 const ndk = new NDK({

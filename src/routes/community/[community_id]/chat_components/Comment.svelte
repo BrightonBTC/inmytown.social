@@ -5,7 +5,7 @@
     import { fetchUser } from "$lib/user/user";
     import type { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import Quote from "./Quote.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
 
     export let comment: NDKEvent;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { loggedInUser } from "$lib/stores/user";
     import { publishUserStatus } from "$lib/user/user";
     import { onMount } from "svelte";

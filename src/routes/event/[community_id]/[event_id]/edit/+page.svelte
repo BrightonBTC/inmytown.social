@@ -8,7 +8,7 @@
     import EventCard from "$lib/event/EventCard.svelte";
     import { type EventMeta, EventSubscriptions, MeetupEvent } from "$lib/event/event";
     import { login } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import Form from "./Form.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
     import { loggedInUser } from "$lib/stores/user";

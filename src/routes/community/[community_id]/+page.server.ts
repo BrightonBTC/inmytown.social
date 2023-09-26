@@ -1,7 +1,7 @@
 import { type CommunityMeta, Community } from "$lib/community/community";
 import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
-import ndkStore from "$lib/ndk";
+import ndkStore from "$lib/stores/ndk";
 import { get } from "svelte/store";
 const ndk = get(ndkStore);
 

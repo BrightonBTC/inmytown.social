@@ -12,7 +12,7 @@
     import TopicSelector from "./TopicSelector.svelte";
     import ResultsInfo from "./ResultsInfo.svelte";
     import UserList from "./UserList.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { CommunitySubscriptions } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { UserSubscriptions } from "$lib/user/user";

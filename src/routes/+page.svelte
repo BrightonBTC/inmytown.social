@@ -1,5 +1,5 @@
 <script lang="ts"> 
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import { onDestroy, onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import { CommunitySubscriptions } from '$lib/community/community';

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { type CommunityMeta, CommunitySubscriptions, Community } from "$lib/community/community";
     import { imgUrlOrDefault } from "$lib/helpers";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
 
     export let id: string;
 

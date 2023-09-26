@@ -4,7 +4,7 @@
     import { login } from "$lib/user/user";
     import { onMount } from "svelte";
     import { onDestroy } from "svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { navigating } from "$app/stores";
     import Loading from "$lib/Loading.svelte";
 

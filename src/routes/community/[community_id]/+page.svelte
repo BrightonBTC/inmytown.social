@@ -16,7 +16,7 @@
     import { Community, CommunitySubscriptions, type CommunityMeta } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { addEventMeta, communityEvents } from "./stores/store.events";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";

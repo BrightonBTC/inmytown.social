@@ -2,7 +2,7 @@
     import { Community, CommunitySubscriptions } from '$lib/community/community';
     import { dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import Tags from '$lib/topics/Tags.svelte';
     import { MeetupEvent, type EventMeta } from './event';
 

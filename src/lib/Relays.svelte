@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import type { NDKRelay } from '@nostr-dev-kit/ndk';
     import { NDKRelayStatus } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';

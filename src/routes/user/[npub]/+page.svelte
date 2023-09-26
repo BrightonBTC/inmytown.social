@@ -7,7 +7,7 @@
     import Follows from "./Follows.svelte";
     import { meetupUser } from "./stores";
     import Loading from "$lib/Loading.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
 

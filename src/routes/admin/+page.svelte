@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { login } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { loggedInUser } from "$lib/stores/user";
 
     onMount(async () => {

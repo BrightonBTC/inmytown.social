@@ -9,7 +9,7 @@
         meetupStore,
     } from "./stores";
     
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import Loading from "$lib/Loading.svelte";
     import Attendees from "./Attendees.svelte";
     import Header from "./Header.svelte";

@@ -5,7 +5,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import Location from "$lib/location/Location.svelte";
     import { MeetupEvent, type EventMeta } from './event';
     import { Community, CommunitySubscriptions } from '$lib/community/community';
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
 
     export let eventData: EventMeta;
     export let eid:string | undefined = undefined

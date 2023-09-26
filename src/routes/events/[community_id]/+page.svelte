@@ -10,7 +10,7 @@
     import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { login } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { addEvent } from "./stores";
     import { loggedInUser } from "$lib/stores/user";
 

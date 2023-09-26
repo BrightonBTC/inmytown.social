@@ -4,7 +4,7 @@
     import { fetchUser } from "./user";
     import { loggedInUser } from "$lib/stores/user";
 
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
 
     export let npub: string | undefined;
     export let cls: string = ''; 

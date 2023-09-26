@@ -4,7 +4,7 @@
     import { addCommunity, communitiesStore, meetupUser, sortedCommunities } from "./stores";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { loggedInUser } from "$lib/stores/user";
 
     let communitySubs = new CommunitySubscriptions($ndk);

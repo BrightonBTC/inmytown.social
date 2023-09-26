@@ -9,7 +9,7 @@
     import Logo from "./Logo.svelte";
     import { loggedInUser } from "./stores/user";
     import Loading from "./Loading.svelte";
-	import ndk from "$lib/ndk";
+	import ndk from "$lib/stores/ndk";
 
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'

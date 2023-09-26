@@ -1,6 +1,6 @@
 <script lang="ts">
     import LocationSelect from "$lib/location/LocationSelect.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import TagSelector from "$lib/topics/TagSelector.svelte";
     import Tags from "$lib/topics/Tags.svelte";
     import { publishUserStatus } from "$lib/user/user";
