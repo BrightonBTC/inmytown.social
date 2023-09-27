@@ -1,6 +1,6 @@
 <script lang="ts">
     import Comment from "./Comment.svelte";
-    import { NDKEvent } from "@nostr-dev-kit/ndk";
+    import { NDKEvent, NDKSubscription } from "@nostr-dev-kit/ndk";
     import {
         community
     } from "../stores/store.community";
@@ -8,6 +8,9 @@
     import Quote from "./Quote.svelte";
     import ndk from "$lib/stores/ndk";
     import { addComment, chatCommentsStore, chatStore, sortedComments } from "../stores/store.chat";
+    import { onDestroy } from "svelte";
+
+    let chommentsSub: NDKSubscription;
 
     $: getChat(), $community.meta;
     $: getComments(), $chatStore;
@@ -32,13 +35,13 @@
         chatCommentsStore.set([]);
 
         if ($chatStore) {
-            const chatSub = $ndk.subscribe(
+            chommentsSub = $ndk.subscribe(
                 {
                     kinds: [42],
                     "#e": [$chatStore],
-                }
+                }, {closeOnEose: false}
             );
-            chatSub.on("event", (event: NDKEvent) => {
+            chommentsSub.on("event", (event: NDKEvent) => {
                 addComment(event);
             });
         }
@@ -64,6 +67,9 @@
     function setRespondingTo(id: string | null){
         respondingTo = id;
     }
+    onDestroy(() => {
+        chommentsSub.stop()
+    })
 </script>
 
 <div class="p-2 mt-3">
