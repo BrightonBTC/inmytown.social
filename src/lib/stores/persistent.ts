@@ -4,9 +4,7 @@ export let suggestedRelays: string[] = [
     "wss://relay.primal.net",
     "wss://nostr-pub.wellorder.net",
     "wss://nos.lol", 
-    "wss://relay.current.fyi",
     "wss://relay.nostr.band",
-    "wss://nostr.orangepill.dev",
     "wss://nostr.fmt.wiz.biz",
     "wss://relay.damus.io",
     "wss://offchain.pub",
@@ -45,7 +43,7 @@ export const npub = writable<string>("npub", "");
 export const searchCountry = writable<string>("searchCountry", "");
 export const searchCity = writable<string>("searchCity", "");
 
-export const selectedRelays = writable<string>("relays", JSON.stringify(suggestedRelays.slice(0, 9)));
+export const selectedRelays = writable<string>("relays", JSON.stringify(suggestedRelays.slice(0, 7)));
 
 export let relays: Array<string>;
 selectedRelays.subscribe((value) => {
