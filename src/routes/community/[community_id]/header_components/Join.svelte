@@ -3,19 +3,23 @@
     import { loggedInUser } from "$lib/stores/user";
     import { publishUserStatus } from "$lib/user/user";
     import { onMount } from "svelte";
-    import { addMember, community, removeMember } from "../stores/store.community";
+    import { addMember, community, communityMembers, removeMember } from "../stores/store.community";
     import LoadingMini from "$lib/LoadingMini.svelte";
 
     let isFollower: boolean
     let fetched: boolean = false
 
-    //$: isFollower = ($loggedInUser?.status?.communities?.find(el => el === $community.meta.eid)) ? true: false, $communityMembers;
+    $: setIsFollower(), $communityMembers;
 
     onMount(async () => {
         await $loggedInUser?.fetchStatus();
-        isFollower = ($loggedInUser?.status?.communities?.find(el => el === $community.meta.eid)) ? true: false
+        setIsFollower()
         fetched = true;
     })
+
+    function setIsFollower(){
+        isFollower = ($loggedInUser?.status?.communities?.find(el => el === $community.meta.eid)) ? true: false
+    }
 
     async function joinNow(){
         if(!$loggedInUser?.status) return

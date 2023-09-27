@@ -13,12 +13,18 @@ export function addMember(s: string){
         communityMembers.set([])
     }
     communityMembers.update(items => {
+        console.log(s)
         items?.push(s)
+        console.log(items)
         return [...new Map(items?.map(v => [v, v])).values()]
     })
 };
 
 export function removeMember(s: string){
-    communityMembers.update(items => items?.filter((itm) => itm !== s))
+    console.log(s)
+    communityMembers.update(items => {
+        console.log(items)
+        return items?.filter((itm) => itm !== s)
+    })
 };
 
