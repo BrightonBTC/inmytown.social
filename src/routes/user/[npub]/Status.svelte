@@ -24,7 +24,7 @@
     {#if $meetupUser.status}
     <div class="bg-dark text-light rounded">
         
-        <p class="text-muted"><small>Current status:</small></p>
+        <p class="text-muted"><small>Location status:</small></p>
         {#if $meetupUser.status.status && $meetupUser.status.status.trim().length > 0}
             <blockquote class="blockquote">
                 <p>{$meetupUser.status.status}</p>

@@ -45,12 +45,12 @@
 
 </script>
 {#if !$editStatus}
-<button class="btn btn-success mb-5" on:click={() => {$editStatus = true}}>Edit Status <i class="bi bi-pencil-fill"></i></button>
+<button class="btn btn-success mb-5" on:click={() => {$editStatus = true}}>Edit Location Status <i class="bi bi-pencil-fill"></i></button>
 {:else}
     {#if $meetupUser.status}
     <form on:submit|preventDefault={submitStatus}>
         <div class="mb-3 mt-3">
-            <label for="status" class="form-label">Status:</label>
+            <label for="status" class="form-label">Location Status:</label>
             <input
                 type="status"
                 class="form-control"
