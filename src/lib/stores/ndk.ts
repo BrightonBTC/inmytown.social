@@ -4,8 +4,7 @@ import { relays } from './persistent';
 import { browser } from '$app/environment';
 
 const ndk = new NDK({
-    explicitRelayUrls: relays,
-    debug: false
+    explicitRelayUrls: relays
 });
 
 if(browser){

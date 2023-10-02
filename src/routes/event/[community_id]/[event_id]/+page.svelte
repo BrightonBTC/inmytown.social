@@ -24,6 +24,8 @@
     import MetaTags from "$lib/MetaTags.svelte";
     import { Community } from "$lib/community/community";
     import { page } from "$app/stores";
+    import { dateStringFull } from "$lib/formatDates";
+    import EventEndedAlert from "$lib/event/EventEndedAlert.svelte";
 
     export let data;
 
@@ -83,6 +85,7 @@
 {/if}
 
 {#if loadingState === 'success'}
+    <EventEndedAlert starts={$meetupStore.meta.starts} ends={$meetupStore.meta.ends} />
     <div class="row">
         <div class="col-md-4">
             <div class=" bg-secondary rounded p-0 border">

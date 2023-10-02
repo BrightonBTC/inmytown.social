@@ -1,6 +1,7 @@
 <script lang="ts">
     import { dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
+    import EventEndedAlert from './EventEndedAlert.svelte';
     import { MeetupEvent, type EventMeta } from './event';
     export let eventData: EventMeta | null;
 </script>
@@ -13,6 +14,7 @@
     <div class="row g-0">
         <div class="col-md-8">
             <div class="card-body">
+                <EventEndedAlert starts={eventData.starts} ends={eventData.ends} />
                 <h4 class="card-title"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a></h4>
                 <p class="card-text text-muted">
                     <i class="bi bi-geo-alt me-2 text-primary"></i> {eventData.city}, {eventData.country}

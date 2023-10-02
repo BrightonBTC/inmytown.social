@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Community, CommunitySubscriptions } from '$lib/community/community';
-    import { dateStringFull } from '$lib/formatDates';
+    import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
     import ndk from '$lib/stores/ndk';
     import Tags from '$lib/topics/Tags.svelte';
@@ -21,7 +21,6 @@
 </script>
 {#if eventData}
 
-
 <div class="card mb-3 shadow">
     <div class="card-header d-flex align-items-center">
         <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
@@ -31,6 +30,7 @@
         </div>
     </div>
     <div class="card-body">
+        {@html dateStatusString(eventData.starts, eventData.ends)}
         <p class="card-text">
             {eventData.brief}
         </p>
