@@ -12,6 +12,7 @@
     import Form from "./Form.svelte";
     import { Community, CommunitySubscriptions } from "$lib/community/community";
     import { loggedInUser } from "$lib/stores/user";
+    import DuplicateEvent from "./DuplicateEvent.svelte";
 
     let eid = data.event_id
     let authorised: boolean;
@@ -70,6 +71,11 @@
         </div>
 
         <div class="col-sm-8">
+
+            {#if eid === "new"}
+                <DuplicateEvent />
+            {/if}
+            
             <Form />
         </div>
     </div>

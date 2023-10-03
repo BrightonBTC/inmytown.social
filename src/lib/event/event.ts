@@ -114,6 +114,14 @@ export class MeetupEvent {
         meta.longitude = community.longitude;
         meta.city = community.city;
         meta.country = community.country;
+        let t = new Date()
+        t.setDate(t.getDate() + 1)
+        t.setHours(18)
+        t.setMinutes(0)
+        t.setMilliseconds(0)
+        meta.starts = t.getTime()/1000
+        t.setHours(22)
+        meta.ends = t.getTime()/1000
         return new MeetupEvent(ndk, meta);
     }
 
