@@ -40,5 +40,6 @@
     .header-image {
         object-fit: cover; 
         width: 100%;
+        aspect-ratio: 16/9;
     }
 </style>

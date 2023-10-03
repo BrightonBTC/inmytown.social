@@ -10,6 +10,7 @@
     import { loggedInUser } from "./stores/user";
     import Loading from "./Loading.svelte";
 	import ndk from "$lib/stores/ndk";
+    import LinkedPfpIcon from "./user/LinkedPFPIcon.svelte";
 
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
@@ -68,11 +69,12 @@
 								class="d-flex nav-link p-0"
 								href="/user/{$loggedInUser.npub}"
 							>
-								<img
+							<LinkedPfpIcon cls="sm nav-uim align-self-center me-2 ms-2" npub={$loggedInUser.npub} /> 
+								<!-- <img
 									src={imgUrlOrDefault($loggedInUser.profile?.image, 'user')}
 									class="rounded-circle nav-uim align-self-center me-2 ms-2"
 									alt="{$loggedInUser.profile?.name} pfp"
-								/>
+								/> -->
 							</a>
 						{:catch error}
 							<span style="color: red">{error.message}</span>

@@ -6,14 +6,30 @@
     import UserWebsite from "$lib/user/UserWebsite.svelte";
     import { meetupUser } from "./stores";
     import UserFollowBtn from "./UserFollowBtn.svelte";
+    import { onMount } from "svelte";
+
+    let imSize = 'lg'
+
+
+    onMount(() => {
+        getPageSize()
+        window.onresize = getPageSize
+    })
+
+    function getPageSize(){
+        const ps = window.matchMedia("(max-width: 800px)")
+        console.log(ps.matches)
+        if(ps.matches) imSize = 'md'
+        else imSize = 'lg'
+    }
 </script>
 {#if $meetupUser?.profile}
 <div class="card shadow-sm">
     <UserFollowBtn />
-    <img class="card-img-top" src={imgUrlOrDefault($meetupUser.profile.banner, 'user-banner')} alt="{$meetupUser.profile.name}" />
+    <img class="card-img-top {imSize}" src={imgUrlOrDefault($meetupUser.profile.banner, 'user-banner')} alt="{$meetupUser.profile.name}" />
     <div class="card-body row ms-0 me-0 bg-secondary">
-        <div class="uim text-center mb-3 col-lg-2">
-            <LinkedPfpIcon npub={$meetupUser.npub} cls="lg"/>
+        <div class="uim text-center mb-3 col-lg-2 {imSize}">
+            <LinkedPfpIcon npub={$meetupUser.npub} cls={imSize}/>
         </div>
         <div class="ps-4 col-lg-10">
             <h3 class="card-title mb-2"><span class="userName"><UserName user={$meetupUser} /></span></h3>
@@ -45,6 +61,9 @@
     .uim{
         margin-top: -100px;
     }
+    .uim.md{
+        margin-top: -70px;
+    }
     .userName{
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -54,6 +73,9 @@
     .card-img-top{
         object-fit: cover;
         width: 100%;
-        max-height: 300px;
+        aspect-ratio: 4/1;
+    }
+    .card-img-top.md{
+        aspect-ratio: 5/2;
     }
 </style>

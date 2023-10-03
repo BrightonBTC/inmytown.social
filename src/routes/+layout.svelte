@@ -55,7 +55,7 @@
 }
 :global([data-bs-theme="dark"]) {
     --bs-secondary-rgb: 47,54,61;
-    --bs-body-font-family: var(--bs-font-monospace);
+    --bs-body-font-family: sans-serif;
     --bs-tertiary-rgb: 58,69,75;
 }
 :global([data-bs-theme="dark"] .shadow-sm, .btn) {
@@ -69,12 +69,15 @@
     opacity: 0.7;
 }
 :global([data-bs-theme="dark"] .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6) {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--bs-heading-color);
-  font-family: 'Ubuntu', sans-serif;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--bs-heading-color);
+    font-family: 'Ubuntu', sans-serif;
+    // background: linear-gradient(45deg, var(--bs-indigo), var(--bs-purple), var(--bs-indigo), var(--bs-indigo));
+    // -webkit-background-clip: text;
+    // -webkit-text-fill-color: transparent;
 }
 :global([data-bs-theme="dark"] .page-home .nav-home, .page-discover .nav-discover, .page-about .nav-about){
     background: rgb(var(--bs-dark-rgb));
