@@ -50,3 +50,5 @@ selectedRelays.subscribe((value) => {
     relays = value !== undefined ? JSON.parse(value) : [];
 });
 
+export const noticeDismissed = writable<string>("noticeDismissed", "");
+

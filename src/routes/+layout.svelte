@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Footer from "$lib/Footer.svelte";
     import Menu from "$lib/Menu.svelte";
     import { login } from "$lib/user/user";
@@ -7,9 +7,9 @@
     import ndk from "$lib/stores/ndk";
     import { navigating } from "$app/stores";
     import Loading from "$lib/Loading.svelte";
+    import { noticeDismissed } from "$lib/stores/persistent";
 
     let inactiveFor = 0;
-    let noticeDismissed = false;
 
     const interval = setInterval(() => {
         inactiveFor++;
@@ -28,16 +28,24 @@
     onDestroy(() => {
         clearInterval(interval)
     })
-</script>
+
+    let showNotice:boolean = false
+    function setShowNotice(){
+        if($noticeDismissed.length < 1 || parseInt($noticeDismissed)+86400000 < Date.now()) showNotice = true
+        else showNotice = false
+    }
+
+    $: $noticeDismissed, setShowNotice()
+</script> 
 
 <Menu />
 <div class="container mt-1 main">
-    {#if !noticeDismissed}
+    {#if showNotice}
     <div class="alert alert-info d-flex">
         <span>Please note that this app is still in early development stages. It should be mostly working
             but things may break at times. Please report any bugs <a href ="https://github.com/BrightonBTC/inmytown.social" target="_blank">here</a>.
         </span>  
-        <button type="button" class="btn-close float-end" on:click={() => noticeDismissed = true}></button>
+        <button type="button" class="btn-close float-end" on:click={() => $noticeDismissed = Date.now().toString()}></button>
     </div>
     {/if}
     {#if $navigating}
