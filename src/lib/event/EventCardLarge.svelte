@@ -28,7 +28,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
 
 <div class="card mb-3 p-2 shadow">
     <div class="row g-0">
-        <div class="col-md-8">
+        <div class="col-lg-6">
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <img src="{imgUrlOrDefault(eventData.community.image, 'event')}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
@@ -46,8 +46,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 </p>
             </div>
         </div>
-        <div class="col-md-4 bg-secondary border rounded d-flex">
-            <a href="{MeetupEvent.url(eventData)}" class="d-flex ">
+        <div class="col-lg-6 bg-secondary rounded d-flex align-items-center">
+            <a href="{MeetupEvent.url(eventData)}">
                 <img
                     src={imgUrlOrDefault(eventData.image, 'event')}
                     alt="musig"
@@ -72,6 +72,6 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     .event-image {
         object-fit: cover;
         width: 100%;
-        min-height: 300px;
+        aspect-ratio: 16/9;
     }
 </style>
