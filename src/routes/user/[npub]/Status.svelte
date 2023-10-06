@@ -22,7 +22,7 @@
 {/if}
 {#if !$editStatus }
     {#if $meetupUser.status}
-    <div class="bg-dark text-light rounded">
+    <div class="bg-dark text-light rounded p-3 border">
         
         <p class="text-muted"><small>Location status:</small></p>
         {#if $meetupUser.status.status && $meetupUser.status.status.trim().length > 0}

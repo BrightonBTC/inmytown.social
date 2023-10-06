@@ -18,7 +18,6 @@
 
     function getPageSize(){
         const ps = window.matchMedia("(max-width: 800px)")
-        console.log(ps.matches)
         if(ps.matches) imSize = 'md'
         else imSize = 'lg'
     }

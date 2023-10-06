@@ -35,7 +35,7 @@
         else showNotice = false
     }
 
-    $: $noticeDismissed, setShowNotice()
+    $: $noticeDismissed, $navigating, setShowNotice()
 </script> 
 
 <Menu />
@@ -65,6 +65,7 @@
     --bs-secondary-rgb: 47,54,61;
     --bs-body-font-family: sans-serif;
     --bs-tertiary-rgb: 58,69,75;
+    --bs-body-bg: #0d161e;
 }
 :global([data-bs-theme="dark"] .shadow-sm, .btn) {
     box-shadow: 0 .125rem .25rem rgba(0,0,0, 0.5) !important;
@@ -92,5 +93,7 @@
     border-radius: 7px;
     font-weight: bold;
 }
-
+:global([data-bs-theme="dark"] .bg-gradient) {
+    background: linear-gradient(45deg, var(--bs-black), var(--bs-dark), var(--bs-dark), rgb(var(--bs-tertiary-rgb)), var(--bs-dark), rgb(var(--bs-tertiary-rgb))) !important;
+}
 </style>

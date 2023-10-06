@@ -28,7 +28,7 @@
     }
 </script>
 
-<div class="bg-dark text-light rounded pt-2 mb-4">
+<div class="text-light rounded pt-2 mb-4">
     Found <strong>{n}</strong> {resType}
     <div class="bg-secondary p-1 ps-3 mt-2 rounded shadow-sm">
         <small>

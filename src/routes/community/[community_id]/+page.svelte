@@ -96,9 +96,9 @@
 
         <div class="col-sm-4 bg-secondary rounded shadow-sm">
             <Map />
-
+            <hr />
             <Tags tags={$community.meta.tags} linked={true} />
-
+            <hr />
             <MemberList />
         </div>
     </div>
