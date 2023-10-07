@@ -17,6 +17,13 @@
     ]
     let selected:string;
 
+    function openLink(url:string){
+        if(url.length > 0){
+            window.open(url)
+        }
+        selected=''
+    }
+
 </script>
 {#if user?.profile}
 <div class="card shadow">
@@ -30,8 +37,8 @@
         <p class="card-text py-2">{user.profile.about}</p>
         <p class="small"><span class="ellip"><UserWebsite profile={user.profile} /></span></p>
         <a href="nostr://{user.npub}" class="btn btn-secondary mb-3">Open profile in native client</a>
-        <select class="form-select m-1" bind:value={selected} on:change={() => {window.open(selected), selected=''}}>
-            <option value="">Open profile in external web client</option>
+        <select class="form-select m-1" bind:value={selected} on:change={() => openLink(selected)}>
+            <option value="" selected>Open profile in external web client</option>
             {#each webClients as link}
                 <option value="https://{link[0]}{link[1]}{user.npub}">{link[0]}</option>
             {/each}
