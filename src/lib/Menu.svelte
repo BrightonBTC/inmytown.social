@@ -1,7 +1,6 @@
 <script lang="ts">
 	import "bootstrap-icons/font/bootstrap-icons.css";
 	import Login from "./Login.svelte";
-	import { imgUrlOrDefault } from "./helpers";
     import Relays from "./Relays.svelte";
     import { goto } from "$app/navigation";
 
@@ -11,10 +10,10 @@
     import Loading from "./Loading.svelte";
 	import ndk from "$lib/stores/ndk";
     import LinkedPfpIcon from "./user/LinkedPFPIcon.svelte";
+    import { notifications } from "./stores/persistent";
 
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
-
 
 </script>
 
@@ -60,11 +59,16 @@
 						<i class="bi bi-arrow-down-up text-light"  />
 					</a>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item u-icon">
 					{#if $ndk && $loggedInUser}
 						{#await $loggedInUser.fetchProfile()}
 							<Loading />
 						{:then}
+							{#if $notifications.length > 0}
+							<span class="notif rounded-circle text-light badge px-0 shadow-sm">
+								{$notifications.length < 100 ? $notifications.length : '99+'}
+							</span>
+							{/if}
 							<a
 								class="d-flex nav-link p-0"
 								href="/user/{$loggedInUser.npub}"
@@ -191,5 +195,19 @@
 	}
 	.navbar:hover{
 		opacity: 1;
+	}
+	.u-icon{
+		position: relative;
+	}
+	.notif{
+		background: green;
+		position: absolute;
+		z-index: 100;
+		right: 0;
+		max-width: 2em;
+		width: 2em;
+		text-align: center;
+		overflow: hidden;
+		font-size: 60%;
 	}
 </style>

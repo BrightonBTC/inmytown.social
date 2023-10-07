@@ -2,7 +2,6 @@
     import Status from "./Status.svelte";
     import MemberList from "./MemberList.svelte";
     import AdminOfList from "./AdminOfList.svelte";
-    import Header from "./Header.svelte";
     import { MeetupUser} from "$lib/user/user";
     import Follows from "./Follows.svelte";
     import { meetupUser } from "./stores";
@@ -10,10 +9,9 @@
     import ndk from "$lib/stores/ndk";
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
+    import UserCard from "$lib/user/UserCard.svelte";
 
-    export let data;
-
-    let page: string = 'status'
+    export let data
 
     let loadingState:loadingState = 'loading'
 
@@ -48,12 +46,12 @@
         else loadingState = 'failed'
     }
 
-    function setPage(p:string){
-        page = p
+    $: loadingState = 'loading', setUser(), data.page, data.npub
+
+    function isActivePage(p:string | undefined){
+        if (p === data.page) return 'active'
+        return ''
     }
-
-    $: loadingState = 'loading', setUser(), setPage('status'), data.npub
-
 </script>
 
 <MetaTags 
@@ -67,29 +65,32 @@
     type="user-banner"
 />
 {#if loadingState === 'success'}
-    <Header />
     <div class="row">
-        <div class="col-lg-3">
-            <div class="mt-3 p-3 border-end">
-                <div class="list-group mt-2 list-group-flush">
-                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('status')}>Location Status</a>
-                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('admin')}>Communities (admin)</a>
-                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('member')}>Communities (member)</a>
-                    <a href="#t" class="list-group-item list-group-item-action" on:click|preventDefault={() => setPage('follows')}>Follows</a>
-                </div>
-            </div>
-            
+        <div class="col-lg-4 mb-3 rounded">
+            <UserCard user={$meetupUser} />
         </div>
-        <div class="col-lg-9 p-4">
-            {#if page==='admin'}
-            <AdminOfList {isLoggedInUser} />
-            {:else if page==='member'}
-            <MemberList />
-            {:else if page==='status'}
-            <Status {isLoggedInUser} />
-            {:else if page==='follows'}
-            <Follows />
-            {/if}
+        <div class="col-lg-8 pb-4">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {isActivePage(undefined)}" href="/user/{$meetupUser.npub}/">Location Status</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {isActivePage('communities')}" href="/user/{$meetupUser.npub}/communities">Communities</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {isActivePage('follows')}" href="/user/{$meetupUser.npub}/follows">Follows</a>
+                </li>
+            </ul>
+            <div class="p-3 mt-3 rounded bg-secondary">
+                {#if data.page==='communities'}
+                <AdminOfList {isLoggedInUser} />
+                <MemberList />
+                {:else if data.page==='follows'}
+                <Follows />
+                {:else}
+                <Status {isLoggedInUser} />
+                {/if}
+            </div>
         </div>
     </div>
 {:else if loadingState === 'loading'}
@@ -99,3 +100,8 @@
         Failed to locate profile for this user
     </div>
 {/if}
+<style>
+    .row{
+        min-height: 100vh;
+    }
+</style>

@@ -8,12 +8,13 @@ const ndk = get(ndkStore);
 
 type userObj = {
     npub: string,
+    page: string | undefined,
     profile: NDKUserProfile | undefined
 }
 
 export const load: PageServerLoad = async ({ params }): Promise<userObj> => {
     let meetupUser:MeetupUser = new MeetupUser({npub:params.npub})
-    let userObj:userObj = {npub:params.npub, profile:undefined}
+    let userObj:userObj = {npub:params.npub, page:params.page, profile:undefined}
     try {
         meetupUser.ndk = ndk
         let profile = await meetupUser.fetchProfile()

@@ -1,4 +1,5 @@
 import { writable } from "@macfja/svelte-persistent-store";
+import { derived } from "svelte/store";
 
 export let suggestedRelays: string[] = [
     "wss://relay.primal.net",
@@ -52,3 +53,27 @@ selectedRelays.subscribe((value) => {
 
 export const noticeDismissed = writable<string>("noticeDismissed", "");
 
+enum notificationKind{
+    message = 0,
+    joinRequest = 1
+}
+
+type notification = {
+    ts: number,
+    kind: notificationKind,
+    event: string,
+    seen: boolean
+}
+
+export const notificationStore = writable<string>("notifications", JSON.stringify([]));
+
+export const notifications = derived(notificationStore, (value) => value !== undefined ? JSON.parse(value) : [])
+
+function notificationAdd(notification:notification){
+    let n: notification[] = []
+    notificationStore.subscribe((value) => {
+        n = value !== undefined ? JSON.parse(value) : [];
+    });
+    n.append()
+    notificationStore.set(JSON.stringify([]))
+}

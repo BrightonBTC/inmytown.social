@@ -84,11 +84,12 @@
 <h3 class="mb-4">
     Administrator of:
 </h3>
-<div class="p-4 d-flex flex-column bg-secondary rounded">
-{#each Object.values($sortedCommunities) as communityDetails}
-    <CommunityCardLarge {communityDetails} />
-{/each}
+<div class="row">
+    {#each Object.values($sortedCommunities) as communityDetails}
+        <div class="col-xl-6"><CommunityCardLarge {communityDetails} /></div>
+    {/each}
 </div>
+
 {/if}
 <style>
     i {
@@ -98,8 +99,5 @@
         width: 40px;
         height: 40px;
         object-fit: cover;
-    }
-    .d-flex{
-        gap:20px;
     }
 </style>

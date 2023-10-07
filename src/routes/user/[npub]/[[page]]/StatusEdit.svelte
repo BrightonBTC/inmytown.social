@@ -45,38 +45,11 @@
 
 </script>
 {#if !$editStatus}
-<button class="btn btn-success mb-5" on:click={() => {$editStatus = true}}>Edit Location Status <i class="bi bi-pencil-fill"></i></button>
+<button class="btn btn-success mt-2 float-end" on:click={() => {$editStatus = true}}>Edit Location Status <i class="bi bi-pencil-fill"></i></button>
 {:else}
     {#if $meetupUser.status}
     <form on:submit|preventDefault={submitStatus}>
-        <div class="mb-3 mt-3">
-            <label for="status" class="form-label">Location Status:</label>
-            <input
-                type="status"
-                class="form-control"
-                maxlength="100"
-                placeholder="eg. visiting London"
-                name="status"
-                bind:value={$meetupUser.status.status}
-            />
-        </div>
-        <div class="form-check mb-3">
-            <label class="form-check-label">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    name="remember"
-                    bind:checked={showStatus}
-                /> Show my profile in location search results.
-            </label>
-        </div>
-        
-        {#if showStatus}
-        <div class="mb-3 d-flex">
-            <label for="tags" class="form-label">Interests:</label>
-            <Tags tags={$meetupUser.status.interests} linked={false} />
-            <TagSelector callback={updateTags} tags={$meetupUser.status.interests} />
-        </div>
+        <p class="bg-dark rounded text-light p-2">Setting a location allows other users to find you in search results on the Discover page. You can also add up to 10 tags and a status message to help people with similar interests find you.</p>
         <div class="mb-3">
             <label for="locationStatus" class="form-label">Current location:</label>
             <div class="d-flex align-items-center">
@@ -90,15 +63,29 @@
                         <option value="visiting">Visiting</option>
                     </select>
                 </div>
-                
                 <div class="ps-2">
                     <LocationSelect country={$meetupUser.status.country} city={$meetupUser.status.city} callback={locChanged} />
                 </div>
-                
             </div>
-            
         </div>
-        {/if}
+        <div class="mb-3 mt-3">
+            <label for="status" class="form-label">Location Status:</label>
+            <input
+                type="status"
+                class="form-control"
+                maxlength="100"
+                placeholder="eg. visiting London"
+                name="status"
+                bind:value={$meetupUser.status.status}
+            />
+        </div>
+        
+        <div class="mb-3 d-flex">
+            <label for="tags" class="form-label">Interests:</label>
+            <Tags tags={$meetupUser.status.interests} linked={false} />
+            <TagSelector callback={updateTags} tags={$meetupUser.status.interests} />
+        </div>
+        
         <button type="submit" class="btn btn-primary">Save Changes</button> 
         <button type="submit" class="btn btn-secondary"  on:click|preventDefault={() => {$editStatus = false}}>Cancel</button>
     </form>

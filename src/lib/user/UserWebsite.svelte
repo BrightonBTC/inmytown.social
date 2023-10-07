@@ -1,6 +1,6 @@
 <script lang="ts">
     import { isValidUrl } from "$lib/helpers";
-    import type { NDKUser, NDKUserProfile } from "@nostr-dev-kit/ndk";
+    import type { NDKUserProfile } from "@nostr-dev-kit/ndk";
     export let profile: NDKUserProfile | undefined = undefined;
 
     let w: URL | boolean;
