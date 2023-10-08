@@ -1,13 +1,12 @@
 <script lang="ts">
-
+    import AdminPanel from "$lib/user/AdminPanel.svelte";
     export let community_id: string;
-
 </script>
-<div class="mt-2 bg-black p-1 mb-2 rounded">
+<AdminPanel>
     <a href="/events/{community_id}" class="btn btn-success btn-sm m-1"
         >Manage events</a
     >
     <a href="/community/edit/{community_id}" class="btn btn-success btn-sm m-1"
         >Edit community</a
     >
-</div>
+</AdminPanel>

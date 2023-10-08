@@ -85,10 +85,10 @@
 {/if}
 
 {#if loadingState === 'success'}
-    <Header />
     {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
     {/if}
+    <Header />
     <div class="row me-1">
         <div class="col-sm-8">
             <Tabs />

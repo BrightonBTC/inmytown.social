@@ -85,6 +85,10 @@
 {/if}
 
 {#if loadingState === 'success'}
+
+    {#if $loggedInUser && $loggedInUser.npub === $meetupStore.meta.author}
+    <AdminPanel data={$meetupStore.meta} />
+    {/if}
     <EventEndedAlert starts={$meetupStore.meta.starts} ends={$meetupStore.meta.ends} />
     <div class="row">
         <div class="col-md-4">
@@ -100,9 +104,6 @@
             </div>
         </div>
         <div class="col-md-8">
-            {#if $loggedInUser && $loggedInUser.npub === $meetupStore.meta.author}
-                <AdminPanel data={$meetupStore.meta} />
-            {/if}
             <Header />
             <Rsvp {hasRsvp} />
             <MainContent />
