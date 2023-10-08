@@ -15,7 +15,7 @@
         ['coracle.social', '/'],
         ['nostree.me', '/'],
     ]
-    let selected:string;
+    let selected:string = '';
 
     function openLink(url:string){
         if(url.length > 0){
@@ -27,22 +27,28 @@
 </script>
 {#if user?.profile}
 <div class="card shadow">
-    <FollowButton {user} />
-    <a href="/user/{user.npub}">
-        <img class="card-img-top rounded-circle p-4" src={imgUrlOrDefault(user.profile.image)} alt="{user.profile.name} photo" />
-    </a>
-    <div class="card-body text-center">
-        <h5 class="card-title"><span class="ellip"><UserName {user} /></span></h5>
-        <p class="small ellip"><span class="ellip"><Nip5 profile={user.profile} /></span></p>
-        <p class="card-text py-2">{user.profile.about}</p>
-        <p class="small"><span class="ellip"><UserWebsite profile={user.profile} /></span></p>
-        <a href="nostr://{user.npub}" class="btn btn-secondary mb-3">Open profile in native client</a>
-        <select class="form-select m-1" bind:value={selected} on:change={() => openLink(selected)}>
-            <option value="" selected>Open profile in external web client</option>
-            {#each webClients as link}
-                <option value="https://{link[0]}{link[1]}{user.npub}">{link[0]}</option>
-            {/each}
-        </select>
+    
+    <div class="card-body text-center row d-flex align-items-center">
+        <div class="col-lg-12 col-sm-6 position-relative">
+            <FollowButton {user} />
+            <a href="/user/{user.npub}">
+                <img class="card-img-top rounded-circle p-4" src={imgUrlOrDefault(user.profile.image)} alt="{user.profile.name} photo" />
+            </a>
+        </div>
+        <div class="col-lg-12 col-sm-6">
+            <h5 class="card-title"><span class="ellip"><UserName {user} /></span></h5>
+            <p class="small ellip"><span class="ellip"><Nip5 profile={user.profile} /></span></p>
+            <p class="card-text py-2">{user.profile.about}</p>
+            <p class="small"><span class="ellip"><UserWebsite profile={user.profile} /></span></p>
+            <a href="nostr://{user.npub}" class="btn btn-secondary mb-3">Open profile in native client</a>
+            <select class="form-select m-1" bind:value={selected} on:change={() => openLink(selected)}>
+                <option value="" selected>Open profile in external web client</option>
+                {#each webClients as link}
+                    <option value="https://{link[0]}{link[1]}{user.npub}">{link[0]}</option>
+                {/each}
+            </select>
+        </div>
+        
     </div>
     
 </div>

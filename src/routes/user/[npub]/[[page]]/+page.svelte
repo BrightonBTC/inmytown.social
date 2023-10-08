@@ -81,7 +81,7 @@
                     <a class="nav-link {isActivePage('follows')}" href="/user/{$meetupUser.npub}/follows">Follows</a>
                 </li>
             </ul>
-            <div class="p-3 mt-3 rounded bg-secondary">
+            <div class="p-3 mt-3 rounded content-holder">
                 {#if data.page==='communities'}
                 <AdminOfList {isLoggedInUser} />
                 <MemberList />
@@ -101,7 +101,10 @@
     </div>
 {/if}
 <style>
-    .row{
+    .row, .content-holder{
         min-height: 100vh;
+    }
+    .content-holder{
+        background: linear-gradient(180deg, rgba(var(--bs-secondary-rgb),.3), transparent, transparent);
     }
 </style>

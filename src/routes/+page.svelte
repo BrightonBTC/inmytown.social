@@ -48,7 +48,7 @@
         <a href="/discover" class="btn btn-primary mb-4 d-block">Find out what's happening in your area now!</a>
     </div>
     <div class="col-lg-5">
-        <div class="card bg-black mb-4">
+        <div class="card bg-dark mb-4">
             <div class="card-header"><h5>Latest communities</h5></div>
             <div class="card-body">
                 {#each Object.values($sortedCommunities) as communityDetails}

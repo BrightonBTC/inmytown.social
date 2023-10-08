@@ -62,10 +62,12 @@
     padding-top:70px;
 }
 :global([data-bs-theme="dark"]) {
-    --bs-secondary-rgb: 47,54,61;
+    --bs-secondary-rgb: 47,54,69;
     --bs-body-font-family: sans-serif;
     --bs-tertiary-rgb: 58,69,75;
     --bs-body-bg: #0d161e;
+    --bs-dark: #060c10;
+    --bs-dark-rgb: 6, 12, 16;
 }
 :global([data-bs-theme="dark"] .shadow-sm, .btn) {
     box-shadow: 0 .125rem .25rem rgba(0,0,0, 0.5) !important;
@@ -89,7 +91,7 @@
     // -webkit-text-fill-color: transparent;
 }
 :global([data-bs-theme="dark"] .page-home .nav-home, .page-discover .nav-discover, .page-about .nav-about){
-    background: rgb(var(--bs-dark-rgb));
+    background: rgb(var(--bs-secondary-rgb));
     border-radius: 7px;
     font-weight: bold;
 }

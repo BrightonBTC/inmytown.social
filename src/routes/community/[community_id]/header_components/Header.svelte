@@ -11,14 +11,14 @@
 
 <div class="card mb-3 p-1 shadow-sm">
     <div class="row g-0">
-        <div class="col-lg-8">
+        <div class="col-lg-7">
             <img
             src={imgUrlOrDefault($community.meta.image, 'community')}
             alt={$community.meta.title}
             class="img-fluid rounded header-image"
             />
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-5">
             
             <div class="card-body">
                 <h1 class="card-title"><b>{$community.meta.title}</b></h1>
