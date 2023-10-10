@@ -8,7 +8,7 @@
 
 </script>
 {#if ends < now}
-    <div class="alert alert-warning">
+    <div class="alert alert-warning bg-dark">
         <strong>Ended! </strong>This event ended on {dateStringFull(ends)}
     </div>
 {:else if starts < (Date.now()/1000) }

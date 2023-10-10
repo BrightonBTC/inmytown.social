@@ -17,7 +17,7 @@
 
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow p-0">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow p-2">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="/">
 			<Logo height={40} />
@@ -36,18 +36,18 @@
 		<div class="collapse navbar-collapse  justify-content-between" id="navbarSupportedContent">
 			<ul class="navbar-nav page-{currentPage}">
 				<li class="nav-item">
-					<a class="nav-link nav-home text-white px-2" href="/"
+					<a class="nav-link nav-home text-white px-2 mx-1" href="/"
 						><i class="bi bi-house text-success"></i> Home</a
 					>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link nav-discover text-white px-2" href="/discover"
+					<a class="nav-link nav-discover text-white px-2 mx-1" href="/discover"
 						><i class="bi bi-eye text-success"></i> Discover</a
 					>
 				</li>
 				<li class="nav-item">
 					<a
-						class="nav-link nav-about text-white px-2"
+						class="nav-link nav-about text-white px-2 mx-1"
 						href="/about"
 						><i class="bi bi-info-circle text-success"  /> About</a
 					>
@@ -55,7 +55,7 @@
 			</ul>
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<a href="#top" class="nav-link bg-secondary rounded px-2" data-bs-toggle="modal" data-bs-target="#relayModal">
+					<a href="#top" class="nav-link rounded px-2" data-bs-toggle="modal" data-bs-target="#relayModal">
 						<i class="bi bi-arrow-down-up text-light"  />
 					</a>
 				</li>
@@ -191,7 +191,7 @@
 		object-fit: cover;
 	}
 	.navbar{
-		background-color: #323d48;
+		border-bottom: 2px solid #323d48 !important;
 	}
 	.navbar:hover{
 		opacity: 1;

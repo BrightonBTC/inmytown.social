@@ -3,10 +3,10 @@ export function imgUrlOrDefault(img: string | undefined, type?: string, domain?:
         
         switch(type){
             case 'community':
-                img = '/img/default-community.png'
+                img = '/img/default-community.jpg'
             break;
             case 'event':
-                img = '/img/default-event.png'
+                img = '/img/default-event.jpg'
             break;
             case 'user':
                 img = '/img/default-user.png'

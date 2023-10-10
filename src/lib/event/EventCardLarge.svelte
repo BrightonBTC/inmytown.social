@@ -46,7 +46,7 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 </p>
             </div>
         </div>
-        <div class="col-lg-6 bg-secondary rounded d-flex align-items-center">
+        <div class="col-lg-6 bg-dark rounded d-flex align-items-center">
             <a href="{MeetupEvent.url(eventData)}">
                 <img
                     src={imgUrlOrDefault(eventData.image, 'event')}

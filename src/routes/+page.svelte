@@ -40,7 +40,7 @@
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4 shadow-sm">
-            <div class="card-header bg-dark"><h1>Welcome</h1><strong>to InMyTown.social</strong></div>
+            <div class="card-header bg-dark text-center"><h1 class="mb-1">Welcome</h1><strong>to InMyTown.social</strong></div>
             <div class="card-body">
                 Find communities and meetup events in your local area using the <a href="https://nostr.how/en/what-is-nostr" target="_blank">NOSTR network</a>.
             </div>

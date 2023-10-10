@@ -44,7 +44,7 @@
         overide = true
     }
 </script>
-<div class="mt-2 text-center bg-secondary rounded border p-2">
+<div class="mt-3 text-center bg-secondary rounded border p-2">
     {#if !hasRsvp || overide}
         <button type="button" class="btn btn-success" on:click={() => rsvp("accepted")}
             >I'm going!</button

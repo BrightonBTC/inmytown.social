@@ -32,7 +32,7 @@
         <div class="col-lg-12 col-sm-6 position-relative">
             <FollowButton {user} />
             <a href="/user/{user.npub}">
-                <img class="card-img-top rounded-circle p-4" src={imgUrlOrDefault(user.profile.image)} alt="{user.profile.name} photo" />
+                <img class="card-img-top rounded-circle p-2" src={imgUrlOrDefault(user.profile.image)} alt="{user.profile.name} photo" />
             </a>
         </div>
         <div class="col-lg-12 col-sm-6">

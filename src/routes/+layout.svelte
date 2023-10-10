@@ -39,7 +39,8 @@
 </script> 
 
 <Menu />
-<div class="container mt-1 main">
+<div class="main-bg-gradient"></div>
+<div class="container mt-1 main position-relative">
     {#if showNotice}
     <div class="alert alert-info d-flex">
         <span>Please note that this app is still in early development stages. It should be mostly working
@@ -59,16 +60,30 @@
 <style lang="scss">
 .main{
     min-height: 100vh;
-    padding-top:70px;
+    padding-top:90px;
+    z-index: 20;
 }
+
 :global([data-bs-theme="dark"]) {
-    --bs-secondary-rgb: 47,54,69;
+    --bs-secondary-rgb: 20,35,60;
     --bs-body-font-family: sans-serif;
     --bs-tertiary-rgb: 58,69,75;
     --bs-body-bg: #0d161e;
     --bs-dark: #060c10;
     --bs-dark-rgb: 6, 12, 16;
+    --bs-border-color-translucent: rgba(41, 72, 104, 0.5);
+    --bs-border-color: #294868;
+    .main-bg-gradient{
+        position: fixed;
+        background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), .15), transparent);
+        height: 400px;
+        width: 100vw;
+        z-index: 10;
+    }
 }
+// :global([data-bs-theme="dark"] .border) {
+//     border: var(--bs-border-width) var(--bs-border-style) rgba(var(--bs-primary-rgb),0.2)!important;
+// }
 :global([data-bs-theme="dark"] .shadow-sm, .btn) {
     box-shadow: 0 .125rem .25rem rgba(0,0,0, 0.5) !important;
 }
@@ -95,7 +110,10 @@
     border-radius: 7px;
     font-weight: bold;
 }
-:global([data-bs-theme="dark"] .bg-gradient) {
-    background: linear-gradient(45deg, var(--bs-black), var(--bs-dark), var(--bs-dark), rgb(var(--bs-tertiary-rgb)), var(--bs-dark), rgb(var(--bs-tertiary-rgb))) !important;
+:global([data-bs-theme="dark"] .navbar .nav-link:not(.u-icon *):hover){
+    filter: brightness(1.2);
+    backdrop-filter: brightness(2);
+    border-radius: 7px;
 }
+
 </style>
