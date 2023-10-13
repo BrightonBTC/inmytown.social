@@ -17,7 +17,10 @@
         if($community.meta.error) return;
 		if(isNew){
 			let created = await $community.create();
-			if(created) await $community.createChat();
+			if(created){
+                await $community.createChat()
+                await $community.createApprovedMemberList()
+            } 
 		}
 		await $community.publishMeta();
 		//if (!$community.meta.error) 

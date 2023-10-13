@@ -6,6 +6,7 @@
     import {
         addAttendee,
         attendeeStore,
+        community,
         meetupStore,
     } from "./stores";
     
@@ -14,7 +15,6 @@
     import Attendees from "./Attendees.svelte";
     import Header from "./Header.svelte";
     import Details from "./Details.svelte";
-    import MainContent from "./MainContent.svelte";
     import CommunityWidget from "./CommunityWidget.svelte";
     import Rsvp from "./Rsvp.svelte";
 
@@ -24,12 +24,14 @@
     import MetaTags from "$lib/MetaTags.svelte";
     import { Community } from "$lib/community/community";
     import { page } from "$app/stores";
-    import { dateStringFull } from "$lib/formatDates";
     import EventEndedAlert from "$lib/event/EventEndedAlert.svelte";
+    import Content from "./Content.svelte";
+    import MainContent from "$lib/MainContent.svelte";
 
     export let data;
 
     let loadingState:loadingState = 'loading'
+    let fetchedMembers = false
 
     let hasRsvp: string;
 
@@ -37,22 +39,27 @@
 
     attendeeStore.set([]);
     meetupStore.set(new MeetupEvent($ndk))
+    community.set(new Community($ndk))
 
     onMount(async () => {
         if(data.event){
             $meetupStore.meta = data.event;
             loadingState = 'success'
         }
-        let community = new Community($ndk)
-        let success = await community.fetchMeta($page.params.community_id)
+        let success = await $community.fetchMeta($page.params.community_id)
+
         if(success){
-            let success = await $meetupStore.fetch(
+            $community.meta = success
+            await $community.fetchMembers()
+            $community = $community
+            fetchedMembers = true
+            console.log('1',$community.meta)
+            let success2 = await $meetupStore.fetch(
                 $page.params.event_id, 
-                community.meta.eid, 
-                community.meta.authorhex
+                $community.meta.eid, 
+                $community.meta.authorhex
             )
-            $meetupStore.meta.community = community.meta
-            if(success) loadingState = 'success'
+            if(success2) loadingState = 'success'
         } 
         if(!data && !success) loadingState = 'failed'
         subscribeRsvp();
@@ -83,7 +90,7 @@
     type="event"
 />
 {/if}
-
+<MainContent>
 {#if loadingState === 'success'}
 
     {#if $loggedInUser && $loggedInUser.npub === $meetupStore.meta.author}
@@ -99,14 +106,16 @@
                 <div class="m-3">
                     <CommunityWidget />
                     <Details />
+                    {#if fetchedMembers}
                     <Attendees />
+                    {/if}
                 </div>
             </div>
         </div>
         <div class="col-md-8">
             <Header />
             <Rsvp {hasRsvp} />
-            <MainContent />
+            <Content />
         </div>
     </div>
 {:else if loadingState === 'loading'}
@@ -116,4 +125,4 @@
         Failed to locate meetup event
     </div>
 {/if}
-
+</MainContent>

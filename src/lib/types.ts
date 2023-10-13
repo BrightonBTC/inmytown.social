@@ -9,3 +9,6 @@ type City = {
 }
 
 type loadingState = 'success' | 'loading' | 'failed'
+
+type userAccessLevel = 'pending' | 'accepted' | 'rejected'
+type userAccessActions = 'accept' | 'block' | 'unblock' | 'clear'

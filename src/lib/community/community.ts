@@ -1,3 +1,4 @@
+import { MeetupUser } from "$lib/user/user"
 import { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
@@ -37,9 +38,17 @@ export const CommunityMetaDefaults: Pick<CommunityMeta, 'uid' | 'eid' | 'title' 
     created: 0
 };
 
+interface UserList{
+    members?: string[]
+    followers?: string[]
+    blocked?: string[]
+    stale?: string[]
+}
+
 export class Community {
     public ndk: NDK;
     public meta: CommunityMeta;
+    public users:UserList = {}
     private membersSubscription?: NDKSubscription;
 
     public constructor(ndk: NDK, meta?: CommunityMeta){
@@ -57,7 +66,9 @@ export class Community {
         else if (!id){
             id = this.meta.eid
         } 
-        let evt = await this.ndk.fetchEvents({ '#e': [id], kinds: [30037] }, { closeOnEose: true });
+        let community = await this.ndk.fetchEvent(id)
+        if(!community) return null
+        let evt = await this.ndk.fetchEvents({ '#e': [id], kinds: [30037], authors: [community.author.hexpubkey()] });
         if (evt.size > 0 && [...evt][0].created_at as number > this.meta.updated) {
             this.meta = Community.parseNostrEvent([...evt][0])
             return this.meta
@@ -72,6 +83,7 @@ export class Community {
             await ndkEvent.publish();
             this.meta.eid = ndkEvent.id;
             this.meta.uid = ndkEvent.id;
+            this.meta.authorhex = ndkEvent.author.hexpubkey()
             return ndkEvent.created_at;
         }
         catch(error){
@@ -96,8 +108,21 @@ export class Community {
         }
     }
 
+    public async createApprovedMemberList(): Promise<void>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 30000;
+            ndkEvent.tags.push(["d", this.meta.uid])
+            ndkEvent.tags.push(["p", this.meta.authorhex])
+            await ndkEvent.publish();
+        }
+        catch(error){
+            console.log('An error occurred creating the chat: '+error)
+        }
+    }
+
     public newUID(){
-        this.meta.uid = parseInt((Date.now() / 1000).toString()).toString()
+        this.meta.uid = 'meetup:'+parseInt((Date.now() / 1000).toString()).toString()
     } 
 
     public async publishMeta(): Promise<void>{
@@ -202,21 +227,148 @@ export class Community {
         return '/community/'+community.eid
     }
 
-    public async fetchMembers(cb: (user: NDKUser) => void): Promise<void>{
-        if(this.membersSubscription) return;
-        try {
-            this.membersSubscription = this.ndk.subscribe(
-                {
-                    kinds: [10037],
-                    "#e": [this.meta.eid],
-                },
-                {closeOnEose: false, groupable: false}
-            );
-            this.membersSubscription.on("event", (event: NDKEvent) => {
-                cb(event.author)
+    public async fetchMembers(): Promise<void>{
+        if (this.meta.uid.length < 1){
+            return 
+        } 
+        await this.fetchBlockedUsers()
+        await this.fetchFollowers()
+        await this.fetchApprovedMembers()
+    }
+
+    public async fetchFollowers(): Promise<void>{
+        try{
+            let response = await this.ndk.fetchEvents({
+                kinds: [10037],
+                "#e": [this.meta.eid]
+            })
+            this.users.followers = []
+            response.forEach((evt) => {
+                if(!this.users.followers?.includes(evt.author.npub) && !this.users.blocked?.includes(evt.author.npub)){
+                    this.users.followers?.push(evt.author.npub)
+                }
+            })
+        }
+        catch(error){
+            console.log('An error fetching follower list: '+error)
+        }
+    }
+
+    public async fetchApprovedMembers(): Promise<void>{
+        let response = await this.ndk.fetchEvents({
+            kinds:[30000],
+            "#d": [this.meta.uid],
+            authors: [this.meta.authorhex]
+        })
+        this.users.members = []
+        this.users.stale = []
+        if(response.size > 0){
+            let mostRecent = [...response].reduce(function(max, obj) {
+                if(obj.created_at && max.created_at){
+                    return obj.created_at > max.created_at? obj : max;
+                }
+                else return [...response][0]
             });
-        } catch (err) {
-            console.log("An ERROR occured", err);
+            let userkeys = mostRecent.tags.filter(k => k[0] === 'p')
+            userkeys.forEach((k) => {
+                let u = new NDKUser({hexpubkey: k[1]})
+                if(this.users.followers?.includes(u.npub)){
+                    this.users.members?.push(u.npub)
+                }
+                else{
+                    this.users.stale?.push(u.npub)
+                }
+            })
+        }
+        let m = new Set(this.users.members)
+        this.users.followers = this.users.followers?.filter( x => !m.has(x) );
+    }
+
+    public async fetchBlockedUsers(): Promise<void>{
+        let response = await this.ndk.fetchEvents({
+            kinds:[30000],
+            "#d": [this.meta.uid+':blocked'],
+            authors: [this.meta.authorhex]
+        })
+        this.users.blocked = []
+        if(response.size > 0){
+            let mostRecent = [...response].reduce(function(max, obj) {
+                if(obj.created_at && max.created_at){
+                    return obj.created_at > max.created_at? obj : max;
+                }
+                else return [...response][0]
+            });
+            let userkeys = mostRecent.tags.filter(k => k[0] === 'p')
+            userkeys.forEach((k) => {
+                let u = new NDKUser({hexpubkey: k[1]})
+                this.users.blocked?.push(u.npub)
+            })
+        }
+    }
+
+    public removeMember(npub:string){
+        if(this.users.members?.includes(npub)){
+            this.users.members = this.users.members?.filter(u => u !== npub)
+            this.updateApprovedMemberList()
+        }
+    }
+
+    public approveMember(npub:string){
+        if(!this.users.members?.includes(npub)){
+            this.users.members?.push(npub)
+            this.updateApprovedMemberList()
+        }
+        this.users.followers = this.users.followers?.filter(u => u !== npub)
+        this.users.blocked = this.users.blocked?.filter(u => u !== npub)
+    }
+
+    public blockUser(npub:string){
+        this.users.members = this.users.members?.filter(u => u !== npub)
+        this.updateApprovedMemberList()
+        if(!this.users.blocked?.includes(npub)){
+            this.users.blocked?.push(npub)
+            this.updateBlockedMemberList()
+        }
+        this.users.followers = this.users.followers?.filter(u => u !== npub)
+        this.users.blocked = this.users.members?.filter(u => u !== npub)
+    }
+
+    public unblockUser(npub:string){
+        if(this.users.blocked?.includes(npub)){
+            this.users.blocked = this.users.blocked?.filter(u => u !== npub)
+            this.updateBlockedMemberList()
+        }
+    }
+
+    public async updateApprovedMemberList(): Promise<void>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 30000;
+            ndkEvent.tags.push(["d", this.meta.uid])
+            this.users.members?.forEach(function(npub){
+                let u = new NDKUser({npub:npub})
+                ndkEvent.tags.push(["p", u.hexpubkey()])
+            })
+            await ndkEvent.publish();
+        }
+        catch(error){
+            console.log('An error occurred updating list: '+error)
+        }
+    }
+
+    public async updateBlockedMemberList(): Promise<void>{
+        try{
+            const ndkEvent = new NDKEvent(this.ndk);
+            ndkEvent.kind = 30000;
+            ndkEvent.tags.push(["d", this.meta.uid+':blocked'])
+            this.users.blocked?.forEach(function(npub){
+                let u = new NDKUser({npub:npub})
+                ndkEvent.tags.push(["p", u.hexpubkey()])
+            })
+            await ndkEvent.publish();
+        }
+        catch(error){
+            console.log('An error occurred updating list: '+error)
         }
     }
 

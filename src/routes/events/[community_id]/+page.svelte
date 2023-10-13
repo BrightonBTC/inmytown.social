@@ -13,6 +13,7 @@
     import ndk from "$lib/stores/ndk";
     import { addEvent } from "./stores";
     import { loggedInUser } from "$lib/stores/user";
+    import MainContent from "$lib/MainContent.svelte";
 
     let communitySubs = new CommunitySubscriptions($ndk)
     let eventSubs = new EventSubscriptions($ndk)
@@ -50,7 +51,7 @@
     }
 
 </script>
-
+<MainContent>
 {#if authorised === true}
     {#if communityDetails}
         <div class="row">
@@ -88,3 +89,4 @@
 {:else}
     <Loading />
 {/if}
+</MainContent>

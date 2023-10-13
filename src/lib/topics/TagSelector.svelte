@@ -51,7 +51,7 @@
                 <h4 class="modal-title text-muted">Add up to 10 tags</h4>
                 <button
                     type="button"
-                    class="btn-close"
+                    class="btn-close text-dark"
                     data-bs-dismiss="modal"
                 />
             </div>

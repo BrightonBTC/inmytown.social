@@ -54,7 +54,7 @@
                     <small>{$community.meta.tags.length} of 10 tags added</small>
                 </form>
                 {#each $community.meta.tags as t}
-                <span class="badge rounded-pill bg-info m-1">#{t} <a href='#top' on:click|preventDefault={() => deleteTag(t)}><i class="bi bi-x-circle"></i></a></span>
+                <span class="badge rounded-pill bg-info m-1">#{t} <a href='#top' on:click|preventDefault={() => deleteTag(t)}><i class="bi bi-x-circle text-dark"></i></a></span>
                 {/each}
             </div>
 

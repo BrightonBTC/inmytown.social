@@ -4,16 +4,19 @@
     import MemberList from "./details_components/MemberList.svelte";
     import { onDestroy, onMount } from "svelte";
     import {
-        addMember,
-        communityMembers,
+        // addMember,
+        // communityMembers,
         community,
-        host
+        host,
+
+        membersFetched
+
     } from "./stores/store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { Community, CommunitySubscriptions, type CommunityMeta } from "$lib/community/community";
+    import { Community } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
     import ndk from "$lib/stores/ndk";
@@ -21,6 +24,7 @@
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
     import { page } from "$app/stores";
+    import MainContent from "$lib/MainContent.svelte";
 
     let loadingState:loadingState = 'loading'
 
@@ -28,13 +32,12 @@
 
     $: community_id = $page.params.community_id;
 
-    let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
 
     community.set(new Community($ndk))
 
     host.set(undefined);
-    communityMembers.set([]);
+    // communityMembers.set([]);
     communityEvents.set([]);
 
     onMount(async () => {
@@ -54,9 +57,10 @@
                 let h = await fetchUser($ndk, $community.meta.author);
                 host.set(h)
             }
-            $community.fetchMembers((user) => {
-                addMember(user.npub)
-            })
+            await $community.fetchMembers()
+            membersFetched.set(true)
+            console.log($community.users)
+            $community = $community
         }
         else loadingState = 'failed'
     });
@@ -68,7 +72,6 @@
     }
 
     onDestroy(() => {
-        communitySubs.closeSubscriptions()
         eventSubs.closeSubscriptions()
         $community.destroy()
     })
@@ -83,7 +86,7 @@
     type="community"
 />
 {/if}
-
+<MainContent>
 {#if loadingState === 'success'}
     {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
@@ -109,3 +112,4 @@
         Failed to locate community
     </div>
 {/if}
+</MainContent>

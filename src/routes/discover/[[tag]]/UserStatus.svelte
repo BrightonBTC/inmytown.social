@@ -20,14 +20,3 @@
 <div class="mt-3">
     <Tags tags={d.interests} linked={true} />
 </div>
-<style>
-    i{
-        font-size: .8rem;
-    }
-    i::before{
-        transform: translateY(-.3rem);
-    }
-    i.rot180::before{
-        transform: rotate(180deg) translateY(.3rem);
-    }
-</style>

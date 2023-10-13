@@ -3,13 +3,13 @@
     import { loggedInUser } from "$lib/stores/user";
     import { publishUserStatus } from "$lib/user/user";
     import { onMount } from "svelte";
-    import { addMember, community, communityMembers, removeMember } from "../stores/store.community";
+    import { community } from "../stores/store.community";
     import LoadingMini from "$lib/LoadingMini.svelte";
 
     let isFollower: boolean
     let fetched: boolean = false
 
-    $: setIsFollower(), $communityMembers;
+    $: setIsFollower(), $community.users.members;
 
     onMount(async () => {
         await $loggedInUser?.fetchStatus();
@@ -25,13 +25,17 @@
         if(!$loggedInUser?.status) return
         $loggedInUser?.status?.communities.push($community.meta.eid);
         publishUserStatus($ndk, $loggedInUser?.status)
-        addMember($loggedInUser?.npub)
+        //addMember($loggedInUser?.npub)
+        $community.users.members = $community.users.members.filter(x => x !== $loggedInUser?.npub)
+        $community = $community
     }
     async function leaveNow(){
         if(!$loggedInUser?.status) return
         $loggedInUser?.status?.communities.splice($loggedInUser?.status?.communities?.findIndex(e => e[1] === $community.meta.eid),1);
-        publishUserStatus($ndk, $loggedInUser?.status)
-        removeMember($loggedInUser?.npub)
+        publishUserStatus($ndk, $loggedInUser.status)
+        //removeMember($loggedInUser?.npub)
+        $community.users.members.push($loggedInUser?.npub)
+        $community = $community
     }
 </script>
 <div class="text-center mt-3">

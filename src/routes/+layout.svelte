@@ -5,9 +5,6 @@
     import { onMount } from "svelte";
     import { onDestroy } from "svelte";
     import ndk from "$lib/stores/ndk";
-    import { navigating } from "$app/stores";
-    import Loading from "$lib/Loading.svelte";
-    import { noticeDismissed } from "$lib/stores/persistent";
 
     let inactiveFor = 0;
 
@@ -29,40 +26,13 @@
         clearInterval(interval)
     })
 
-    let showNotice:boolean = false
-    function setShowNotice(){
-        if($noticeDismissed.length < 1 || parseInt($noticeDismissed)+86400000 < Date.now()) showNotice = true
-        else showNotice = false
-    }
-
-    $: $noticeDismissed, $navigating, setShowNotice()
 </script> 
 
 <Menu />
-<div class="main-bg-gradient"></div>
-<div class="container mt-1 main position-relative">
-    {#if showNotice}
-    <div class="alert alert-info d-flex">
-        <span>Please note that this app is still in early development stages. It should be mostly working
-            but things may break at times. Please report any bugs <a href ="https://github.com/BrightonBTC/inmytown.social" target="_blank">here</a>.
-        </span>  
-        <button type="button" class="btn-close float-end" on:click={() => $noticeDismissed = Date.now().toString()}></button>
-    </div>
-    {/if}
-    {#if $navigating}
-        <Loading t="Scanning the Nostrverse..." />
-    {:else}
-        <slot />
-    {/if}
-</div>
+<slot />
 
 <Footer />
 <style lang="scss">
-.main{
-    min-height: 100vh;
-    padding-top:90px;
-    z-index: 20;
-}
 
 :global([data-bs-theme="dark"]) {
     --bs-secondary-rgb: 20,35,60;
@@ -73,17 +43,14 @@
     --bs-dark-rgb: 6, 12, 16;
     --bs-border-color-translucent: rgba(41, 72, 104, 0.5);
     --bs-border-color: #294868;
-    .main-bg-gradient{
-        position: fixed;
-        background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), .15), transparent);
-        height: 400px;
-        width: 100vw;
-        z-index: 10;
-    }
 }
-// :global([data-bs-theme="dark"] .border) {
-//     border: var(--bs-border-width) var(--bs-border-style) rgba(var(--bs-primary-rgb),0.2)!important;
-// }
+:global([data-bs-theme="dark"] body) {
+    background-image: linear-gradient(180deg, rgba(var(--bs-primary-rgb), .15), transparent);
+    background-size: 30% 70%;
+    background-repeat: repeat-x;
+    background-attachment: fixed;
+}
+ 
 :global([data-bs-theme="dark"] .shadow-sm, .btn) {
     box-shadow: 0 .125rem .25rem rgba(0,0,0, 0.5) !important;
 }
@@ -101,9 +68,6 @@
     line-height: 1.2;
     color: var(--bs-heading-color);
     font-family: 'Ubuntu', sans-serif;
-    // background: linear-gradient(45deg, var(--bs-indigo), var(--bs-purple), var(--bs-indigo), var(--bs-indigo));
-    // -webkit-background-clip: text;
-    // -webkit-text-fill-color: transparent;
 }
 :global([data-bs-theme="dark"] .page-home .nav-home, .page-discover .nav-discover, .page-about .nav-about){
     background: rgb(var(--bs-secondary-rgb));

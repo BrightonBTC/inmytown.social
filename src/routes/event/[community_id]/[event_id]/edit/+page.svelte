@@ -13,6 +13,7 @@
     import { Community, CommunitySubscriptions } from "$lib/community/community";
     import { loggedInUser } from "$lib/stores/user";
     import DuplicateEvent from "./DuplicateEvent.svelte";
+    import MainContent from "$lib/MainContent.svelte";
 
     let eid = data.event_id
     let authorised: boolean;
@@ -62,7 +63,7 @@
     }
 
 </script>
-
+<MainContent>
 {#if authorised === true}
     <div class="row">
         <div class="col-sm-4 border-end border-top bg-secondary rounded">
@@ -86,4 +87,4 @@
 {:else}
     <Loading t={loadingMessage} />
 {/if}
-    
+</MainContent>

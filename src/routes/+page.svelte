@@ -7,6 +7,7 @@
     import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
     import MetaTags from '$lib/MetaTags.svelte';
+    import MainContent from '$lib/MainContent.svelte';
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
@@ -37,6 +38,7 @@
     image=""
     type="community"
 />
+<MainContent>
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4 shadow-sm">
@@ -68,4 +70,4 @@
         </div>
     </div>
 </div>
-
+</MainContent>

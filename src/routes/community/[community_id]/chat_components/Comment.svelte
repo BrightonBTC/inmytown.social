@@ -84,5 +84,11 @@
 
     .bubble-wrap {
         padding-left: 10px;
+        animation: fadeIn .8s;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
     }
 </style>

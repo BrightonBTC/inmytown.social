@@ -16,6 +16,7 @@
     import { CommunitySubscriptions } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { UserSubscriptions } from "$lib/user/user";
+    import MainContent from "$lib/MainContent.svelte";
 
     let communitySubs = new CommunitySubscriptions($ndk);
     let eventSubs = new EventSubscriptions($ndk);
@@ -86,6 +87,7 @@
         if(typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 </script>
+<MainContent>
 {#if $searchCity && $searchCountry}  
     <div class="row">
         <div class="col-lg-3 pt-2 pb-4">
@@ -117,3 +119,4 @@
 <p>Please set a location to get started:</p>
 <LocationSearch />
 {/if}
+</MainContent>

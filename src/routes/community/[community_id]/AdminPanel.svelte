@@ -9,4 +9,7 @@
     <a href="/community/edit/{community_id}" class="btn btn-success btn-sm m-1"
         >Edit community</a
     >
+    <a href="/community/members/{community_id}" class="btn btn-success btn-sm m-1"
+        >Manage Members</a
+    >
 </AdminPanel>

@@ -1,7 +1,6 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { sortedPast, sortedUpcoming } from "./stores/store.events";
-    import EventCard from "$lib/event/EventCard.svelte";
     import EventCardLarge from "$lib/event/EventCardLarge.svelte";
 </script>
 

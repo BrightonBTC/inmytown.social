@@ -10,6 +10,7 @@
     import { loggedInUser } from "$lib/stores/user";
     import MetaTags from "$lib/MetaTags.svelte";
     import UserCard from "$lib/user/UserCard.svelte";
+    import MainContent from "$lib/MainContent.svelte";
 
     export let data
 
@@ -64,6 +65,7 @@
     image={data.profile?.image}
     type="user-banner"
 />
+<MainContent>
 {#if loadingState === 'success'}
     <div class="row">
         <div class="col-lg-4 mb-3 rounded">
@@ -100,6 +102,7 @@
         Failed to locate profile for this user
     </div>
 {/if}
+</MainContent>
 <style>
     .row, .content-holder{
         min-height: 100vh;
