@@ -1,14 +1,16 @@
 <script lang="ts"> 
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import { onDestroy, onMount } from 'svelte';
     import { addCommunity, addEvent, sortedCommunities, sortedEvents } from './stores';
     import { CommunitySubscriptions } from '$lib/community/community';
     import CommunityCardLarge from '$lib/community/CommunityCardLarge.svelte';
     import { EventSubscriptions } from '$lib/event/event';
     import EventCardSmall from '$lib/event/EventCardSmall.svelte';
+    import MetaTags from '$lib/MetaTags.svelte';
+    import MainContent from '$lib/MainContent.svelte';
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
+    let eventSubs = new EventSubscriptions($ndk);
 
     onMount(() => {
         communitySubs.subscribe({limit:50}, async (data) => {
@@ -29,10 +31,18 @@
     })
 
 </script>
+<MetaTags 
+    title="Find meetup events and communities in your local area"
+    description="In My Town is a NOSTR based hub for local communities and events"
+    url=""
+    image=""
+    type="community"
+/>
+<MainContent>
 <div class="row">
     <div class="col-lg-3">
         <div class="card bg-secondary mb-4 shadow-sm">
-            <div class="card-header bg-dark"><h1>Welcome</h1><strong>to InMyTown.social</strong></div>
+            <div class="card-header bg-dark text-center"><h1 class="mb-1">Welcome</h1><strong>to InMyTown.social</strong></div>
             <div class="card-body">
                 Find communities and meetup events in your local area using the <a href="https://nostr.how/en/what-is-nostr" target="_blank">NOSTR network</a>.
             </div>
@@ -40,7 +50,7 @@
         <a href="/discover" class="btn btn-primary mb-4 d-block">Find out what's happening in your area now!</a>
     </div>
     <div class="col-lg-5">
-        <div class="card bg-black mb-4">
+        <div class="card bg-dark mb-4">
             <div class="card-header"><h5>Latest communities</h5></div>
             <div class="card-body">
                 {#each Object.values($sortedCommunities) as communityDetails}
@@ -60,4 +70,4 @@
         </div>
     </div>
 </div>
-
+</MainContent>

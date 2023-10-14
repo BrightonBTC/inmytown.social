@@ -24,7 +24,7 @@
 	"type": "module",
 	"dependencies": {
 		"@macfja/svelte-persistent-store": "^2.3.2",
-		"@nostr-dev-kit/ndk": "^0.7.7",
+		"@nostr-dev-kit/ndk": "^0.8.11",
 		"@popperjs/core": "^2.11.8",
 		"@types/node": "^20.5.0",
 		"@types/url-parse": "^1.4.8",

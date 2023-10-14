@@ -10,7 +10,7 @@ export function dateStringFull(ts: number){
 
 export function dateStatusString(starts: number, ends: number){
     let now = Date.now() / 1000;
-    if(ends < (now)) return '<span class="badge bg-warning">ended</span>';
+    if(ends < (now)) return '<span class="badge bg-warning text-dark">ended</span>';
     else if (ends > (now) && starts < (now)) return '<span class="badge bg-success">happening now</span>';
     else return ''
 }

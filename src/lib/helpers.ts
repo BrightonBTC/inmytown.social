@@ -1,17 +1,24 @@
-export function imgUrlOrDefault(img: string | undefined, type?: string) {
+export function imgUrlOrDefault(img: string | undefined, type?: string, domain?: string) {
 	if (!img || img.length < 1){
         
         switch(type){
             case 'community':
-                img = '/img/default-community.png'
+                img = '/img/default-community.jpg'
             break;
             case 'event':
-                img = '/img/default-event.png'
+                img = '/img/default-event.jpg'
+            break;
+            case 'user':
+                img = '/img/default-user.png'
+            break;
+            case 'user-banner':
+                img = '/img/default-user-banner.jpg'
             break;
             default:
                 img = '/img/default.jpeg';
             break;
         }
+        if(domain) img = domain+img
     }
 	return img;
 }

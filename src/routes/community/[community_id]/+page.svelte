@@ -1,69 +1,97 @@
 <script lang="ts">
-    import type { CommunityID } from "./+page";
-    export let data: CommunityID;
-    import Header from "./Header.svelte";
-    import Map from "./Map.svelte";
-    import MemberList from "./MemberList.svelte";
-    import type { NDKUser } from "@nostr-dev-kit/ndk";
+    import Header from "./header_components/Header.svelte";
+    import Map from "./details_components/Map.svelte";
+    import MemberList from "./details_components/MemberList.svelte";
     import { onDestroy, onMount } from "svelte";
     import {
-        addMember,
-        communityMembers,
+        // addMember,
+        // communityMembers,
         community,
-    } from "./store.community";
+        host,
+
+        membersFetched
+
+    } from "./stores/store.community";
     import Loading from "$lib/Loading.svelte";
     import Tabs from "./Tabs.svelte";
-    import { userNpub } from "$lib/stores";
     import AdminPanel from "./AdminPanel.svelte";
     import Tags from "$lib/topics/Tags.svelte";
-    import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { Community } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { fetchUser } from "$lib/user/user";
-    import ndk from "$lib/ndk";
-    import { addEventMeta, communityEvents } from "./store.events";
+    import ndk from "$lib/stores/ndk";
+    import { addEventMeta, communityEvents } from "./stores/store.events";
+    import { loggedInUser } from "$lib/stores/user";
+    import MetaTags from "$lib/MetaTags.svelte";
+    import { page } from "$app/stores";
+    import MainContent from "$lib/MainContent.svelte";
 
-    $: community_id = data.community_id;
+    let loadingState:loadingState = 'loading'
 
-    let host: NDKUser | undefined;
+    export let data
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
+    $: community_id = $page.params.community_id;
 
-    community.set(new Community(ndk))
-    communityMembers.set([]);
+    let eventSubs = new EventSubscriptions($ndk);
+
+    community.set(new Community($ndk))
+
+    host.set(undefined);
+    // communityMembers.set([]);
     communityEvents.set([]);
 
     onMount(async () => {
+        // set community if we succesfully retrieved server side
+        if(data.community){
+            $community.meta = data.community
+            loadingState = 'success'
+        }
+        // fetch community again client side
+        let result = await $community.fetchMeta(community_id)
+        if(result) loadingState = 'success'
         
-        communitySubs.subscribeByID(community_id, async (data) => {
-            $community.meta = data
-            fetchEvents(data.authorhex)
-            if(!host) host = await fetchUser(ndk, data.author);
-            $community.fetchMembers((user) => {
-                addMember(user.npub)
-            })
-        });
-
+        // continue if we've successfully retrieved a community, either server or client side
+        if(data.community || result){
+            fetchEvents($community.meta.authorhex)
+            if(!$host){
+                let h = await fetchUser($ndk, $community.meta.author);
+                host.set(h)
+            }
+            await $community.fetchMembers()
+            membersFetched.set(true)
+            console.log($community.users)
+            $community = $community
+        }
+        else loadingState = 'failed'
     });
 
-    async function fetchEvents(author: string) {
+    function fetchEvents(author: string) {
         eventSubs.subscribe({"#e": [community_id], authors:[author]}, async (data) => {
             addEventMeta(data)
         });
     }
 
     onDestroy(() => {
-        communitySubs.closeSubscriptions()
         eventSubs.closeSubscriptions()
         $community.destroy()
     })
 </script>
 
-{#if $community.meta.eid.length > 0}
-    <Header {host} />
-    {#if $userNpub && host && $userNpub === host.npub}
+{#if data.community}
+<MetaTags 
+    title="{data.community.title} | Community @ InMyTown"
+    description="{data.community.title}, a Nostr Meetup Community in {data.community.city} {data.community.country} with a focus on {data.community.tags.join(', ')}"
+    url="{Community.url(data.community)}"
+    image={data.community.image}
+    type="community"
+/>
+{/if}
+<MainContent>
+{#if loadingState === 'success'}
+    {#if $loggedInUser && $host && $loggedInUser.npub === $host.npub}
         <AdminPanel {community_id} />
     {/if}
+    <Header />
     <div class="row me-1">
         <div class="col-sm-8">
             <Tabs />
@@ -71,12 +99,17 @@
 
         <div class="col-sm-4 bg-secondary rounded shadow-sm">
             <Map />
-
+            <hr />
             <Tags tags={$community.meta.tags} linked={true} />
-
+            <hr />
             <MemberList />
         </div>
     </div>
-{:else}
-    <Loading />
+{:else if loadingState === 'loading'}
+    <Loading t="Searching the Nostrverse for your community" />
+{:else if loadingState === 'failed'}
+    <div class="alert alert-warning">
+        Failed to locate community
+    </div>
 {/if}
+</MainContent>

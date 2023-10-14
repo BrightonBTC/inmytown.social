@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Community, CommunitySubscriptions } from '$lib/community/community';
-    import { dateStringFull } from '$lib/formatDates';
+    import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import Tags from '$lib/topics/Tags.svelte';
     import { MeetupEvent, type EventMeta } from './event';
 
@@ -11,7 +11,7 @@
 
     $: setData(), eid
 
-    let communitySubs = new CommunitySubscriptions(ndk); 
+    let communitySubs = new CommunitySubscriptions($ndk); 
 
     function setData(){
         communitySubs.subscribeByID(eventData.community.eid, async (data) => {
@@ -20,7 +20,6 @@
     }
 </script>
 {#if eventData}
-
 
 <div class="card mb-3 shadow">
     <div class="card-header d-flex align-items-center">
@@ -31,6 +30,7 @@
         </div>
     </div>
     <div class="card-body">
+        {@html dateStatusString(eventData.starts, eventData.ends)}
         <p class="card-text">
             {eventData.brief}
         </p>

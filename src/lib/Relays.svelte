@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
     import type { NDKRelay } from '@nostr-dev-kit/ndk';
     import { NDKRelayStatus } from '@nostr-dev-kit/ndk';
     import { onMount } from 'svelte';
@@ -12,16 +12,16 @@
 
     onMount(() => {
         update();
-        ndk.pool.on('connect', () => {
+        $ndk.pool.on('connect', () => {
             update();
         });
-        ndk.pool.on('relay:connect', () => {
+        $ndk.pool.on('relay:connect', () => {
             update();
         });
-        ndk.pool.on('disconnect', () => {
+        $ndk.pool.on('disconnect', () => {
             update();
         });
-        ndk.pool.on('notice', relayNotice);
+        $ndk.pool.on('notice', relayNotice);
     });
 
     function relayNotice(relay: NDKRelay, notice: string) {
@@ -39,7 +39,7 @@
     }
 
     function update() {
-        relays = Array.from(ndk.pool.relays.values());
+        relays = Array.from($ndk.pool.relays.values());
     }
 
     let expandSubscriptionList: Record<string, boolean> = {};

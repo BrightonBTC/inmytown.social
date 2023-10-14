@@ -2,21 +2,21 @@
     import type { Community } from "./+page";
     export let data: Community;
     import { onMount } from "svelte";
-
-    import { userNpub } from "$lib/stores";
     import Loading from "$lib/Loading.svelte";
     import CommunityCard from "$lib/community/CommunityCard.svelte";
     import { goto } from "$app/navigation";
     import { myEvents } from "./stores";
     import EventRow from "./EventRow.svelte";
     import { type CommunityMeta, CommunitySubscriptions } from "$lib/community/community";
-    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    import { EventSubscriptions } from "$lib/event/event";
     import { login } from "$lib/user/user";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { addEvent } from "./stores";
+    import { loggedInUser } from "$lib/stores/user";
+    import MainContent from "$lib/MainContent.svelte";
 
-    let communitySubs = new CommunitySubscriptions(ndk)
-    let eventSubs = new EventSubscriptions(ndk)
+    let communitySubs = new CommunitySubscriptions($ndk)
+    let eventSubs = new EventSubscriptions($ndk)
 
     let community_id = data.community_id;
     let communityDetails: CommunityMeta;
@@ -27,9 +27,9 @@
     $: authorised ? fetchEvents(): null
 
     onMount(async () => {
-        await login(ndk);
+        await login($ndk);
 
-        if ($userNpub) {
+        if ($loggedInUser) {
             await fetchCommunity();
         }
         else{
@@ -40,7 +40,7 @@
     async function fetchCommunity() {
         communitySubs.subscribeByID(community_id, async (data) => {
             communityDetails = data;
-            authorised = communityDetails?.author === $userNpub;
+            authorised = communityDetails?.author === $loggedInUser?.npub;
         });
     }
 
@@ -51,7 +51,7 @@
     }
 
 </script>
-
+<MainContent>
 {#if authorised === true}
     {#if communityDetails}
         <div class="row">
@@ -75,7 +75,7 @@
                     </thead>
                     <tbody>
                         {#each $myEvents as event}
-                            <EventRow {community_id} {event} />
+                            <EventRow {event} />
                         {/each}
                     </tbody>
                 </table>
@@ -89,3 +89,4 @@
 {:else}
     <Loading />
 {/if}
+</MainContent>

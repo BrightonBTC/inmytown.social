@@ -1,6 +1,8 @@
 <script lang="ts">
     import { dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
+    import Tags from '$lib/topics/Tags.svelte';
+    import EventEndedAlert from './EventEndedAlert.svelte';
     import { MeetupEvent, type EventMeta } from './event';
     export let eventData: EventMeta | null;
 </script>
@@ -10,27 +12,25 @@
 </p>
 
 <div class="card mb-3 p-2 shadow">
-    <div class="row g-0">
-        <div class="col-md-8">
-            <div class="card-body">
-                <h4 class="card-title"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a></h4>
-                <p class="card-text text-muted">
-                    <i class="bi bi-geo-alt me-2 text-primary"></i> {eventData.city}, {eventData.country}
-                </p>
-                <p class="card-text">
-                    {eventData.brief}
-                </p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <a href="{MeetupEvent.url(eventData)}"><img
-                src={imgUrlOrDefault(eventData.image, 'event')}
-                alt="musig"
-                class="rounded event-image"
-            />
-            </a>
-            
-        </div>
+    <div class="card-body">
+        <EventEndedAlert starts={eventData.starts} ends={eventData.ends} />
+        <h4 class="card-title"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a></h4>
+        <p class="card-text text-muted">
+            <i class="bi bi-geo-alt me-2 text-primary"></i> {eventData.city}, {eventData.country}
+        </p>
+        <p class="card-text">
+            {eventData.brief}
+        </p>
+    </div>
+    <a href="{MeetupEvent.url(eventData)}">
+        <img
+            src={imgUrlOrDefault(eventData.image, 'event')}
+            alt="musig"
+            class="rounded event-image"
+        />
+    </a>
+    <div class="mt-2 p-2 pt-3 border-top">
+        <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
 {/if}
@@ -38,6 +38,6 @@
     .event-image {
         object-fit: cover;
         width: 100%;
-        height: 250px;
+        aspect-ratio: 16/9;
     }
 </style>

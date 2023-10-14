@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { suggestedRelays } from "$lib/stores";
-    import { relays, selectedRelays } from "$lib/stores";
+    import { suggestedRelays } from "$lib/stores/persistent";
+    import { relays, selectedRelays } from "$lib/stores/persistent";
 
     let newRelay: string;
     let inList = new Set(relays);

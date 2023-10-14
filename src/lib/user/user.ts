@@ -1,6 +1,8 @@
-import ndk from "$lib/ndk"
-import { profile, uHex, uNpub, userHasSigner, userHex, userNpub, userProfile, userStatus } from "$lib/stores"
-import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
+import { browser } from "$app/environment"
+import { npub } from "$lib/stores/persistent"
+import { loggedInUser } from "$lib/stores/user"
+import NDK, { NDKEvent, NDKSubscription, NDKUser, type NDKFilter, type NDKSubscriptionOptions, type NostrEvent, NDKKind } from "@nostr-dev-kit/ndk"
+import { get } from "svelte/store"
 
 export interface UserStatus{
     communities: string[]
@@ -9,35 +11,77 @@ export interface UserStatus{
     locationStatus?: LocationStatus
     country?: string
     city?: string
+    created?: number
 }
 
 export class MeetupUser extends NDKUser {
 
-    public status?: UserStatus;
+    public status?: UserStatus
 
     public constructor(opts: {}){
         super(opts)
-        this.ndk = ndk
     }
 
-    public async fetchStatus(){
-        let events = await this.ndk?.fetchEvents({
-            authors: [this.hexpubkey()],
-            kinds: [10037]
-        }, {})
-        if(events && events.size > 0){
-            this.status = MeetupUser.parseStatus([...events][0])
+    public hasProfile(){
+        return this.profile && Object.keys(this.profile).length > 0
+    }
+
+    public profileCreatedAt(){
+        return this.profile?.created_at || 0
+    }
+
+    public async fetchStatus(): Promise<void>{
+        try{
+            let events = await this.ndk?.fetchEvents({
+                authors: [this.hexpubkey()],
+                kinds: [10037]
+            }, {closeOnEose:true})
+            if(events && events.size > 0){
+                this.status = MeetupUser.parseStatus([...events][0])
+            }
+        }
+        catch(error){
+            console.log('An error occurred fetching status: '+error)
         }
     }
 
-    public async publishStatus(){
+    public async unfollow(
+        userToUnfollow: NDKUser,
+        currentFollowList?: Set<NDKUser>): Promise<boolean>{
+            if (!this.ndk) throw new Error("No NDK instance found");
 
+            this.ndk.assertSigner();
+            
+            try{
+                if (!currentFollowList) {
+                    currentFollowList = await this.follows();
+                }
+    
+                let reducedList = [...currentFollowList].filter((v) => v.npub !== userToUnfollow.npub)
+    
+                const event = new NDKEvent(this.ndk, {
+                    kind: NDKKind.Contacts,
+                } as NostrEvent);
+    
+                for (const follow of reducedList) {
+                    event.tag(follow);
+                }
+        
+                await event.publish();
+        
+                return Promise.resolve(true);
+            }
+            catch(error){
+                console.log('An error occurred trying to unfollow: '+error)
+            }
+            return Promise.resolve(false);
     }
 
     public static parseStatus(event: NDKEvent){
         let data: UserStatus = {
             communities: [],
-            interests: []
+            interests: [],
+            created: event.created_at
         };
         data.communities = event.tags.filter((t) => t[0] === 'e').map(a => a[1]) || [];
         if(event && event.content.trim().length > 0){
@@ -74,7 +118,7 @@ export class UserSubscriptions {
         this.ndk = ndk
     }
 
-    public async subscribeStatuses(filter: NDKFilter, cb: (data: NDKEvent) => void, opts?: NDKSubscriptionOptions){
+    public async subscribeStatuses(filter: NDKFilter, cb: (data: NDKEvent) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         filter.kinds = [10037]
         try {
             const sub = this.ndk.subscribe(
@@ -99,34 +143,49 @@ export class UserSubscriptions {
     }
 }
 
+export async function login(ndk: NDK): Promise<boolean> {
+    let res:boolean = false
+    let _loggedInUser = get(loggedInUser)
+    let _npub:string = get(npub)
 
-export async function login(ndk: NDK) {
-    if(!userHasSigner) return false;
-    let loggedin = false
-    if(!uNpub || !uHex || !profile){
-        await ndk.signer?.user().then(async (user) => {
-            if (!!user.npub) {
-                console.log(
-                    "Permission granted to read their public key:",
-                    user.npub
-                );
-                userNpub.set(user.npub)
-                userHex.set(user.hexpubkey())
-                let u = ndk.getUser({npub: user?.npub})
-                await u.fetchProfile();
-                userProfile.set(JSON.stringify(u.profile));
-                loggedin = true
-            }
-        });
+    if(browser && !window.nostr) res = false
+    else if(_loggedInUser) res = true
+    else if (_npub.length > 0){
+        setLoggedInUserByNpub(ndk, _npub)
+        res = true
     }
     else{
-        loggedin = true
+        try{
+            await ndk.signer?.user().then(async (user) => {
+                if (user.npub) {
+                    console.log(
+                        "Permission granted to read public key:",
+                        user.npub
+                    );
+                    npub.set(user.npub)
+                    setLoggedInUserByNpub(ndk, user.npub)
+                    res = true
+                }
+                else{
+                    res = false
+                }
+            })
+        }
+        catch(error){
+            console.log("An ERROR occured when subscribing to events", error);
+            res = false
+        }
     }
-    return loggedin;
+    return Promise.resolve(res)
+}
+function setLoggedInUserByNpub(ndk:NDK, npub: string){
+    let meetupUser = new MeetupUser({npub:npub})
+    meetupUser.ndk = ndk
+    loggedInUser.set(meetupUser)
 }
 
 
-export let fetchUser = async function (ndk: NDK, npub: string) {
+export let fetchUser = async function (ndk: NDK, npub: string): Promise<NDKUser | undefined> {
     let user: NDKUser | undefined;
     try {
         user = ndk?.getUser({
@@ -136,11 +195,11 @@ export let fetchUser = async function (ndk: NDK, npub: string) {
     } catch (error) {
         console.log("An ERROR occured when fetching user", error);
     } finally{
-        return user;
+        return Promise.resolve(user);
     }
 };
 
-export async function publishUserStatus(ndk:NDK, data: UserStatus) {
+export async function publishUserStatus(ndk:NDK, data: UserStatus): Promise<void> {
     try{
         const ndkEvent = new NDKEvent(ndk);
         ndkEvent.kind = 10037;
@@ -160,9 +219,7 @@ export async function publishUserStatus(ndk:NDK, data: UserStatus) {
             ndkEvent.tags.push(["locationStatus", data.locationStatus]);
         }
         await ndkEvent.publish();
-        userStatus.set(JSON.stringify(data));
-        return ndkEvent
     } catch (err) {
-        return "An ERROR occured publishing the community metadata:"+ err;
+        console.log("An ERROR occured publishing the community metadata:"+ err);
     } 
 }

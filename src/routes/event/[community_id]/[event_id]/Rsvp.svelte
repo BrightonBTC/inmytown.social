@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { hasSigner } from "$lib/stores";
+    import { loggedInUser } from "$lib/stores/user";
     import { meetupStore } from "./stores";
 
     export let hasRsvp:string;
@@ -12,7 +12,7 @@
     $: setUI(), hasRsvp
 
     async function rsvp(state: string){
-        if($hasSigner){
+        if($loggedInUser){
             $meetupStore.rsvp(state)
             overide = false;
         }
@@ -44,7 +44,7 @@
         overide = true
     }
 </script>
-<div class="mt-2 text-center bg-secondary rounded border p-2">
+<div class="mt-3 text-center bg-secondary rounded border p-2">
     {#if !hasRsvp || overide}
         <button type="button" class="btn btn-success" on:click={() => rsvp("accepted")}
             >I'm going!</button

@@ -1,7 +1,8 @@
 <script lang="ts">
     import About from "./About.svelte";
-    import Chat from "./Chat.svelte";
+    import Chat from "./chat_components/Chat.svelte";
     import Events from "./Events.svelte";
+    import { membersFetched } from "./stores/store.community";
 </script>
 <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
@@ -64,6 +65,8 @@
         role="tabpanel"
         aria-labelledby="chat-tab"
     >
+        {#if $membersFetched}
         <Chat />
+        {/if}
     </div>
 </div>

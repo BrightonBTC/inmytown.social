@@ -8,17 +8,11 @@
 </script>
 
 
-    {#if user}
+    {#if user?.profile}
     <a href="/user/{user.npub}" class="text-decoration-none">
-        {#await user.fetchProfile()}
-                {npub}
-        {:then value}
-            {user.profile?.displayName ||
+        {user.profile?.displayName ||
                     user.profile?.name ||
                     user.profile?.nip05 ||
                     npub}
-        {:catch error}
-            {npub}
-        {/await}
     </a>
     {/if}

@@ -2,7 +2,7 @@
     import LocationSearch from "./LocationSearch.svelte";
     import type { NDKFilter } from "@nostr-dev-kit/ndk";
     import { addCommunity, addEvent, addPerson, addTopic, communityList, eventList, personList, searchType, sortedCommunities, topics } from "./stores";
-    import { searchCity, searchCountry } from "$lib/stores";
+    import { searchCity, searchCountry } from "$lib/stores/persistent";
     import { onDestroy, onMount } from "svelte";
     import CommunityCardLarge from "$lib/community/CommunityCardLarge.svelte";
     import TypeSwitch from "./TypeSwitch.svelte";
@@ -12,14 +12,15 @@
     import TopicSelector from "./TopicSelector.svelte";
     import ResultsInfo from "./ResultsInfo.svelte";
     import UserList from "./UserList.svelte";
-    import ndk from "$lib/ndk";
+    import ndk from "$lib/stores/ndk";
     import { CommunitySubscriptions } from "$lib/community/community";
     import { EventSubscriptions } from "$lib/event/event";
     import { UserSubscriptions } from "$lib/user/user";
+    import MainContent from "$lib/MainContent.svelte";
 
-    let communitySubs = new CommunitySubscriptions(ndk);
-    let eventSubs = new EventSubscriptions(ndk);
-    let userSubs = new UserSubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
+    let eventSubs = new EventSubscriptions($ndk);
+    let userSubs = new UserSubscriptions($ndk);
 
     $: tag = data.tag;
 
@@ -86,8 +87,9 @@
         if(typeof window !== 'undefined') window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 </script>
+<MainContent>
 {#if $searchCity && $searchCountry}  
-    <div class="row me-1">
+    <div class="row">
         <div class="col-lg-3 pt-2 pb-4">
             <LocationSearch />
             <TypeSwitch />
@@ -117,3 +119,4 @@
 <p>Please set a location to get started:</p>
 <LocationSearch />
 {/if}
+</MainContent>

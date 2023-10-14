@@ -1,4 +1,9 @@
+<script>
 
+    import MainContent from "$lib/MainContent.svelte";
+
+</script>
+<MainContent>
 <h1>About</h1>
 <p>
     InMyTown uses the NOSTR protocol to allow users to create meetup communities
@@ -14,3 +19,4 @@
         target="_blank">github.com/BrightonBTC/inmytown.social</a
     >.
 </p>
+</MainContent>

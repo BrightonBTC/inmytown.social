@@ -5,12 +5,12 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import Location from "$lib/location/Location.svelte";
     import { MeetupEvent, type EventMeta } from './event';
     import { Community, CommunitySubscriptions } from '$lib/community/community';
-    import ndk from '$lib/ndk';
+    import ndk from '$lib/stores/ndk';
 
     export let eventData: EventMeta;
     export let eid:string | undefined = undefined
 
-    let communitySubs = new CommunitySubscriptions(ndk);
+    let communitySubs = new CommunitySubscriptions($ndk);
 
     $: setData(), eid
 
@@ -28,10 +28,10 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
 
 <div class="card mb-3 p-2 shadow">
     <div class="row g-0">
-        <div class="col-md-8">
+        <div class="col-lg-6">
             <div class="card-body">
                 <div class="d-flex align-items-center">
-                    <img src="{imgUrlOrDefault(eventData.community.image)}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
+                    <img src="{imgUrlOrDefault(eventData.community.image, 'event')}" alt="{eventData.community.title}" class="cImg rounded-circle m-2 " />
                     <div class="ps-2">
                         <h4 class="card-title mb-1"><a href="{MeetupEvent.url(eventData)}" class="text-decoration-none text-muted">{eventData.title}</a> </h4>
                         <small>An event by <a href="{Community.url(eventData.community)}">{eventData.community.title}</a></small>
@@ -46,8 +46,8 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
                 </p>
             </div>
         </div>
-        <div class="col-md-4 bg-secondary border rounded d-flex">
-            <a href="{MeetupEvent.url(eventData)}" class="d-flex ">
+        <div class="col-lg-6 bg-dark rounded d-flex align-items-center">
+            <a href="{MeetupEvent.url(eventData)}">
                 <img
                     src={imgUrlOrDefault(eventData.image, 'event')}
                     alt="musig"
@@ -72,6 +72,6 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     .event-image {
         object-fit: cover;
         width: 100%;
-        min-height: 300px;
+        aspect-ratio: 16/9;
     }
 </style>

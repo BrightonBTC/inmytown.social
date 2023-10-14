@@ -1,7 +1,5 @@
 <script lang="ts">
     import "bootstrap-icons/font/bootstrap-icons.css";
-    import type { URLVars } from "./+page";
-    export let data: URLVars;
 
     import { onDestroy, onMount } from "svelte";
 
@@ -12,52 +10,64 @@
         meetupStore,
     } from "./stores";
     
-    import ndk from "$lib/ndk";
-    import { userNpub } from "$lib/stores";
+    import ndk from "$lib/stores/ndk";
     import Loading from "$lib/Loading.svelte";
     import Attendees from "./Attendees.svelte";
     import Header from "./Header.svelte";
     import Details from "./Details.svelte";
-    import MainContent from "./MainContent.svelte";
     import CommunityWidget from "./CommunityWidget.svelte";
     import Rsvp from "./Rsvp.svelte";
 
-    import { EventSubscriptions, MeetupEvent } from "$lib/event/event";
+    import {  MeetupEvent } from "$lib/event/event";
     import AdminPanel from "./AdminPanel.svelte";
-    import { Community, CommunitySubscriptions } from "$lib/community/community";
-    let eventSubs = new EventSubscriptions(ndk);
-    let communitySubs = new CommunitySubscriptions(ndk);
+    import { loggedInUser } from "$lib/stores/user";
+    import MetaTags from "$lib/MetaTags.svelte";
+    import { Community } from "$lib/community/community";
+    import { page } from "$app/stores";
+    import EventEndedAlert from "$lib/event/EventEndedAlert.svelte";
+    import Content from "./Content.svelte";
+    import MainContent from "$lib/MainContent.svelte";
+
+    export let data;
+
+    let loadingState:loadingState = 'loading'
+    let fetchedMembers = false
 
     let hasRsvp: string;
-    let event_id = data.event_id;
-    let loaded:boolean = false;
 
     let loadingMessage:string = 'Fetching community...';
 
     attendeeStore.set([]);
-    community.set(new Community(ndk))
-    meetupStore.set(new MeetupEvent(ndk))
+    meetupStore.set(new MeetupEvent($ndk))
+    community.set(new Community($ndk))
 
     onMount(async () => {
-        communitySubs.subscribeByID(data.community_id, async (data) => {
-            $community.meta = data;
-            fetchEvent();
-        });
+        if(data.event){
+            $meetupStore.meta = data.event;
+            loadingState = 'success'
+        }
+        let success = await $community.fetchMeta($page.params.community_id)
+
+        if(success){
+            $community.meta = success
+            await $community.fetchMembers()
+            $community = $community
+            fetchedMembers = true
+            console.log('1',$community.meta)
+            let success2 = await $meetupStore.fetch(
+                $page.params.event_id, 
+                $community.meta.eid, 
+                $community.meta.authorhex
+            )
+            if(success2) loadingState = 'success'
+        } 
+        if(!data && !success) loadingState = 'failed'
+        subscribeRsvp();
     });
 
     onDestroy(() => {
         $meetupStore.destroy()
     })
-
-    async function fetchEvent(){
-        loadingMessage = 'Fetching event...'
-        eventSubs.subscribeOne($community.meta, event_id, async (data) => {
-            $meetupStore.meta = data;
-            // await $meetupStore.fetchCommunity()
-            loaded = true;
-            subscribeRsvp();
-        })
-    }
 
     function subscribeRsvp() {
         $meetupStore.fetchRSVPs(async (event) => {
@@ -65,34 +75,54 @@
                 .filter((x) => x[0] === "l" && x[2] === 'status')[0][1]
                 .toString();
             addAttendee(event.author.npub, rsvp);
-            if (event.author.npub == $userNpub) {
+            if (event.author.npub == $loggedInUser?.npub) {
                 hasRsvp = rsvp;
             }
         })
     }
 </script>
-{#if loaded}
-    <div class="row me-1">
-        <div class="col-sm-4 bg-secondary rounded p-0 border">
-            <h1 class="card-title text-light rounded-top mb-3 bg-secondary p-3">
-                {$meetupStore.meta.title}
-            </h1>
-            <div class="m-3">
-                <CommunityWidget />
-                <Details />
-                <Attendees />
+{#if data.event}
+<MetaTags 
+    title="{data.event.title} | Events InMyTown"
+    description={data.event.brief}
+    url="{MeetupEvent.url(data.event)}"
+    image={data.event.image}
+    type="event"
+/>
+{/if}
+<MainContent>
+{#if loadingState === 'success'}
+
+    {#if $loggedInUser && $loggedInUser.npub === $meetupStore.meta.author}
+    <AdminPanel data={$meetupStore.meta} />
+    {/if}
+    <EventEndedAlert starts={$meetupStore.meta.starts} ends={$meetupStore.meta.ends} />
+    <div class="row">
+        <div class="col-md-4">
+            <div class=" bg-secondary rounded p-0 border">
+                <h1 class="card-title text-light rounded-top mb-3 bg-secondary p-3">
+                    {$meetupStore.meta.title}
+                </h1>
+                <div class="m-3">
+                    <CommunityWidget />
+                    <Details />
+                    {#if fetchedMembers}
+                    <Attendees />
+                    {/if}
+                </div>
             </div>
         </div>
-        <div class="col-sm-8">
-            {#if $userNpub && $userNpub === $meetupStore.meta.author}
-                <AdminPanel data={$meetupStore.meta} />
-            {/if}
+        <div class="col-md-8">
             <Header />
             <Rsvp {hasRsvp} />
-            <MainContent />
+            <Content />
         </div>
     </div>
-{:else}
+{:else if loadingState === 'loading'}
     <Loading t={loadingMessage} />
+{:else if loadingState === 'failed'}
+    <div class="alert alert-warning">
+        Failed to locate meetup event
+    </div>
 {/if}
-
+</MainContent>

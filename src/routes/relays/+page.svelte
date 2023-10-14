@@ -1,6 +1,9 @@
 <script lang="ts">
+    import MainContent from "$lib/MainContent.svelte";
     import RelayAdder from "./RelayAdder.svelte";
 </script>
-<div class="row">
-    <RelayAdder />
-</div>
+<MainContent>
+    <div class="row">
+        <RelayAdder />
+    </div>
+</MainContent>
