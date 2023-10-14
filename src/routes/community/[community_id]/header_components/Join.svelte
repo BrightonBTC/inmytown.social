@@ -25,16 +25,14 @@
         if(!$loggedInUser?.status) return
         $loggedInUser?.status?.communities.push($community.meta.eid);
         publishUserStatus($ndk, $loggedInUser?.status)
-        //addMember($loggedInUser?.npub)
-        $community.users.members = $community.users.members.filter(x => x !== $loggedInUser?.npub)
+        $community.users.members = $community.users.members?.filter(x => x !== $loggedInUser?.npub)
         $community = $community
     }
     async function leaveNow(){
         if(!$loggedInUser?.status) return
         $loggedInUser?.status?.communities.splice($loggedInUser?.status?.communities?.findIndex(e => e[1] === $community.meta.eid),1);
         publishUserStatus($ndk, $loggedInUser.status)
-        //removeMember($loggedInUser?.npub)
-        $community.users.members.push($loggedInUser?.npub)
+        $community.users.members?.push($loggedInUser?.npub)
         $community = $community
     }
 </script>
