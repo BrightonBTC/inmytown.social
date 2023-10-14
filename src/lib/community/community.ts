@@ -227,82 +227,97 @@ export class Community {
         return '/community/'+community.eid
     }
 
-    public async fetchMembers(): Promise<void>{
-        if (this.meta.uid.length < 1){
-            return 
-        } 
-        await this.fetchBlockedUsers()
-        await this.fetchFollowers()
-        await this.fetchApprovedMembers()
+    public async fetchMembers(): Promise<void> {
+        if (this.meta.uid.length < 1) {
+            return;
+        }
+
+        try {
+            const [blockedUsers, followers, approvedMembers] = await Promise.all([
+                this.fetchBlockedUsers(),
+                this.fetchFollowers(),
+                this.fetchApprovedMembers(),
+            ]);
+
+            this.users.blocked = blockedUsers;
+
+            const filteredFollowers = followers.filter((member) => !blockedUsers.includes(member));
+
+            const filteredMembers = approvedMembers.filter((member) => !blockedUsers.includes(member));
+
+            this.users.members = filteredMembers.filter((member) => filteredFollowers?.includes(member));
+
+            this.users.stale = filteredMembers.filter((member) => !filteredFollowers?.includes(member));
+
+            this.users.followers = filteredFollowers.filter((follower) => !filteredMembers.includes(follower));
+
+        } catch (error) {
+            console.log('An error fetching members: ' + error);
+        }
     }
 
-    public async fetchFollowers(): Promise<void>{
-        try{
-            let response = await this.ndk.fetchEvents({
+    public async fetchFollowers(): Promise<string[]> {
+        try {
+            const response = await this.ndk.fetchEvents({
                 kinds: [10037],
-                "#e": [this.meta.eid]
-            })
-            this.users.followers = []
-            response.forEach((evt) => {
-                if(!this.users.followers?.includes(evt.author.npub) && !this.users.blocked?.includes(evt.author.npub)){
-                    this.users.followers?.push(evt.author.npub)
-                }
-            })
-        }
-        catch(error){
-            console.log('An error fetching follower list: '+error)
+                "#e": [this.meta.eid],
+            });
+
+            // Convert the Set to an array
+            const responseArray = [...response];
+
+            return responseArray.map((evt) => evt.author.npub);
+        } catch (error) {
+            console.log('An error fetching follower list: ' + error);
+            return [];
         }
     }
 
-    public async fetchApprovedMembers(): Promise<void>{
-        let response = await this.ndk.fetchEvents({
-            kinds:[30000],
-            "#d": [this.meta.uid],
-            authors: [this.meta.authorhex]
-        })
-        this.users.members = []
-        this.users.stale = []
-        if(response.size > 0){
-            let mostRecent = [...response].reduce(function(max, obj) {
-                if(obj.created_at && max.created_at){
-                    return obj.created_at > max.created_at? obj : max;
-                }
-                else return [...response][0]
+    public async fetchApprovedMembers(): Promise<string[]> {
+        try {
+            const response = await this.ndk.fetchEvents({
+                kinds: [30000],
+                "#d": [this.meta.uid],
+                authors: [this.meta.authorhex],
             });
-            let userkeys = mostRecent.tags.filter(k => k[0] === 'p')
-            userkeys.forEach((k) => {
-                let u = new NDKUser({hexpubkey: k[1]})
-                if(this.users.followers?.includes(u.npub)){
-                    this.users.members?.push(u.npub)
-                }
-                else{
-                    this.users.stale?.push(u.npub)
-                }
-            })
+
+            // Convert the Set to an array
+            const responseArray = [...response];
+
+            const mostRecent = responseArray.reduce((max, obj) =>
+                obj.created_at && max.created_at && obj.created_at > max.created_at ? obj : max,
+                responseArray[0]
+            );
+
+            const userkeys = mostRecent.tags.filter((k) => k[0] === 'p');
+
+            return userkeys.map((k) => new NDKUser({ hexpubkey: k[1] }).npub);
+        } catch (error) {
+            console.log('An error fetching approved members: ' + error);
+            return [];
         }
-        let m = new Set(this.users.members)
-        this.users.followers = this.users.followers?.filter( x => !m.has(x) );
     }
 
-    public async fetchBlockedUsers(): Promise<void>{
-        let response = await this.ndk.fetchEvents({
-            kinds:[30000],
-            "#d": [this.meta.uid+':blocked'],
-            authors: [this.meta.authorhex]
-        })
-        this.users.blocked = []
-        if(response.size > 0){
-            let mostRecent = [...response].reduce(function(max, obj) {
-                if(obj.created_at && max.created_at){
-                    return obj.created_at > max.created_at? obj : max;
-                }
-                else return [...response][0]
+    public async fetchBlockedUsers(): Promise<string[]> {
+        try {
+            const response = await this.ndk.fetchEvents({
+                kinds: [30000],
+                "#d": [this.meta.uid + ':blocked'],
+                authors: [this.meta.authorhex],
             });
-            let userkeys = mostRecent.tags.filter(k => k[0] === 'p')
-            userkeys.forEach((k) => {
-                let u = new NDKUser({hexpubkey: k[1]})
-                this.users.blocked?.push(u.npub)
-            })
+
+            // Convert the Set to an array
+            const responseArray = [...response];
+
+            const userkeys = responseArray.reduce<string[]>((blockedUsers, obj) => {
+                const tags = obj.tags.filter((tag) => tag[0] === 'p');
+                return [...blockedUsers, ...tags.map((tag) => tag[1])];
+            }, []);
+
+            return userkeys.map((k) => new NDKUser({ hexpubkey: k }).npub);
+        } catch (error) {
+            console.log('An error fetching blocked users: ' + error);
+            return [];
         }
     }
 
