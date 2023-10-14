@@ -41,7 +41,7 @@
 
 </script>
 
-<div id="map" class="mb-4 mt-5" />
+<div id="map" class="mb-4 mt-1" />
 
 <style>
     #map {

@@ -37,7 +37,6 @@
 
     function getComments() {
         chatCommentsStore.set([]);
-        console.log($chatFilter);
         let authors: string[] | undefined = undefined;
 
         if ($chatFilter == 1) {
@@ -63,7 +62,6 @@
                 });
             }
         }
-        console.log(authors);
 
         if ($chatStore) {
             let filter: NDKFilter = {
