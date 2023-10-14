@@ -53,7 +53,6 @@
             await $community.fetchMembers()
             $community = $community
             fetchedMembers = true
-            console.log('1',$community.meta)
             let success2 = await $meetupStore.fetch(
                 $page.params.event_id, 
                 $community.meta.eid, 

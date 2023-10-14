@@ -12,6 +12,10 @@
     import LinkedPfpIcon from "./user/LinkedPFPIcon.svelte";
     import { notifications } from "./stores/persistent";
 
+	function closeNav(){
+		document.querySelector('.navbar-collapse')?.classList.remove('show')
+	}
+
 	let currentPage:string;
 	$: currentPage = $page.url.pathname.split('/')[1] || 'home'
 
@@ -19,7 +23,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow p-2">
 	<div class="container-fluid">
-		<a class="navbar-brand" href="/">
+		<a class="navbar-brand" href="/" on:click={closeNav}>
 			<Logo height={40} />
 		</a>
 		<button
@@ -36,19 +40,19 @@
 		<div class="collapse navbar-collapse  justify-content-between" id="navbarSupportedContent">
 			<ul class="navbar-nav page-{currentPage}">
 				<li class="nav-item">
-					<a class="nav-link nav-home text-white px-2 mx-1" href="/"
+					<a class="nav-link nav-home text-white px-2 mx-1" href="/" on:click={closeNav}
 						><i class="bi bi-house text-success"></i> Home</a
 					>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link nav-discover text-white px-2 mx-1" href="/discover"
+					<a class="nav-link nav-discover text-white px-2 mx-1" href="/discover" on:click={closeNav}
 						><i class="bi bi-eye text-success"></i> Discover</a
 					>
 				</li>
 				<li class="nav-item">
 					<a
 						class="nav-link nav-about text-white px-2 mx-1"
-						href="/about"
+						href="/about" on:click={closeNav}
 						><i class="bi bi-info-circle text-success"  /> About</a
 					>
 				</li>
@@ -71,14 +75,9 @@
 							{/if}
 							<a
 								class="d-flex nav-link p-0"
-								href="/user/{$loggedInUser.npub}"
+								href="/user/{$loggedInUser.npub}" on:click={closeNav}
 							>
 							<LinkedPfpIcon cls="sm nav-uim align-self-center me-2 ms-2" npub={$loggedInUser.npub} /> 
-								<!-- <img
-									src={imgUrlOrDefault($loggedInUser.profile?.image, 'user')}
-									class="rounded-circle nav-uim align-self-center me-2 ms-2"
-									alt="{$loggedInUser.profile?.name} pfp"
-								/> -->
 							</a>
 						{:catch error}
 							<span style="color: red">{error.message}</span>
@@ -193,9 +192,7 @@
 	.navbar{
 		border-bottom: 2px solid #323d48 !important;
 	}
-	.navbar:hover{
-		opacity: 1;
-	}
+	
 	.u-icon{
 		position: relative;
 	}
@@ -210,4 +207,5 @@
 		overflow: hidden;
 		font-size: 60%;
 	}
+
 </style>

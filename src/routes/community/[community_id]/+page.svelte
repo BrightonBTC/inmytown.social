@@ -59,7 +59,6 @@
             }
             await $community.fetchMembers()
             membersFetched.set(true)
-            console.log($community.users)
             $community = $community
         }
         else loadingState = 'failed'
@@ -92,17 +91,19 @@
         <AdminPanel {community_id} />
     {/if}
     <Header />
-    <div class="row me-1">
-        <div class="col-sm-8">
+    <div class="row">
+        <div class="col-lg-8">
             <Tabs />
         </div>
 
-        <div class="col-sm-4 bg-secondary rounded shadow-sm">
-            <Map />
-            <hr />
-            <Tags tags={$community.meta.tags} linked={true} />
-            <hr />
-            <MemberList />
+        <div class="col-lg-4">
+            <div class="bg-secondary rounded shadow-sm p-3">
+                <MemberList />
+                <hr />
+                <Tags tags={$community.meta.tags} linked={true} />
+                <hr />
+                <Map />
+            </div>
         </div>
     </div>
 {:else if loadingState === 'loading'}
