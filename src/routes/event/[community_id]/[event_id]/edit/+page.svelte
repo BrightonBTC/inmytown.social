@@ -10,19 +10,18 @@
     import { login } from "$lib/user/user";
     import ndk from "$lib/stores/ndk";
     import Form from "./Form.svelte";
-    import { Community, CommunitySubscriptions } from "$lib/community/community";
+    import { Community } from "$lib/community/community";
     import { loggedInUser } from "$lib/stores/user";
     import DuplicateEvent from "./DuplicateEvent.svelte";
     import MainContent from "$lib/MainContent.svelte";
 
     let eid = data.event_id
-    let authorised: boolean;
+    let loaded:loadingState = 'loading'
     let eventMeta: EventMeta;
 
     let loadingMessage:string = 'Fetching community...';
 
     let eventSubs = new EventSubscriptions($ndk);
-    let communitySubs = new CommunitySubscriptions($ndk);
 
     $: eid, community.set(new Community($ndk)), meetupStore.set(new MeetupEvent($ndk))
     
@@ -33,19 +32,23 @@
             fetchCommunity()
         }
         else{
-            authorised = false;
+            loaded = 'denied'
         }
     });
 
     async function fetchCommunity(){
-        communitySubs.subscribeByID(data.community_id, async (data) => {
-            $community.meta = data;
+
+        const success = await $community.fetchMeta(data.community_id)
+        if(success){
+            $community = $community
             if(eid==='new' && $loggedInUser){
                 meetupStore.set(MeetupEvent.new($ndk, $community.meta))
-                authorised = true;
+                loaded = 'success'
             }
             else fetchMeetup();
-        });
+        }
+        else loaded = 'failed'
+
     }
 
     async function fetchMeetup() {
@@ -53,18 +56,18 @@
         eventSubs.subscribeOne($community.meta, eid, async (data) => {
             eventMeta = data
             if (eventMeta.author === $loggedInUser?.npub) {
-                authorised = true;
+                loaded = 'success'
                 $meetupStore.meta = eventMeta
                 
             } else {
-                authorised = false;
+                loaded = 'denied'
             }
         })
     }
 
 </script>
 <MainContent>
-{#if authorised === true}
+{#if loaded === 'success'}
     <div class="row">
         <div class="col-sm-4 border-end border-top bg-secondary rounded">
             <h1>Edit event</h1>
@@ -80,9 +83,13 @@
             <Form />
         </div>
     </div>
-{:else if authorised === false}
+{:else if loaded === 'denied'}
     <div class="alert alert-warning">
         <strong>Warning!</strong> You are not authorised to modify this event!
+    </div>
+{:else if loaded === 'failed'}
+    <div class="alert alert-danger">
+        <strong>Something went wrong!</strong> Unable to fetch community!
     </div>
 {:else}
     <Loading t={loadingMessage} />

@@ -1,20 +1,26 @@
 <script lang="ts">
-    import { type CommunityMeta, CommunitySubscriptions, Community } from "$lib/community/community";
+    import LoadingMini from "$lib/LoadingMini.svelte";
+import { type CommunityMeta, Community } from "$lib/community/community";
     import { imgUrlOrDefault } from "$lib/helpers";
     import Location from "$lib/location/Location.svelte";
     import ndk from "$lib/stores/ndk";
 
     export let id: string;
 
-    let communityDetails: CommunityMeta;
+    let communityDetails: CommunityMeta | null;
+    let loaded:loadingState = 'loading'
 
-    let communitySubs = new CommunitySubscriptions($ndk)
-    communitySubs.subscribeByID(id, async (data) => {
-        communityDetails = data;
-    });
+    async function fetch() {
+        const community = new Community($ndk)
+        communityDetails = await community.fetchMeta(id)
+        if(communityDetails) loaded = 'success'
+        else loaded = 'failed'
+    }
+
+    fetch()
 </script>
 
-{#if communityDetails}
+{#if loaded === 'success' && communityDetails}
     <li class="list-group-item d-flex align-items-center">
         <img
             src={imgUrlOrDefault(communityDetails.image)}
@@ -27,7 +33,7 @@
         </div>
         
     </li>
-{:else}
+{:else if loaded==='failed'}
     <li class="list-group-item list-group-item-warning d-flex">
         <i class="bi bi-exclamation-triangle me-3" />
         <small>
@@ -35,6 +41,10 @@
             relay set to retrieve it.
             <br /> <small class="text-muted">{id}</small>
         </small>
+    </li>
+{:else}
+    <li class="list-group-item d-flex align-items-center">
+        <LoadingMini />
     </li>
 {/if}
 <style>

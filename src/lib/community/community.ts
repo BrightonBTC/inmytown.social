@@ -68,9 +68,13 @@ export class Community {
         } 
         let community = await this.ndk.fetchEvent(id)
         if(!community) return null
-        let evt = await this.ndk.fetchEvents({ '#e': [id], kinds: [30037], authors: [community.author.hexpubkey()] });
-        if (evt.size > 0 && [...evt][0].created_at as number > this.meta.updated) {
-            this.meta = Community.parseNostrEvent([...evt][0])
+        let events = await this.ndk.fetchEvents({ '#e': [id], kinds: [30037], authors: [community.author.hexpubkey()] });
+        if (events.size > 0 ) {
+            const mostRecent = [...events].reduce((max, obj) =>
+                obj.created_at && max.created_at && obj.created_at > max.created_at ? obj : max,
+                [...events][0]
+            );
+            this.meta = Community.parseNostrEvent(mostRecent)
             return this.meta
         }
         return null
@@ -400,30 +404,30 @@ export class CommunitySubscriptions {
         this.ndk = ndk
     }
 
-    public async subscribeByID(community_id: string, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
-        let community: CommunityMeta = {
-            ...CommunityMetaDefaults,
-            eid: community_id
-        };
-        try {
-            let communitySub = this.ndk.subscribe(
-                {
-                    kinds: [1037],
-                    "ids": [community_id],
-                },
-                opts
-            );
-            if(opts && opts.closeOnEose === false){
-                this.subscriptions.push(communitySub)
-            }
-            communitySub.on("event", (event: NDKEvent) =>  {
-                community.created = event.created_at ? event.created_at : 0;
-                this.subscribeMeta(community, cb)
-            });
-        } catch (err) {
-            console.log("An ERROR occured when subscribing to community", err);
-        } 
-    }
+    // public async subscribeByID(community_id: string, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
+    //     let community: CommunityMeta = {
+    //         ...CommunityMetaDefaults,
+    //         eid: community_id
+    //     };
+    //     try {
+    //         let communitySub = this.ndk.subscribe(
+    //             {
+    //                 kinds: [1037],
+    //                 "ids": [community_id],
+    //             },
+    //             opts
+    //         );
+    //         if(opts && opts.closeOnEose === false){
+    //             this.subscriptions.push(communitySub)
+    //         }
+    //         communitySub.on("event", (event: NDKEvent) =>  {
+    //             community.created = event.created_at ? event.created_at : 0;
+    //             this.subscribeMeta(community, cb)
+    //         });
+    //     } catch (err) {
+    //         console.log("An ERROR occured when subscribing to community", err);
+    //     } 
+    // }
 
     public async subscribe(filter: NDKFilter, cb: (data: CommunityMeta) => void, opts?: NDKSubscriptionOptions): Promise<void>{
         filter.kinds = [1037]

@@ -6,6 +6,6 @@ export const load: PageLoad = ({ params }) => {
     }
 }
 
-export interface Community{
+export interface CommunityID{
     community_id: string
 }

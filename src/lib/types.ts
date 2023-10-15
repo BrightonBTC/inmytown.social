@@ -8,7 +8,7 @@ type City = {
     lng: string;
 }
 
-type loadingState = 'success' | 'loading' | 'failed'
+type loadingState = 'success' | 'loading' | 'failed' | 'denied'
 
 type userAccessLevel = 'pending' | 'accepted' | 'rejected'
 type userAccessActions = 'accept' | 'block' | 'unblock' | 'clear'

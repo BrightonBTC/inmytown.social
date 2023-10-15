@@ -37,7 +37,11 @@ export class MeetupUser extends NDKUser {
                 kinds: [10037]
             }, {closeOnEose:true})
             if(events && events.size > 0){
-                this.status = MeetupUser.parseStatus([...events][0])
+                const mostRecent = [...events].reduce((max, obj) =>
+                    obj.created_at && max.created_at && obj.created_at > max.created_at ? obj : max,
+                    [...events][0]
+                );
+                this.status = MeetupUser.parseStatus(mostRecent)
             }
         }
         catch(error){

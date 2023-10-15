@@ -92,17 +92,17 @@ export class MeetupEvent {
         return false
     }
 
-    public async fetchCommunity(): Promise<void>{
-        try{
-            const sub = new CommunitySubscriptions(this.ndk);
-            await sub.subscribeByID(this.meta.community.eid, (data) => {
-                this.meta.community = data
-            })
-        }
-        catch(error){
-            console.log('An error occurred fetching community: '+error)
-        }
-    }
+    // public async fetchCommunity(): Promise<void>{
+    //     try{
+    //         const sub = new CommunitySubscriptions(this.ndk);
+    //         await sub.subscribeByID(this.meta.community.eid, (data) => {
+    //             this.meta.community = data
+    //         })
+    //     }
+    //     catch(error){
+    //         console.log('An error occurred fetching community: '+error)
+    //     }
+    // }
 
     public static new(ndk: NDK, community: CommunityMeta){
         let meta = {

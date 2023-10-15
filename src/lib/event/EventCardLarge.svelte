@@ -4,24 +4,32 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import Tags from '$lib/topics/Tags.svelte';
     import Location from "$lib/location/Location.svelte";
     import { MeetupEvent, type EventMeta } from './event';
-    import { Community, CommunitySubscriptions } from '$lib/community/community';
+    import { Community } from '$lib/community/community';
     import ndk from '$lib/stores/ndk';
+    import Loading from '$lib/Loading.svelte';
 
     export let eventData: EventMeta;
     export let eid:string | undefined = undefined
 
-    let communitySubs = new CommunitySubscriptions($ndk);
+    let loaded:loadingState = 'loading'
 
     $: setData(), eid
 
-    function setData(){
-        communitySubs.subscribeByID(eventData.community.eid, async (data) => {
-            if(data.eid === eventData.community.eid) eventData.community = data;
-        })
+    async function setData(){ 
+        const community = new Community($ndk)
+        const communityDetails = await community.fetchMeta(eventData.community.eid)
+        if(communityDetails){
+            eventData.community = communityDetails
+            loaded = 'success'
+        }
+        else{
+            loaded = 'failed'
+        }
+
     }
 
 </script>
-{#if eventData}
+{#if eventData && loaded === 'success'}
 <p class="text-muted mb-2 mt-4">
     <small>{@html dateStatusString(eventData.starts, eventData.ends)} {dateStringFull(eventData.starts)} </small>
 </p>
@@ -61,6 +69,12 @@ import { dateStatusString, dateStringFull } from '$lib/formatDates';
         <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
+{:else if loaded === 'loading'}
+    <Loading />
+{:else if loaded === 'failed'}
+    <div class="alert alert-danger">
+        <strong>Warning!</strong> Something went wrong fetching this community!
+    </div>
 {/if}
 
 <style>

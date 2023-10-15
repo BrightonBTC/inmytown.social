@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { Community, CommunitySubscriptions } from '$lib/community/community';
+    import Loading from '$lib/Loading.svelte';
+    import { Community } from '$lib/community/community';
     import { dateStatusString, dateStringFull } from '$lib/formatDates';
     import { imgUrlOrDefault } from '$lib/helpers';
     import ndk from '$lib/stores/ndk';
@@ -9,17 +10,24 @@
     export let eventData: EventMeta;
     export let eid:string | undefined = undefined
 
+    let loaded:loadingState = 'loading'
+
     $: setData(), eid
 
-    let communitySubs = new CommunitySubscriptions($ndk); 
+    async function setData(){ 
+        const community = new Community($ndk)
+        const communityDetails = await community.fetchMeta(eventData.community.eid)
+        if(communityDetails){
+            eventData.community = communityDetails
+            loaded = 'success'
+        }
+        else{
+            loaded = 'failed'
+        }
 
-    function setData(){
-        communitySubs.subscribeByID(eventData.community.eid, async (data) => {
-            if(data.eid === eventData.community.eid) eventData.community = data;
-        })
     }
 </script>
-{#if eventData}
+{#if eventData && loaded === 'success'}
 
 <div class="card mb-3 shadow">
     <div class="card-header d-flex align-items-center">
@@ -58,6 +66,12 @@
         <Tags tags={eventData.tags} linked={true} />
     </div>
 </div>
+{:else if loaded === 'loading'}
+    <Loading />
+{:else if loaded === 'failed'}
+    <div class="alert alert-danger">
+        <strong>Warning!</strong> Something went wrong fetching this community!
+    </div>
 {/if}
 <style>
     .cImg{
