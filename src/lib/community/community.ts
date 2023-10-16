@@ -1,4 +1,3 @@
-import { MeetupUser } from "$lib/user/user"
 import { NDKEvent, NDKSubscription, type NDKFilter, type NDKSubscriptionOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import type NDK from "@nostr-dev-kit/ndk"
 import Geohash from "latlon-geohash"
